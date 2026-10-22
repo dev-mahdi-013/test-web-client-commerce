@@ -1,0 +1,136 @@
+@import "tailwindcss";
+@import "@heroui/styles";
+@import "./fonts.css";
+
+@theme {
+  --font-sans: "Peyda", ui-sans-serif, system-ui, sans-serif;
+}
+
+:root {
+  --background: #f8f8f8;
+  --accent: #0485f7;
+  --accent-foreground: #ffffff;
+  --focus: var(--accent);
+  --link: var(--accent);
+
+  /* HodHod design tokens */
+  --panel: #f5f5f5;
+  --panel-cards: #efeff0;
+  --panel-border: #e2e2e3;
+  --field-muted: #ececec;
+  --icon-button: #ebebec;
+  --icon-button-hover: #e0e0e2;
+  --heading-bullet: #d9d9d9;
+  --card-action: #213a5c;
+  --card-expiry-alert: #ef4444;
+  --card-active: linear-gradient(150deg, #50e24b 0%, #2fcc51 30%, #11a452 65%, #068a4c 100%);
+  --card-expired: linear-gradient(155deg, #e2e2e2 0%, #c9c9c9 55%, #adadad 100%);
+
+  /* Assembly status pills */
+  --status-running: #ff8000;
+  --status-running-bg: #fff0e0;
+  --status-published: #ffcc00;
+  --status-published-bg: #fff8dc;
+  --status-pending: #9a9a9a;
+  --status-pending-bg: #eeeeee;
+  --status-finished: #17c964;
+  --status-finished-bg: #e7f8ef;
+  --status-archived: #6f6f6f;
+  --status-archived-bg: #ededed;
+  --status-canceled: #ff5c5c;
+  --status-canceled-bg: #ffecec;
+
+  /* Voters ring chart */
+  --chart-strong: #0485f7;
+  --chart-mid: #4E9FFF;
+  --chart-soft: #8DC1FF;
+  --chart-track: #e4e4e4;
+  --box-shadow:
+    0 0 1px 0 rgb(0 0 0 / 0.06), 0 2px 4px 0 rgb(0 0 0 / 0.06), 0 1px 2px 0 rgb(0 0 0 / 0.06);
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@utility animate-fade-in {
+  animation: fade-in 150ms ease-out;
+}
+
+/* HeroUI places a "left" drawer at flex-start (the right edge under RTL) but slides it with a physical
+   -100% translate; flip the slide so it enters and leaves from the edge it sits on. */
+@keyframes drawer-enter-from-right {
+  from {
+    translate: 100% 0;
+  }
+}
+
+[dir="rtl"] .drawer__content--left[data-entering="true"] .drawer__dialog,
+[dir="rtl"] .drawer__content--left[data-exiting="true"] .drawer__dialog {
+  translate: 100% 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [dir="rtl"] .drawer__content--left .drawer__dialog {
+    animation: drawer-enter-from-right 250ms cubic-bezier(0.32, 0.72, 0, 1);
+  }
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Latin / English text starts on the left; Persian stays RTL. */
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="hidden"]),
+  textarea {
+    unicode-bidi: plaintext;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    direction: rtl;
+    text-align: right;
+    unicode-bidi: isolate;
+  }
+}
+
+/* Typed Latin/digits start on the left; the empty field keeps the placeholder on the right. */
+@utility input-ltr-type {
+  direction: ltr;
+  unicode-bidi: isolate;
+
+  &:placeholder-shown {
+    text-align: right;
+  }
+
+  &:not(:placeholder-shown) {
+    text-align: left;
+  }
+
+  &::placeholder {
+    direction: rtl;
+    text-align: right;
+    unicode-bidi: isolate;
+  }
+}
+
+/* The whole close control closes the dialog, not only the icon glyph. */
+.close-button::before {
+  content: "";
+  position: absolute;
+  inset: -8px;
+}
+
+.close-button > * {
+  pointer-events: none;
+}
