@@ -54,7 +54,7 @@ function RoleCopy({ role, subtitle, large, singleLine }: RoleCopyProps) {
       )}
     >
       <span className={titleClass}>{roleTitle(role)}</span>
-      {subtitle ? <span className={cityClass}>{subtitle}</span> : null}
+      {/* {subtitle ? <span className={cityClass}>{subtitle}</span> : null} */}
     </span>
   );
 }
