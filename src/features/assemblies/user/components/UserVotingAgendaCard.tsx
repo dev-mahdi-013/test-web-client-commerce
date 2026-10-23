@@ -35,6 +35,7 @@ function SelectionDot({ selected }: { selected: boolean }) {
 export function UserVotingAgendaCard({ agenda, isPending, onConfirm }: UserVotingAgendaCardProps) {
   const isPerson = agenda.kind === "person";
   const maxSelections = agenda.minSelections;
+  const isVoteDisabled = isPending || agenda.hasVoted === true;
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const rows = agenda.candidates.map((candidate, index) => ({
@@ -43,6 +44,7 @@ export function UserVotingAgendaCard({ agenda, isPending, onConfirm }: UserVotin
   }));
 
   const toggle = (candidateId: string) => {
+    if (isVoteDisabled) return;
     if (selectedIds.includes(candidateId)) {
       setSelectedIds((current) => current.filter((id) => id !== candidateId));
       return;
@@ -55,6 +57,7 @@ export function UserVotingAgendaCard({ agenda, isPending, onConfirm }: UserVotin
   };
 
   const handleConfirm = () => {
+    if (isVoteDisabled) return;
     if (selectedIds.length === 0) {
       toast.danger("حداقل یک گزینه را انتخاب کنید");
       return;
@@ -110,7 +113,11 @@ export function UserVotingAgendaCard({ agenda, isPending, onConfirm }: UserVotin
                     <Table.Cell className={`${cellClassName} font-bold`}>
                       <button
                         aria-pressed={selected}
-                        className="flex cursor-pointer items-center gap-2.5 text-start"
+                        className={cn(
+                          "flex items-center gap-2.5 text-start",
+                          isVoteDisabled ? "cursor-not-allowed" : "cursor-pointer",
+                        )}
+                        disabled={isVoteDisabled}
                         type="button"
                         onClick={() => toggle(candidate.id)}
                       >
@@ -124,7 +131,11 @@ export function UserVotingAgendaCard({ agenda, isPending, onConfirm }: UserVotin
                       <Table.Cell className={cellClassName}>
                         <button
                           aria-pressed={selected}
-                          className="w-full cursor-pointer text-start"
+                          className={cn(
+                            "w-full text-start",
+                            isVoteDisabled ? "cursor-not-allowed" : "cursor-pointer",
+                          )}
+                          disabled={isVoteDisabled}
                           type="button"
                           onClick={() => toggle(candidate.id)}
                         >
@@ -143,6 +154,7 @@ export function UserVotingAgendaCard({ agenda, isPending, onConfirm }: UserVotin
       <div className="mt-5 flex shrink-0 justify-start sm:mt-7">
         <Button
           className="h-10 min-w-[148px] rounded-full px-8 text-sm font-medium"
+          isDisabled={isVoteDisabled}
           isPending={isPending}
           onPress={handleConfirm}
         >

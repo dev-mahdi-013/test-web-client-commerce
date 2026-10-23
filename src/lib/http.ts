@@ -1,4 +1,5 @@
 import axios, { type Method } from "axios";
+import { recordBackendResponse } from "./backend-storage";
 
 export class ApiError extends Error {
   readonly status: number;
@@ -82,6 +83,7 @@ export function createHttpClient({ baseUrl, authorization, unwrapEnvelope, trans
   ) {
     try {
       const { data, status } = await instance.request<unknown>({ url: path, method, data: body, params, headers, signal });
+      recordBackendResponse(path, status, data);
 
       if (unwrapEnvelope && data && typeof data === "object") {
         if ("success" in data && !data.success) throw toApiError(status, data);

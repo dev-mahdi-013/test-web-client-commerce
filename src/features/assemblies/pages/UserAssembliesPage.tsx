@@ -23,8 +23,14 @@ export function UserAssembliesPage() {
   const startIndex = (currentPage - 1) * (assemblies.data?.pageSize ?? ASSEMBLIES_PAGE_SIZE) + 1;
 
   const card = useMemo(
-    () => userMembershipCard(profile.data?.fullName ?? "—"),
-    [profile.data?.fullName],
+    () =>
+      userMembershipCard(
+        profile.data?.fullName ?? "—",
+        profile.data?.phone ?? "",
+        profile.data?.roles ?? [],
+        profile.data?.activeRoleId ?? null,
+      ),
+    [profile.data?.activeRoleId, profile.data?.fullName, profile.data?.phone, profile.data?.roles],
   );
 
   return (

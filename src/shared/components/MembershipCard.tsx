@@ -17,18 +17,26 @@ type CardFieldProps = {
   label: string;
   value: ReactNode;
   className?: string;
+  labelClassName?: string;
   /** When true, forces LTR only while truncated so ellipsis sits on the right. */
   ltrEllipsisWhenTruncated?: boolean;
   /** Re-measure truncation when this identity changes (e.g. card number). */
   contentKey?: string;
 };
 
-export function CardField({ label, value, className, ltrEllipsisWhenTruncated = false, contentKey }: CardFieldProps) {
+export function CardField({
+  label,
+  value,
+  className,
+  labelClassName,
+  ltrEllipsisWhenTruncated = false,
+  contentKey,
+}: CardFieldProps) {
   const truncation = useLtrEllipsisWhenTruncated(ltrEllipsisWhenTruncated, contentKey);
 
   return (
     <div className={cn("", className)}>
-      <p className="text-[11px] text-(--card-label)">{label}</p>
+      <p className={cn("text-[11px] text-(--card-label)", labelClassName)}>{label}</p>
       <p ref={truncation.ref} className="mt-0.5 truncate text-[13px] font-bold" dir={truncation.dir}>
         {value}
       </p>
@@ -72,7 +80,13 @@ export function MembershipCard({ card, footer, children, dimWhenExpired = true, 
 
         <CardField label={isLegal ? "نام شرکت" : "نام"} value={card.holderName} />
         {isLegal ? (
-          <CardField label="کد ملی مدیر عامل" value={<span dir="ltr">{card.managerNationalId ?? "—"}</span>} />
+          <CardField
+            contentKey={card.managerNationalId ?? undefined}
+            label="کد ملی مدیر عامل"
+            labelClassName="whitespace-nowrap text-[10px]"
+            ltrEllipsisWhenTruncated
+            value={<span dir="ltr">{card.managerNationalId ?? "—"}</span>}
+          />
         ) : (
           <span />
         )}

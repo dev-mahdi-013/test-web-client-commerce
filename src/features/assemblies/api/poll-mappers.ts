@@ -119,6 +119,7 @@ export type ApiSurvey = {
   _id: string;
   pollId?: string;
   title: string;
+  voted?: { _id?: string } | null;
   maxSelection?: number;
   eligibilityScope?: number;
   orderItemSource?: { type?: string };
@@ -177,6 +178,7 @@ function toCandidate(item: ApiSurveyItem): AgendaCandidate {
       id: item.data._id,
       name: item.data.memberName,
       cardNo: item.data.memberCard?.cardNum ?? null,
+      memberId: item.data.memberId,
       voterCount: item.data.votersCount ?? 0,
       voteCount: item.data.votesCount ?? 0,
     };
@@ -195,6 +197,7 @@ export function toAgenda(survey: ApiSurvey): AssemblyAgenda {
   return {
     id: survey._id,
     title: survey.title,
+    hasVoted: Boolean(survey.voted?._id),
     kind,
     unit: toAssemblyUnit(survey.eligibilityScope),
     minSelections: survey.maxSelection ?? 1,

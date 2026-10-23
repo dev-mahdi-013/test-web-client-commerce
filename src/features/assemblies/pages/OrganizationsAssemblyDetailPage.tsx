@@ -97,6 +97,9 @@ export function OrganizationsAssemblyDetailPage() {
     detail.status === "pending" || detail.status === "canceled" || detail.status === "published";
   const canEditAgendaFields = canManageAgenda;
 
+
+  console.log(detail,'dsads')
+
   return (
     <div className="flex flex-col gap-6 rounded-3xl bg-(--panel-cards) px-4 py-5 sm:px-6 xl:px-10">
       <section aria-label="اطلاعات عمومی مجمع" className="flex flex-col gap-4">
@@ -119,6 +122,7 @@ export function OrganizationsAssemblyDetailPage() {
           <>
             <h3 className="text-right text-sm font-medium text-foreground">افزودن دستور</h3>
             <AddAgendaForm
+              associationId={detail.associationId}
               isPending={addAgenda.isPending}
               onSubmit={(input) => {
                 addAgenda.mutate(input);
@@ -130,6 +134,7 @@ export function OrganizationsAssemblyDetailPage() {
           {detail.agendas.map((agenda) => (
             <OrganizationsAgendaCard
               key={agenda.id}
+              associationId={detail.associationId}
               agenda={agenda}
               canEditFields={canEditAgendaFields}
               isDeleteBusy={removeAgenda.isPending || removeCandidate.isPending}
@@ -145,8 +150,8 @@ export function OrganizationsAssemblyDetailPage() {
                 removeAgenda.mutate(agendaId, { onSuccess })
               }
               onUpdateAgenda={(agendaId, input) => updateAgenda.mutate({ agendaId, input })}
-              onAddCandidate={(agendaId, name, onSuccess) =>
-                addCandidate.mutate({ agendaId, name }, { onSuccess })
+              onAddCandidate={(agendaId, candidate, onSuccess) =>
+                addCandidate.mutate({ agendaId, candidate }, { onSuccess })
               }
               onRemoveCandidate={(agendaId, candidateId, onSuccess) =>
                 removeCandidate.mutate({ agendaId, candidateId }, { onSuccess })

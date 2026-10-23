@@ -1,12 +1,13 @@
 import { toast } from "@heroui/react";
 import { agendaKindLabel, assemblyUnitOptions } from "../../config";
-import type { AssemblyAgenda, UpdateAgendaInput } from "../../types";
+import type { AgendaCandidateInput, AssemblyAgenda, UpdateAgendaInput } from "../../types";
 import { AgendaCandidatesTable } from "../../components/AgendaCandidatesTable";
 import { AssemblyDetailField } from "../../components/AssemblyDetailField";
 import { DeleteConfirmPopoverButton } from "../../components/DeleteConfirmPopoverButton";
 import { AgendaInlineEditField } from "./AgendaInlineEditField";
 
 type OrganizationsAgendaCardProps = {
+  associationId?: string | null;
   agenda: AssemblyAgenda;
   isEditable?: boolean;
   canEditFields?: boolean;
@@ -15,13 +16,14 @@ type OrganizationsAgendaCardProps = {
   removingCandidateId?: string | null;
   isAddingCandidate?: boolean;
   onUpdateAgenda?: (agendaId: string, input: UpdateAgendaInput) => void;
-  onAddCandidate?: (agendaId: string, name: string, onSuccess: () => void) => void;
+  onAddCandidate?: (agendaId: string, candidate: AgendaCandidateInput, onSuccess: () => void) => void;
   onRemoveAgenda?: (agendaId: string, onSuccess: () => void) => void;
   onRemoveCandidate?: (agendaId: string, candidateId: string, onSuccess: () => void) => void;
 };
 
 /** Agenda card for organizations role — same layout as AgendaCard, with delete actions. */
 export function OrganizationsAgendaCard({
+  associationId,
   agenda,
   isEditable = false,
   canEditFields = false,
@@ -35,8 +37,8 @@ export function OrganizationsAgendaCard({
   onRemoveCandidate,
 }: OrganizationsAgendaCardProps) {
   return (
-    <article className="relative flex flex-col rounded-[20px] bg-white p-4 shadow-(--box-shadow) sm:p-6 sm:ps-8">
-      <span aria-hidden className="absolute inset-y-0 start-0 w-1.5 bg-accent" />
+    <article className="relative flex flex-col overflow-hidden rounded-[20px] bg-white p-4 shadow-(--box-shadow) sm:p-6 sm:ps-8">
+      <span aria-hidden className="absolute inset-y-0 start-0 w-[10px] bg-accent" />
 
       <div className="relative mb-4">
         {isEditable && onRemoveAgenda && (
@@ -113,6 +115,7 @@ export function OrganizationsAgendaCard({
       </div>
 
       <AgendaCandidatesTable
+        associationId={associationId}
         agenda={agenda}
         isAddingCandidate={isAddingCandidate}
         isDeleteBusy={isDeleteBusy}
@@ -120,7 +123,7 @@ export function OrganizationsAgendaCard({
         removingCandidateId={removingCandidateId}
         onAddCandidate={
           isEditable && onAddCandidate
-            ? (name, onSuccess) => onAddCandidate(agenda.id, name, onSuccess)
+            ? (candidate, onSuccess) => onAddCandidate(agenda.id, candidate, onSuccess)
             : undefined
         }
         onRemoveCandidate={

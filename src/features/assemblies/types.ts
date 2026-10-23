@@ -40,6 +40,7 @@ export type AgendaCandidate = {
   id: string;
   name: string;
   cardNo: string | null;
+  memberId?: string;
   voterCount: number;
   voteCount: number;
 };
@@ -47,6 +48,7 @@ export type AgendaCandidate = {
 export type AssemblyAgenda = {
   id: string;
   title: string;
+  hasVoted?: boolean;
   kind: AgendaKind;
   unit: AssemblyUnit;
   minSelections: number;
@@ -85,13 +87,12 @@ export type CreateAgendaInput = {
   maxSelections: number;
   kind: AgendaKind;
   unit: AssemblyUnit;
-  candidates: Array<{
-    name: string;
-    cardNo?: string | null;
-    memberId?: string;
-    memberRoleId?: string;
-  }>;
+  candidates: AgendaCandidateInput[];
 };
+
+export type AgendaCandidateInput =
+  | { name: string; cardNo?: string | null; memberId: string; memberRoleId: string }
+  | { name: string; cardNo?: string | null; memberId?: undefined; memberRoleId?: undefined };
 
 export type UpdateAgendaInput = {
   title?: string;
@@ -101,5 +102,5 @@ export type UpdateAgendaInput = {
 
 export type AddAgendaCandidateInput = {
   agendaId: string;
-  name: string;
+  candidate: AgendaCandidateInput;
 };

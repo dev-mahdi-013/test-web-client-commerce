@@ -1,6 +1,5 @@
 import type { Profile, UserRole } from "./types";
 
-/** Title of the card-issuance role, as shown in the role switcher. */
 export const CARD_ISSUANCE_ROLE_TITLE = "واحد صدور کارت";
 
 const BackendRoleType = {
@@ -33,19 +32,10 @@ const ROLE_TYPE_BY_BACKEND_ID: Record<string, number> = {
   "58266c9e69ed41fda78338b574cdd389": BackendRoleType.CardIssuanceOfficer,
 };
 
-/**
- * Instance role ids that must win over `roleTypeId`.
- * «رئیس انجمن» is association-info only — not shared with تشکل استانی or دبیر.
- */
-const ROLE_OVERRIDE_BY_ID: Record<string, { appRole: AppRole; title: string }> = {
-  "71764a3514144b5bb55101f165b4245e": { appRole: "association-info", title: "رئیس انجمن" },
-};
-
 function roleTitleKey(title: string) {
   return title.trim().replace(/\u200c/g, "").replace(/ي/g, "ی").replace(/ك/g, "ک").replace(/\s+/g, "");
 }
 
-/** Which design a role follows. Anything else keeps the general menu. */
 export type AppRole =
   | "chamber-president"
   | "card-issuance"
@@ -61,7 +51,6 @@ const CARD_ISSUANCE = roleTitleKey(CARD_ISSUANCE_ROLE_TITLE);
 const ORGANIZATIONS = roleTitleKey("امور تشکلها");
 const ORGANIZATIONS_OFFICER = roleTitleKey("مأمور امور تشکل ها");
 const ASSOCIATION_HEAD = roleTitleKey("رئیس انجمن مجامع");
-/** Display title for the dedicated «رئیس انجمن» app role (override id / title match). */
 const ASSOCIATION_INFO = roleTitleKey("رئیس انجمن");
 const ASSOCIATION_SECRETARY = roleTitleKey("دبیر تشکل استانی");
 const ASSOCIATION_SECRETARY_SHORT = roleTitleKey("دبیر انجمن");
@@ -80,8 +69,6 @@ function backendRoleDefinition(id: string | undefined) {
 }
 
 function backendRoleFor(role: Pick<UserRole, "id" | "roleTypeId"> | undefined) {
-  const roleId = role?.id?.trim().toLowerCase();
-  if (roleId && ROLE_OVERRIDE_BY_ID[roleId]) return ROLE_OVERRIDE_BY_ID[roleId];
   return backendRoleDefinition(role?.roleTypeId) ?? backendRoleDefinition(role?.id);
 }
 
@@ -106,7 +93,6 @@ export function appRoleOf(role: Pick<UserRole, "id" | "roleTypeId" | "title"> | 
   return "other";
 }
 
-/** First page of that role's menu. */
 export function homePathFor(role: AppRole) {
   switch (role) {
     case "chamber-president":

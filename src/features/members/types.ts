@@ -17,4 +17,5 @@ export type ChamberMember = {
 export type ListMembersParams = {
   page: number;
   query?: string;
+  associationId?: string | null;
 };

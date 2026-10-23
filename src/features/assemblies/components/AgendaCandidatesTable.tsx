@@ -1,16 +1,17 @@
 import { Table } from "@heroui/react";
 import type { ReactNode } from "react";
-import type { AssemblyAgenda } from "../types";
+import type { AgendaCandidateInput, AssemblyAgenda } from "../types";
 import { AgendaCandidateAddField } from "./AgendaCandidateAddField";
 import { DeleteConfirmPopoverButton } from "./DeleteConfirmPopoverButton";
 
 type AgendaCandidatesTableProps = {
+  associationId?: string | null;
   agenda: AssemblyAgenda;
   isEditable?: boolean;
   isDeleteBusy?: boolean;
   removingCandidateId?: string | null;
   isAddingCandidate?: boolean;
-  onAddCandidate?: (name: string, onSuccess: () => void) => void;
+  onAddCandidate?: (candidate: AgendaCandidateInput, onSuccess: () => void) => void;
   onRemoveCandidate?: (candidateId: string, onSuccess: () => void) => void;
   /** Optional leading cell (e.g. selection control) for each candidate row. */
   renderLeadingCell?: (candidateId: string) => ReactNode;
@@ -36,6 +37,7 @@ type TableRow =
 
 /** Shared candidates table with optional name + plus add row. */
 export function AgendaCandidatesTable({
+  associationId,
   agenda,
   isEditable = false,
   isDeleteBusy = false,
@@ -99,9 +101,15 @@ export function AgendaCandidatesTable({
                     className="border-(--panel-cards) !bg-transparent px-0 py-2"
                   >
                     <AgendaCandidateAddField
+                      associationId={associationId}
+                      isMember={isPerson}
                       existingNames={agenda.candidates.map((candidate) => candidate.name)}
+                      existingIds={agenda.candidates.map((candidate) => candidate.id)}
+                      existingMemberIds={agenda.candidates.flatMap((candidate) =>
+                        candidate.memberId ? [candidate.memberId] : [],
+                      )}
                       isPending={isAddingCandidate}
-                      onAdd={(name, onSuccess) => onAddCandidate?.(name, onSuccess)}
+                      onAdd={(candidate, onSuccess) => onAddCandidate?.(candidate, onSuccess)}
                     />
                   </Table.Cell>
                 ) : (

@@ -23,8 +23,16 @@ export function SidebarContent({ onNavigate, onRequestLogout }: SidebarContentPr
   const visibleNavItems = navItemsFor(role);
   const showMembershipCard = role === "user";
   const userCard = useMemo(
-    () => (showMembershipCard ? userMembershipCard(profile.data?.fullName ?? "—") : null),
-    [profile.data?.fullName, showMembershipCard],
+    () =>
+      showMembershipCard
+        ? userMembershipCard(
+            profile.data?.fullName ?? "—",
+            profile.data?.phone ?? "",
+            profile.data?.roles ?? [],
+            profile.data?.activeRoleId ?? null,
+          )
+        : null,
+    [profile.data?.activeRoleId, profile.data?.fullName, profile.data?.phone, profile.data?.roles, showMembershipCard],
   );
 
   return (

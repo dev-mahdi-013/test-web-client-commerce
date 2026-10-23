@@ -27,7 +27,8 @@ type ApiAssociationInfo = {
 
 /** Association-president member: one card, identified by its card role id. */
 type ApiAssociationMember = {
-  _id: string;
+  id?: string;
+  _id?: string;
   roleId: string;
   name: string;
   phone: string;
@@ -65,8 +66,13 @@ function toAssociation(association: ApiJoinedAssociation): MemberAssociation {
 }
 
 function toAssociationMember(member: ApiAssociationMember): ChamberMember {
+  const memberId = member.id ?? member._id;
+  if (!memberId) {
+    throw new Error("شناسه عضو انجمن در پاسخ سرویس موجود نیست");
+  }
+
   return {
-    id: member._id,
+    id: memberId,
     fullName: member.name,
     phone: member.phone,
     associationCount: 1,
@@ -75,8 +81,17 @@ function toAssociationMember(member: ApiAssociationMember): ChamberMember {
 }
 
 export const membersApi = {
-  listMembers: async ({ page, query }: ListMembersParams) => {
-    if (currentCommerceScope() === "ap") {
+  listMembers: async ({ page, query, associationId }: ListMembersParams) => {
+    const scope = currentCommerceScope();
+    if (scope === "pao" && associationId) {
+      return commercePage<ApiAssociationMember, ChamberMember>(
+        `/pao/associations/${associationId}/members/list`,
+        { page, searchKeyword: query },
+        toAssociationMember,
+      );
+    }
+
+    if (scope === "ap") {
       // The association endpoint returns all members; search and pages are cut here.
       const members = await commerceHttp<ApiAssociationMember[]>("/ap/association/members/list");
       const keyword = query?.trim();

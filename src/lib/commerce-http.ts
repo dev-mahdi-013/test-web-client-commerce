@@ -111,7 +111,7 @@ export async function commercePage<T, R>(
   { page = 1, searchKeyword, status, associationId }: ListParams,
   map: (item: T) => R,
 ): Promise<Paginated<R>> {
-  const { data, meta } = await commerceHttp<ListEnvelope<T>>(path, {
+  const body = await commerceHttp<ListEnvelope<T> | T[]>(path, {
     params: {
       page,
       searchKeyword: searchKeyword?.trim() || undefined,
@@ -121,6 +121,10 @@ export async function commercePage<T, R>(
     envelope: true,
   });
 
+  // Some endpoints (e.g. a search with `searchKeyword`) answer with a bare array instead of
+  // `{ success, data, meta }`; accept both shapes.
+  const data = Array.isArray(body) ? body : body?.data;
+  const meta = Array.isArray(body) ? undefined : body?.meta;
   const items = Array.isArray(data) ? data : [];
 
   return {

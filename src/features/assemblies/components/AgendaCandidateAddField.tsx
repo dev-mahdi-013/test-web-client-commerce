@@ -1,16 +1,26 @@
 import { AddIcon } from "@solar-icons/react/linear/add";
 import { Button, Input, TextField } from "@heroui/react";
 import { useState } from "react";
+import { AgendaMemberSearchField, type AgendaMemberCandidate } from "./AgendaMemberSearchField";
+import type { AgendaCandidateInput } from "../types";
 
 type AgendaCandidateAddFieldProps = {
+  associationId?: string | null;
+  isMember: boolean;
   existingNames: string[];
+  existingIds: string[];
+  existingMemberIds: string[];
   isPending?: boolean;
-  onAdd: (name: string, onSuccess: () => void) => void;
+  onAdd: (candidate: AgendaCandidateInput, onSuccess: () => void) => void;
 };
 
 /** Plus + candidate-name field used as the first row in agenda candidate tables. */
 export function AgendaCandidateAddField({
+  associationId,
+  isMember,
   existingNames,
+  existingIds,
+  existingMemberIds,
   isPending,
   onAdd,
 }: AgendaCandidateAddFieldProps) {
@@ -20,8 +30,34 @@ export function AgendaCandidateAddField({
 
   const submit = () => {
     if (!trimmedName || isDuplicate || isPending) return;
-    onAdd(trimmedName, () => setCandidateName(""));
+    onAdd({ name: trimmedName }, () => setCandidateName(""));
   };
+
+  const addMember = (member: AgendaMemberCandidate, onSuccess: () => void) => {
+    onAdd(
+      {
+        name: member.name,
+        cardNo: member.cardNo,
+        memberId: member.memberId,
+        memberRoleId: member.memberRoleId,
+      },
+      onSuccess,
+    );
+  };
+
+  if (isMember) {
+    return (
+      <div className="px-4 py-3">
+        <AgendaMemberSearchField
+          associationId={associationId}
+          existingIds={existingIds}
+          existingMemberIds={existingMemberIds}
+          isPending={isPending}
+          onAdd={addMember}
+        />
+      </div>
+    );
+  }
 
   return (
     <form

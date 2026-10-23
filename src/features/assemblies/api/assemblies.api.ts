@@ -207,8 +207,10 @@ export const assembliesApi = {
   },
 
   addAgenda: async (assemblyId: string, input: CreateAgendaInput) => {
-    const hasMembers = input.candidates.some((candidate) => candidate.memberId && candidate.memberRoleId);
-    const sourceType = input.kind === "person" && hasMembers ? "FromMembers" : "FreeText";
+    if (input.kind === "person" && input.candidates.some((candidate) => !candidate.memberId || !candidate.memberRoleId)) {
+      throw new Error("برای دستور عضو، کاندیدا باید از فهرست اعضا انتخاب شود");
+    }
+    const sourceType = input.kind === "person" ? "FromMembers" : "FreeText";
 
     const survey = await commerceHttp<ApiSurvey>(`${pollsBase()}/${assemblyId}/surveys/add`, {
       method: "POST",
@@ -285,10 +287,13 @@ export const assembliesApi = {
     return assembliesApi.getAssembly(assemblyId);
   },
 
-  addAgendaCandidate: async (assemblyId: string, { agendaId, name }: AddAgendaCandidateInput) => {
+  addAgendaCandidate: async (assemblyId: string, { agendaId, candidate }: AddAgendaCandidateInput) => {
+    const isMember = Boolean(candidate.memberId && candidate.memberRoleId);
     await commerceHttp(`${pollsBase()}/${assemblyId}/surveys/${agendaId}/items/add`, {
       method: "POST",
-      body: { type: "FreeText", data: { content: name.trim() } },
+      body: isMember
+        ? { type: "Member", data: { memberId: candidate.memberId, memberRoleId: candidate.memberRoleId } }
+        : { type: "FreeText", data: { content: candidate.name.trim() } },
     });
     return assembliesApi.getAssembly(assemblyId);
   },

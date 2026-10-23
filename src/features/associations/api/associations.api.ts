@@ -10,9 +10,10 @@ import type {
 
 type ApiAssociation = {
   _id: string;
-  name: string;
-  establishmentDate: number;
-  lastPollDate: number;
+  name?: string;
+  associationName?: string;
+  establishmentDate?: number;
+  lastPollDate?: number;
   presidentId?: string;
   presidentName?: string;
   secretaryId?: string;
@@ -35,9 +36,9 @@ function associationsBase() {
 function toAssociation(association: ApiAssociation): Association {
   return {
     id: association._id,
-    name: association.name,
-    foundedAt: fromEpoch(association.establishmentDate),
-    lastMeetingAt: fromEpoch(association.lastPollDate),
+    name: association.name ?? association.associationName ?? "",
+    foundedAt: fromEpoch(association.establishmentDate ?? 0),
+    lastMeetingAt: fromEpoch(association.lastPollDate ?? 0),
     presidentId: association.presidentId || null,
     presidentName: association.presidentName || null,
     secretaryName: association.secretaryName || null,
@@ -46,7 +47,6 @@ function toAssociation(association: ApiAssociation): Association {
 
 function toMember(member: ApiAssociationMember): AssociationMember {
   return {
-    // A member joins with one of their cards, and may join with several
     id: `${member._id}.${member.roleId}`,
     fullName: member.name,
     phone: member.phone,
@@ -62,7 +62,6 @@ function jalaliToEpoch(value: string) {
 
 export const associationsApi = {
   listAssociations: async ({ page, query }: ListAssociationsParams) => {
-    // The association-president API exposes only the active association.
     if (currentCommerceScope() === "ap") {
       const info = await commerceHttp<ApiAssociation | ApiAssociation[]>("/ap/association/info");
       const association = Array.isArray(info) ? info[0] : info;

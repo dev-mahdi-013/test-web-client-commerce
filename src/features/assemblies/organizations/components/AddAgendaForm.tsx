@@ -2,16 +2,18 @@ import { AddIcon } from "@solar-icons/react/linear/add";
 import { CloseIcon } from "@solar-icons/react/linear/close";
 import { Button, Input, Label, TextField } from "@heroui/react";
 import { useState } from "react";
+import { AgendaMemberSearchField, type AgendaMemberCandidate } from "@/features/assemblies/components/AgendaMemberSearchField";
 import { SelectField } from "@/shared/components/SelectField";
+import type { AgendaCandidateInput } from "../../types";
 import { assemblyUnitOptions } from "../../config";
 import type { AgendaKind, AssemblyUnit, CreateAgendaInput } from "../../types";
 
-type DraftCandidate = {
+type DraftCandidate = AgendaCandidateInput & {
   id: string;
-  name: string;
 };
 
 type AddAgendaFormProps = {
+  associationId?: string | null;
   isPending?: boolean;
   isDisabled?: boolean;
   onSubmit: (input: CreateAgendaInput) => void;
@@ -24,7 +26,7 @@ const kindOptions: Array<{ value: AgendaKind; label: string }> = [
   { value: "text", label: "نوشته" },
 ];
 
-export function AddAgendaForm({ isPending, isDisabled = false, onSubmit }: AddAgendaFormProps) {
+export function AddAgendaForm({ associationId, isPending, isDisabled = false, onSubmit }: AddAgendaFormProps) {
   const [title, setTitle] = useState("");
   const [maxSelections, setMaxSelections] = useState("3");
   const [kind, setKind] = useState<AgendaKind>("person");
@@ -34,7 +36,7 @@ export function AddAgendaForm({ isPending, isDisabled = false, onSubmit }: AddAg
   const [error, setError] = useState<string | null>(null);
   const isFormDisabled = isPending || isDisabled;
 
-  const addCandidate = () => {
+  const addTextCandidate = () => {
     if (isFormDisabled) return;
     const name = candidateQuery.trim();
     if (!name) return;
@@ -43,6 +45,29 @@ export function AddAgendaForm({ isPending, isDisabled = false, onSubmit }: AddAg
       return;
     }
     setCandidates((current) => [...current, { id: `${Date.now()}-${name}`, name }]);
+    setCandidateQuery("");
+  };
+
+  const addMemberCandidate = (member: AgendaMemberCandidate, onSuccess: () => void) => {
+    if (isFormDisabled) return;
+    if (!candidates.some((candidate) => candidate.id === member.id)) {
+      setCandidates((current) => [
+        ...current,
+        {
+          id: member.id,
+          name: member.name,
+          cardNo: member.cardNo,
+          memberId: member.memberId,
+          memberRoleId: member.memberRoleId,
+        },
+      ]);
+    }
+    onSuccess();
+  };
+
+  const changeKind = (value: string) => {
+    setKind(value as AgendaKind);
+    setCandidates([]);
     setCandidateQuery("");
   };
 
@@ -70,7 +95,7 @@ export function AddAgendaForm({ isPending, isDisabled = false, onSubmit }: AddAg
       unit,
       candidates:
         kind === "person"
-          ? candidates.map((candidate) => ({ name: candidate.name }))
+          ? candidates.map(({ id: _id, ...candidate }) => candidate)
           : [{ name: trimmedTitle }],
     });
 
@@ -112,7 +137,7 @@ export function AddAgendaForm({ isPending, isDisabled = false, onSubmit }: AddAg
             popoverClassName="z-[var(--z-index-overlay)] max-sm:!w-[200px]"
             showBackdrop
             value={kind}
-            onChange={(value) => setKind(value as AgendaKind)}
+            onChange={changeKind}
           />
         </div>
 
@@ -132,30 +157,39 @@ export function AddAgendaForm({ isPending, isDisabled = false, onSubmit }: AddAg
 
         <div className="relative flex flex-col gap-1">
           <span className="text-xs font-bold text-foreground">افزودن کاندیدا</span>
-          <div className="relative">
-            <TextField isDisabled={isFormDisabled} value={candidateQuery} onChange={setCandidateQuery}>
-              <Input
-                className={`${fieldClassName} pe-10`}
-                placeholder="جستجو و انتخاب نام"
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") {
-                    event.preventDefault();
-                    addCandidate();
-                  }
-                }}
-              />
-            </TextField>
-            <Button
-              isIconOnly
-              aria-label="افزودن کاندیدا"
-              className="absolute end-1 top-1/2 size-6 min-w-6 -translate-y-1/2 rounded-full bg-accent p-0 text-white"
-              isDisabled={isFormDisabled || !candidateQuery.trim()}
-              size="sm"
-              onPress={addCandidate}
-            >
-              <AddIcon className="h-[37px] w-5 text-white" />
-            </Button>
-          </div>
+          {kind === "person" ? (
+            <AgendaMemberSearchField
+              associationId={associationId}
+              existingIds={candidates.map((candidate) => candidate.id)}
+              isDisabled={isFormDisabled}
+              onAdd={addMemberCandidate}
+            />
+          ) : (
+            <div className="relative">
+              <TextField isDisabled={isFormDisabled} value={candidateQuery} onChange={setCandidateQuery}>
+                <Input
+                  className={`${fieldClassName} pe-10`}
+                  placeholder="نام کاندیدا"
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      event.preventDefault();
+                      addTextCandidate();
+                    }
+                  }}
+                />
+              </TextField>
+              <Button
+                isIconOnly
+                aria-label="افزودن کاندیدا"
+                className="absolute end-1 top-1/2 size-6 min-w-6 -translate-y-1/2 rounded-full bg-accent p-0 text-white"
+                isDisabled={isFormDisabled || !candidateQuery.trim()}
+                size="sm"
+                onPress={addTextCandidate}
+              >
+                <AddIcon className="h-[37px] w-5 text-white" />
+              </Button>
+            </div>
+          )}
           {candidates.length > 0 && (
             <ul className="mt-2 flex w-full flex-col gap-2 rounded-xl bg-(--field-muted) p-2 lg:absolute lg:end-0 lg:top-full lg:z-10">
               {candidates.map((candidate) => (
@@ -165,7 +199,7 @@ export function AddAgendaForm({ isPending, isDisabled = false, onSubmit }: AddAg
                 >
                   <button
                     aria-label={`حذف ${candidate.name}`}
-                    className="flex size-5 min-w-5 items-center justify-center rounded-full bg-danger text-white transition-colors hover:bg-danger/80"
+                    className="flex size-5 min-w-5 cursor-pointer items-center justify-center rounded-full bg-danger text-white transition-colors hover:bg-danger/80 disabled:cursor-not-allowed"
                     disabled={isFormDisabled}
                     type="button"
                     onClick={() => setCandidates((current) => current.filter((item) => item.id !== candidate.id))}

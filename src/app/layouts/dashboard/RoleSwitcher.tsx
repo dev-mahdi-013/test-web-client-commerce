@@ -3,9 +3,10 @@ import { WidgetIcon } from "@solar-icons/react/linear/widget";
 import { Dropdown, Skeleton } from "@heroui/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
+import { useAssociations } from "@/features/associations/hooks/useAssociations";
 import { useSessionStore } from "@/features/auth/stores/session.store";
 import { useProfile } from "@/features/profile/hooks/useProfile";
-import { appRoleOf, homePathFor, roleTitleOf } from "@/features/profile/roles";
+import { appRoleOf, homePathFor, roleTitleOf, type AppRole } from "@/features/profile/roles";
 import type { UserRole } from "@/features/profile/types";
 import { cn } from "@/lib/cn";
 import { singleSelectedKeys } from "@/shared/components/tableSelection";
@@ -15,13 +16,29 @@ function roleTitle(role: UserRole) {
   return roleTitleOf(role) || "نقش بدون عنوان";
 }
 
-function cityLabel(role: UserRole) {
-  const province = findProvince(role.province);
-  if (province) return provinceLabel(province);
-  return role.province ? String(role.province) : "استان نامشخص";
+const ASSOCIATION_APP_ROLES: ReadonlySet<AppRole> = new Set<AppRole>([
+  "association-head",
+  "association-info",
+  "association-secretary",
+]);
+
+function isAssociationRole(role: UserRole) {
+  return ASSOCIATION_APP_ROLES.has(appRoleOf(role));
 }
 
-function RoleCopy({ role, large, singleLine }: { role: UserRole; large?: boolean; singleLine?: boolean }) {
+function provinceLabelOf(role: UserRole) {
+  const province = findProvince(role.province);
+  return province ? provinceLabel(province) : undefined;
+}
+
+type RoleCopyProps = {
+  role: UserRole;
+  subtitle?: string;
+  large?: boolean;
+  singleLine?: boolean;
+};
+
+function RoleCopy({ role, subtitle, large, singleLine }: RoleCopyProps) {
   const titleClass = cn("truncate font-bold", large ? "text-xs md:text-sm" : "text-xs");
   const cityClass = cn(
     "truncate font-normal text-muted",
@@ -37,7 +54,7 @@ function RoleCopy({ role, large, singleLine }: { role: UserRole; large?: boolean
       )}
     >
       <span className={titleClass}>{roleTitle(role)}</span>
-      <span className={cityClass}>{cityLabel(role)}</span>
+      {subtitle ? <span className={cityClass}>{subtitle}</span> : null}
     </span>
   );
 }
@@ -51,6 +68,16 @@ export function RoleSwitcher() {
   const roles = profile.data?.roles ?? [];
   const activeRole = roles.find((role) => role.id === profile.data?.activeRoleId);
 
+  const activeAssociationRole = activeRole !== undefined && isAssociationRole(activeRole);
+  const associations = useAssociations({ page: 1 }, { enabled: activeAssociationRole });
+  const associationName = activeAssociationRole ? associations.data?.items[0]?.name : undefined;
+  const triggerSubtitle = activeRole
+    ? isAssociationRole(activeRole)
+      ? associationName
+      : provinceLabelOf(activeRole)
+    : undefined;
+  const associationSubtitleOf = (role: UserRole) => (isAssociationRole(role) ? associationName : undefined);
+
   return (
     <Dropdown className="block w-full">
       <Dropdown.Trigger
@@ -62,7 +89,7 @@ export function RoleSwitcher() {
           <WidgetIcon className="size-[18px] md:size-5 lg:size-[22px]" />
         </span>
         {activeRole ? (
-          <RoleCopy singleLine large role={activeRole} />
+          <RoleCopy singleLine large role={activeRole} subtitle={triggerSubtitle} />
         ) : profile.data ? (
           <span className="truncate text-xs text-muted lg:text-sm">نقشی ثبت نشده</span>
         ) : (
@@ -85,7 +112,6 @@ export function RoleSwitcher() {
           onSelectionChange={(keys) => {
             const [roleId] = keys === "all" ? [] : [...keys];
             if (typeof roleId !== "string" || roleId === activeRole?.id) return;
-            // Every Commerce request is authorized as the active role, so cached data belongs to the old one.
             setActiveRole(roleId);
             queryClient.resetQueries();
             const nextRole = roles.find((role) => role.id === roleId);
@@ -97,11 +123,11 @@ export function RoleSwitcher() {
               key={role.id}
               id={role.id}
               className="items-center gap-3 rounded-xl px-3 py-3"
-              textValue={`${roleTitle(role)} ${cityLabel(role)}`}
+              textValue={[roleTitle(role), associationSubtitleOf(role)].filter(Boolean).join(" ")}
             >
               {({ isSelected }) => (
                 <>
-                  <RoleCopy role={role} />
+                  <RoleCopy role={role} subtitle={associationSubtitleOf(role)} />
                   <span
                     aria-hidden
                     className={

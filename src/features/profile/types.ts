@@ -1,8 +1,10 @@
 export type UserRole = {
+  [key: string]: unknown;
   id: string;
   roleTypeId?: string;
   title: string;
   province: string | number;
+  chamberName?: string | null;
 };
 
 export type Profile = {

@@ -3,7 +3,6 @@ import { accountsHttp } from "@/lib/accounts-http";
 import type { UserRole } from "@/features/profile/types";
 import type { AuthSession, Captcha, SendOtpPayload, SendOtpResponse, VerifyOtpPayload } from "../types";
 
-/** Login type the Account Service uses to return commerce (as opposed to town) roles */
 const COMMERCE_LOGIN_TYPE = 0xff36;
 
 type CaptchaResponse = {
@@ -17,6 +16,7 @@ type OtpSendResponse = {
 };
 
 type ApiRole = {
+  [key: string]: unknown;
   id?: string | number;
   roleId?: string;
   _id?: string;
@@ -24,6 +24,10 @@ type ApiRole = {
   title?: string;
   name?: string;
   province?: string | number;
+  chamberName?: string;
+  chamber?: { name?: string };
+  roomName?: string;
+  room?: { name?: string };
 };
 
 type OtpVerifyResponse = {
@@ -34,12 +38,20 @@ type OtpVerifyResponse = {
   roles?: ApiRole[];
 };
 
+function chamberNameOf(role: ApiRole) {
+  const candidates = [role.chamberName, role.chamber?.name, role.roomName, role.room?.name];
+  const name = candidates.find((value): value is string => typeof value === "string" && value.trim() !== "");
+  return name ? name.trim() : null;
+}
+
 function toUserRole(role: ApiRole, index: number): UserRole {
   return {
+    ...role,
     id: String(role.roleId ?? role.id ?? role._id ?? index),
     roleTypeId: role.role == null ? undefined : String(role.role),
     title: role.title ?? role.name ?? "",
     province: role.province == null ? "" : String(role.province),
+    chamberName: chamberNameOf(role),
   };
 }
 
