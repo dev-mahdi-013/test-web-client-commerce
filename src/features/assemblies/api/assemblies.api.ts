@@ -98,6 +98,7 @@ async function detailOf(poll: ApiPoll): Promise<AssemblyDetail> {
 
 function operationsForStatusChange(current: AssemblyStatus, next: AssemblyStatus) {
   if (next === "canceled" && current === "pending") return [pollOperation.sendToReview];
+  if (next === "published" && current === "canceled") return [pollOperation.approve];
   if (next === "pending" && (current === "canceled" || current === "published")) {
     return [pollOperation.reDraft];
   }

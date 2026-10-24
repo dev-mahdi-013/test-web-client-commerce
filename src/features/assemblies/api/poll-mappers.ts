@@ -157,6 +157,7 @@ export function toAssembly(poll: ApiPoll): Assembly {
     status: toAssemblyStatus(poll.status),
     announcedAt: fromEpoch(poll.createdDate ?? 0),
     createdBy: createdByLabel(poll),
+    createdById: poll.createdBy?.data?._id ?? null,
     createdAt: fromEpoch(poll.createdDate ?? 0),
     newsDate: fromEpoch(poll.pollDate ?? 0),
     startsAt: formatClock(startIso),

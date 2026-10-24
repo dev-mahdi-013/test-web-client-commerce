@@ -10,7 +10,7 @@ import { appRoleOf, homePathFor, roleTitleOf, type AppRole } from "@/features/pr
 import type { UserRole } from "@/features/profile/types";
 import { cn } from "@/lib/cn";
 import { singleSelectedKeys } from "@/shared/components/tableSelection";
-import { findProvince, provinceLabel } from "@/shared/data/provinces";
+import { findProvince } from "@/shared/data/provinces";
 
 function roleTitle(role: UserRole) {
   return roleTitleOf(role) || "نقش بدون عنوان";
@@ -22,13 +22,39 @@ const ASSOCIATION_APP_ROLES: ReadonlySet<AppRole> = new Set<AppRole>([
   "association-secretary",
 ]);
 
+/** Titles of association-side roles (دبیر تشکل / رئیس انجمن / رئیس تشکل). */
+const ASSOCIATION_TITLE_PATTERN = /(انجمن|دبیر\s*تشکل|رئیس\s*تشکل|رییس\s*تشکل)/u;
+
 function isAssociationRole(role: UserRole) {
-  return ASSOCIATION_APP_ROLES.has(appRoleOf(role));
+  const appRole = appRoleOf(role);
+  if (ASSOCIATION_APP_ROLES.has(appRole)) return true;
+  // Fall back to the title so these roles never show the province subtitle.
+  return appRole !== "organizations" && ASSOCIATION_TITLE_PATTERN.test(roleTitleOf(role));
 }
 
-function provinceLabelOf(role: UserRole) {
-  const province = findProvince(role.province);
-  return province ? provinceLabel(province) : undefined;
+/** Association name carried by the role itself, if the backend sends one. */
+function roleAssociationNameOf(role: UserRole) {
+  const nested = (value: unknown) =>
+    value && typeof value === "object" ? (value as { name?: unknown }).name : undefined;
+  const candidates = [role.associationName, role.association, nested(role.association), role.unionName];
+  const name = candidates.find((v): v is string => typeof v === "string" && v.trim() !== "");
+  return name?.trim();
+}
+
+/** Drops the «اتاق بازرگانی» prefix so only the place name remains (e.g. «قزوین»). */
+function stripChamberPrefix(name: string) {
+  return name
+    .trim()
+    .replace(/^اتاق\s+بازرگانی[\s،,:-]*/u, "")
+    .replace(/^اتاق[\s،,:-]+/u, "")
+    .trim();
+}
+
+/** Place name of the role's chamber; falls back to the province name when the backend sends none. */
+function chamberLabelOf(role: UserRole) {
+  const chamberName = role.chamberName ? stripChamberPrefix(role.chamberName) : "";
+  if (chamberName) return chamberName;
+  return findProvince(role.province)?.name;
 }
 
 type RoleCopyProps = {
@@ -54,7 +80,7 @@ function RoleCopy({ role, subtitle, large, singleLine }: RoleCopyProps) {
       )}
     >
       <span className={titleClass}>{roleTitle(role)}</span>
-      {/* {subtitle ? <span className={cityClass}>{subtitle}</span> : null} */}
+      {subtitle ? <span className={cityClass}>{subtitle}</span> : null}
     </span>
   );
 }
@@ -69,14 +95,23 @@ export function RoleSwitcher() {
   const activeRole = roles.find((role) => role.id === profile.data?.activeRoleId);
 
   const activeAssociationRole = activeRole !== undefined && isAssociationRole(activeRole);
-  const associations = useAssociations({ page: 1 }, { enabled: activeAssociationRole });
-  const associationName = activeAssociationRole ? associations.data?.items[0]?.name : undefined;
+  // The association endpoint is only valid for the real association app roles.
+  const canFetchAssociation = activeRole !== undefined && ASSOCIATION_APP_ROLES.has(appRoleOf(activeRole));
+  const associations = useAssociations({ page: 1 }, { enabled: canFetchAssociation });
+  const fetchedAssociationName = canFetchAssociation ? associations.data?.items[0]?.name : undefined;
+  // The fetched name belongs to the active role only; other roles show just their own name.
+  const associationNameOf = (role: UserRole) =>
+    role.id === activeRole?.id
+      ? fetchedAssociationName || roleAssociationNameOf(role)
+      : roleAssociationNameOf(role);
+  const associationSubtitleOf = (role: UserRole) =>
+    isAssociationRole(role) ? associationNameOf(role) : undefined;
+  // Association roles show the association name; every other role shows its chamber name.
   const triggerSubtitle = activeRole
-    ? isAssociationRole(activeRole)
-      ? associationName
-      : provinceLabelOf(activeRole)
+    ? activeAssociationRole
+      ? associationNameOf(activeRole)
+      : chamberLabelOf(activeRole)
     : undefined;
-  const associationSubtitleOf = (role: UserRole) => (isAssociationRole(role) ? associationName : undefined);
 
   return (
     <Dropdown className="block w-full">

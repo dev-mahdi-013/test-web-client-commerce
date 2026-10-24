@@ -41,20 +41,34 @@ export function AssociationAssemblyDetailPage() {
     if (!detail) return null;
     return (
       <AssociationAssemblyHeaderActions
+        hasAgendas={detail.agendas.length > 0}
         isPending={statusBusy}
         status={detail.status}
-        onCancelSendForReview={() => {
-          updateStatus.mutate(
-            { assemblyId: detail.id, status: "pending" },
-            { onSuccess: () => toast.success("ارسال برای بازبینی لغو شد") },
-          );
+        onSecondaryAction={() => {
+          if (detail.status === "canceled") {
+            updateStatus.mutate(
+              { assemblyId: detail.id, status: "pending" },
+              { onSuccess: () => toast.success("ارسال برای بازبینی لغو شد") },
+            );
+          } else if (detail.status === "running") {
+            updateStatus.mutate(
+              { assemblyId: detail.id, status: "finished" },
+              { onSuccess: () => toast.success("مجمع پایان یافت") },
+            );
+          }
         }}
-        onSendForReview={() => {
-          updateStatus.mutate(
-            // Reviewing (0x02); the API only accepts SendToReview from a draft poll.
-            { assemblyId: detail.id, status: "canceled" },
-            { onSuccess: () => toast.success("برای بازبینی ارسال شد") },
-          );
+        onPrimaryAction={() => {
+          if (detail.status === "pending") {
+            updateStatus.mutate(
+              { assemblyId: detail.id, status: "canceled" },
+              { onSuccess: () => toast.success("برای بازبینی ارسال شد") },
+            );
+          } else if (detail.status === "published") {
+            updateStatus.mutate(
+              { assemblyId: detail.id, status: "running" },
+              { onSuccess: () => toast.success("مجمع شروع شد") },
+            );
+          }
         }}
       />
     );

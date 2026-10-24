@@ -22,6 +22,7 @@ export type Assembly = {
   status: AssemblyStatus;
   announcedAt: string | null;
   createdBy: string;
+  createdById: string | null;
   createdAt: string | null;
   /** `pollDate` — روز رای‌گیری */
   newsDate: string | null;

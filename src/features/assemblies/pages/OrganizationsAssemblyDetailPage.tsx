@@ -1,6 +1,7 @@
 import { Spinner, toast } from "@heroui/react";
 import { useMemo } from "react";
 import { useParams } from "react-router";
+import { useSessionStore } from "@/features/auth/stores/session.store";
 import { getErrorMessage } from "@/lib/http";
 import { SectionHeading } from "@/shared/components/SectionHeading";
 import { useHeaderActions } from "@/shared/hooks/useHeaderActions";
@@ -23,6 +24,8 @@ import { OrganizationsAgendaCard } from "../organizations/components/Organizatio
 /** Assembly detail for the organizations (امور تشکل‌ها) role. */
 export function OrganizationsAssemblyDetailPage() {
   const { assemblyId = "" } = useParams();
+  const activeRoleId = useSessionStore((state) => state.activeRoleId);
+  const session = useSessionStore((state) => state.session);
   const assembly = useAssembly(assemblyId || null);
   const detail = assembly.data;
   const updateStatus = useUpdateAssemblyStatus();
@@ -33,11 +36,42 @@ export function OrganizationsAssemblyDetailPage() {
   const addCandidate = useAddAgendaCandidate(assemblyId);
 
   const statusBusy = updateStatus.isPending;
+
+  // The backend's `createdBy.data._id` is not guaranteed to equal the role id, so
+  // compare it against every identifier carried by the active role (id, roleId,
+  // _id, chamber/association ids, ...). If no id matches, fall back to comparing
+  // the creator's display name with the logged-in user's name.
+  const isCreatedByCurrentUser = useMemo(() => {
+    if (!detail) return false;
+    const activeRole =
+      session?.user.roles.find((role) => role.id === activeRoleId) ?? session?.user.roles[0];
+
+    const createdById = detail.createdById?.trim().toLowerCase();
+    if (createdById && activeRole) {
+      const matchesId = Object.values(activeRole).some(
+        (value) => typeof value === "string" && value.trim().toLowerCase() === createdById,
+      );
+      if (matchesId) return true;
+    }
+
+    const normalizeName = (value: string) =>
+      value
+        .replace(/\u200c/g, "")
+        .replace(/ي/g, "ی")
+        .replace(/ك/g, "ک")
+        .replace(/\s+/g, "")
+        .toLowerCase();
+    const creatorName = normalizeName(detail.createdBy ?? "");
+    const userName = normalizeName(session?.user.name ?? "");
+    return creatorName !== "" && creatorName !== "—" && creatorName === userName;
+  }, [activeRoleId, detail, session]);
+
   const headerActions = useMemo(() => {
     if (!detail) return null;
     return (
       <AssemblyHeaderActions
         hasAgendas={detail.agendas.length > 0}
+        isCreatedByCurrentUser={isCreatedByCurrentUser}
         isPending={statusBusy}
         status={detail.status}
         onEnd={() => {
@@ -47,14 +81,20 @@ export function OrganizationsAssemblyDetailPage() {
           );
         }}
         onStart={() => {
-          // A draft goes to review; a reviewing poll is approved and starts voting.
-          const isDraft = detail.status === "pending";
+          const nextStatus =
+            detail.status === "pending"
+              ? "canceled"
+              : detail.status === "canceled"
+                ? "published"
+                : "running";
           updateStatus.mutate(
-            { assemblyId: detail.id, status: isDraft ? "canceled" : "running" },
+            { assemblyId: detail.id, status: nextStatus },
             {
               onSuccess: (updatedAssembly) => {
                 if (updatedAssembly?.status === "canceled") {
                   toast.success("مجمع برای بازبینی ارسال شد");
+                } else if (updatedAssembly?.status === "published") {
+                  toast.success("مجمع تأیید شد");
                 } else if (updatedAssembly?.status === "running") {
                   toast.success("مجمع شروع شد");
                 }
@@ -64,7 +104,7 @@ export function OrganizationsAssemblyDetailPage() {
         }}
       />
     );
-  }, [detail, statusBusy, updateStatus]);
+  }, [detail, isCreatedByCurrentUser, statusBusy, updateStatus]);
 
   useHeaderActions(headerActions);
 
@@ -92,13 +132,18 @@ export function OrganizationsAssemblyDetailPage() {
     );
   }
 
-  // PAO survey endpoints allow changes before voting starts; the API checks ownership.
+  // Add-agenda box, edit pencil and delete icons: only for the owner, and only
+  // in "پیش‌نویس" (pending) and "در انتظار" (published).
   const canManageAgenda =
-    detail.status === "pending" || detail.status === "canceled" || detail.status === "published";
+    isCreatedByCurrentUser && (detail.status === "pending" || detail.status === "published");
   const canEditAgendaFields = canManageAgenda;
+  const canAddAgenda = canManageAgenda;
 
-
-  console.log(detail,'dsads')
+  console.log(detail, 'dsads', {
+    createdById: detail.createdById,
+    isCreatedByCurrentUser,
+    activeRole: session?.user.roles.find((role) => role.id === activeRoleId),
+  })
 
   return (
     <div className="flex flex-col gap-6 rounded-3xl bg-(--panel-cards) px-4 py-5 sm:px-6 xl:px-10">
@@ -118,7 +163,7 @@ export function OrganizationsAssemblyDetailPage() {
 
       <section aria-label="دستورهای مجمع" className="flex flex-col gap-4">
         <SectionHeading className="lg:text-base">دستورهای مجمع</SectionHeading>
-        {canManageAgenda && (
+        {canAddAgenda && (
           <>
             <h3 className="text-right text-sm font-medium text-foreground">افزودن دستور</h3>
             <AddAgendaForm
