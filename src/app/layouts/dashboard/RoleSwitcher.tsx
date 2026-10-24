@@ -22,6 +22,8 @@ const ASSOCIATION_APP_ROLES: ReadonlySet<AppRole> = new Set<AppRole>([
   "association-secretary",
 ]);
 
+const NO_NAME_PLACEHOLDER = "—";
+
 /** Titles of association-side roles (دبیر تشکل / رئیس انجمن / رئیس تشکل). */
 const ASSOCIATION_TITLE_PATTERN = /(انجمن|دبیر\s*تشکل|رئیس\s*تشکل|رییس\s*تشکل)/u;
 
@@ -30,15 +32,6 @@ function isAssociationRole(role: UserRole) {
   if (ASSOCIATION_APP_ROLES.has(appRole)) return true;
   // Fall back to the title so these roles never show the province subtitle.
   return appRole !== "organizations" && ASSOCIATION_TITLE_PATTERN.test(roleTitleOf(role));
-}
-
-/** Association name carried by the role itself, if the backend sends one. */
-function roleAssociationNameOf(role: UserRole) {
-  const nested = (value: unknown) =>
-    value && typeof value === "object" ? (value as { name?: unknown }).name : undefined;
-  const candidates = [role.associationName, role.association, nested(role.association), role.unionName];
-  const name = candidates.find((v): v is string => typeof v === "string" && v.trim() !== "");
-  return name?.trim();
 }
 
 /** Drops the «اتاق بازرگانی» prefix so only the place name remains (e.g. «قزوین»). */
@@ -98,18 +91,17 @@ export function RoleSwitcher() {
   // The association endpoint is only valid for the real association app roles.
   const canFetchAssociation = activeRole !== undefined && ASSOCIATION_APP_ROLES.has(appRoleOf(activeRole));
   const associations = useAssociations({ page: 1 }, { enabled: canFetchAssociation });
-  const fetchedAssociationName = canFetchAssociation ? associations.data?.items[0]?.name : undefined;
-  // The fetched name belongs to the active role only; other roles show just their own name.
+  // The name comes only from the association API response: nothing is shown until it arrives,
+  // and only for the active role (the one the response belongs to).
   const associationNameOf = (role: UserRole) =>
-    role.id === activeRole?.id
-      ? fetchedAssociationName || roleAssociationNameOf(role)
-      : roleAssociationNameOf(role);
+    role.id === activeRole?.id && canFetchAssociation ? associations.data?.items[0]?.name || undefined : undefined;
+  // A dash keeps the subtitle line (and the item height) while the name is missing or loading.
   const associationSubtitleOf = (role: UserRole) =>
-    isAssociationRole(role) ? associationNameOf(role) : undefined;
+    isAssociationRole(role) ? associationNameOf(role) ?? NO_NAME_PLACEHOLDER : undefined;
   // Association roles show the association name; every other role shows its chamber name.
   const triggerSubtitle = activeRole
     ? activeAssociationRole
-      ? associationNameOf(activeRole)
+      ? associationNameOf(activeRole) ?? NO_NAME_PLACEHOLDER
       : chamberLabelOf(activeRole)
     : undefined;
 
