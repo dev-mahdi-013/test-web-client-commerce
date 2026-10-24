@@ -1,7 +1,7 @@
 import { CheckIcon } from "@solar-icons/react/linear/check";
 import { CloseIcon } from "@solar-icons/react/linear/close";
 import type { RefObject } from "react";
-import { BlurBackdrop } from "./BlurBackdrop";
+import { OpaqueBackdrop } from "./OpaqueBackdrop";
 import { cn } from "@/lib/cn";
 import { SelectField, type SelectFieldOption } from "./SelectField";
 
@@ -100,7 +100,7 @@ export function InlineEditControl({
 
   return (
     <>
-      <BlurBackdrop isOpen />
+      <OpaqueBackdrop isOpen />
       <div
         ref={editorRef}
         className={cn("relative z-[var(--z-index-overlay)] flex h-9 items-center gap-1 rounded-xl bg-(--field-muted) ps-3 pe-1", className)}

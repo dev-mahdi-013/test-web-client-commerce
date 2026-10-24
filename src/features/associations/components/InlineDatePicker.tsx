@@ -2,7 +2,7 @@ import { Popover } from "@heroui/react";
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/cn";
 import { formatJalaliParts, isValidJalaliDate, toJalali, type JalaliParts } from "@/lib/date";
-import { BlurBackdrop } from "@/shared/components/BlurBackdrop";
+import { OpaqueBackdrop } from "@/shared/components/OpaqueBackdrop";
 import { JalaliCalendar } from "@/shared/components/JalaliCalendar";
 import { useAutoPopoverPlacement } from "@/shared/hooks/useAutoPopoverPlacement";
 
@@ -46,7 +46,7 @@ export function InlineDatePicker({ label, value, onChange, autoOpen = false, onC
 
   return (
     <>
-      <BlurBackdrop isOpen={isOpen} />
+      <OpaqueBackdrop isOpen={isOpen} />
       <Popover isOpen={isOpen} onOpenChange={handleOpenChange}>
         <button
           ref={triggerRef}

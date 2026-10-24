@@ -2,7 +2,7 @@ import { PenIcon } from "@solar-icons/react/linear/pen";
 import { Popover } from "@heroui/react";
 import { useMemo, useRef, useState } from "react";
 import { formatJalali, formatJalaliParts, toJalali } from "@/lib/date";
-import { BlurBackdrop } from "@/shared/components/BlurBackdrop";
+import { OpaqueBackdrop } from "@/shared/components/OpaqueBackdrop";
 import { JalaliCalendar } from "@/shared/components/JalaliCalendar";
 import type { MembershipCardData } from "@/shared/types/membership";
 import { useAutoPopoverPlacement } from "@/shared/hooks/useAutoPopoverPlacement";
@@ -33,7 +33,7 @@ export function ExpiryDatePicker({ memberId, card }: ExpiryDatePickerProps) {
 
   return (
     <>
-      <BlurBackdrop isOpen={isOpen} />
+      <OpaqueBackdrop isOpen={isOpen} />
       <Popover isOpen={isOpen} onOpenChange={handleOpenChange}>
         <button
           ref={triggerRef}

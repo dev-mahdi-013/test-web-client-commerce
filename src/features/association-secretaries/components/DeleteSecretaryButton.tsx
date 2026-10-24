@@ -1,7 +1,7 @@
 import { TrashBinTrashIcon } from "@solar-icons/react/linear/trash-bin-trash";
 import { Button, CloseButton, Popover } from "@heroui/react";
 import { useRef } from "react";
-import { BlurBackdrop } from "@/shared/components/BlurBackdrop";
+import { OpaqueBackdrop } from "@/shared/components/OpaqueBackdrop";
 import type { AssociationSecretary } from "../types";
 
 type DeleteSecretaryButtonProps = {
@@ -22,7 +22,7 @@ export function DeleteSecretaryButton({
 
   return (
     <>
-      <BlurBackdrop isOpen={isOpen} />
+      <OpaqueBackdrop isOpen={isOpen} />
       <Popover isOpen={isOpen} onOpenChange={onOpenChange}>
         <Button
           ref={triggerRef}

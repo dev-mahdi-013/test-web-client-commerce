@@ -2,7 +2,7 @@ import { AltArrowDownIcon } from "@solar-icons/react/linear/alt-arrow-down";
 import { Dropdown } from "@heroui/react";
 import { useState } from "react";
 import { cn } from "@/lib/cn";
-import { BlurBackdrop } from "./BlurBackdrop";
+import { OpaqueBackdrop } from "./OpaqueBackdrop";
 import { singleSelectedKeys } from "./tableSelection";
 
 export type SelectFieldOption = {
@@ -42,7 +42,7 @@ export function SelectField({
 
   return (
     <>
-      <BlurBackdrop isOpen={showBackdrop && isOpen} />
+      <OpaqueBackdrop isOpen={showBackdrop && isOpen} />
       <Dropdown isOpen={isOpen} onOpenChange={setIsOpen}>
       <Dropdown.Trigger
         aria-label={label}

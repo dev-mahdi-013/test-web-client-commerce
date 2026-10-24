@@ -3,7 +3,7 @@ import { useRef, useState } from "react";
 import { cn } from "@/lib/cn";
 import { formatJalaliParts, isValidJalaliDate, toJalali, type JalaliParts } from "@/lib/date";
 import { useAutoPopoverPlacement } from "@/shared/hooks/useAutoPopoverPlacement";
-import { BlurBackdrop } from "./BlurBackdrop";
+import { OpaqueBackdrop } from "./OpaqueBackdrop";
 import { JalaliCalendar } from "./JalaliCalendar";
 
 type JalaliDateFieldProps = {
@@ -38,7 +38,7 @@ export function JalaliDateField({ label, value, onChange, className }: JalaliDat
 
   return (
     <>
-      <BlurBackdrop isOpen={isOpen} />
+      <OpaqueBackdrop isOpen={isOpen} />
       <Popover isOpen={isOpen} onOpenChange={handleOpenChange}>
         <button
           ref={triggerRef}

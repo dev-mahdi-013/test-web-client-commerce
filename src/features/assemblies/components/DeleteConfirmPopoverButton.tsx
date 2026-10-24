@@ -1,7 +1,7 @@
 import { CloseIcon } from "@solar-icons/react/linear/close";
 import { Button, CloseButton, Popover } from "@heroui/react";
 import { useRef, useState } from "react";
-import { BlurBackdrop } from "@/shared/components/BlurBackdrop";
+import { OpaqueBackdrop } from "@/shared/components/OpaqueBackdrop";
 
 type DeleteConfirmPopoverButtonProps = {
   label: string;
@@ -34,7 +34,7 @@ export function DeleteConfirmPopoverButton({
 
   return (
     <>
-      <BlurBackdrop isOpen={isOpen} />
+      <OpaqueBackdrop isOpen={isOpen} />
       <Popover isOpen={isOpen} onOpenChange={handleOpenChange}>
         <Button
           ref={triggerRef}

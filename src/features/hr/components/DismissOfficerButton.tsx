@@ -2,7 +2,7 @@ import { TrashBinTrashIcon } from "@solar-icons/react/linear/trash-bin-trash";
 import { Button, CloseButton, Popover, toast } from "@heroui/react";
 import { useRef } from "react";
 import { getErrorMessage } from "@/lib/http";
-import { BlurBackdrop } from "@/shared/components/BlurBackdrop";
+import { OpaqueBackdrop } from "@/shared/components/OpaqueBackdrop";
 import { useDismissOfficer } from "../hooks/useOfficers";
 import type { Officer, OfficerUnit } from "../types";
 
@@ -34,7 +34,7 @@ export function DismissOfficerButton({ officer, unit, isOpen, onOpenChange }: Di
 
   return (
     <>
-      <BlurBackdrop isOpen={isOpen} />
+      <OpaqueBackdrop isOpen={isOpen} />
       <Popover isOpen={isOpen} onOpenChange={handleOpenChange}>
         <Button
           ref={triggerRef}
