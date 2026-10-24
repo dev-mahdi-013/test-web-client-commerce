@@ -33,3 +33,14 @@ export type AuthSession = {
   tokenId: string;
   user: AuthUser;
 };
+
+/** One of the user's logins, as listed in the active sessions dialog. */
+export type UserSession = {
+  /** Server id of the login; also the token id the logout endpoint expects */
+  id: string;
+  deviceName: string;
+  ip: string | null;
+  /** ISO date of the last activity, missing when the backend sends no timestamp */
+  lastActiveAt: string | null;
+  isCurrent: boolean;
+};

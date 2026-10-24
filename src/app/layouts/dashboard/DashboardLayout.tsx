@@ -1,10 +1,11 @@
 import { Drawer } from "@heroui/react";
 import { useEffect, useState } from "react";
 import { Outlet } from "react-router";
+import { ActiveSessionsDialog } from "@/features/auth/components/ActiveSessionsDialog";
 import { useSession } from "@/features/auth/hooks/useSession";
-import { ConfirmModal } from "@/shared/components/ConfirmModal";
 import { useUiStore } from "@/shared/stores/ui.store";
 import { AppHeader } from "./AppHeader";
+import { LogoutDialog } from "./LogoutDialog";
 import { SidebarContent } from "./SidebarContent";
 
 export function DashboardLayout() {
@@ -12,10 +13,16 @@ export function DashboardLayout() {
   const isMobileNavOpen = useUiStore((state) => state.isMobileNavOpen);
   const setMobileNavOpen = useUiStore((state) => state.setMobileNavOpen);
   const [isLogoutOpen, setLogoutOpen] = useState(false);
+  const [isSessionsOpen, setSessionsOpen] = useState(false);
 
   const requestLogout = () => {
     setMobileNavOpen(false);
     setLogoutOpen(true);
+  };
+
+  const requestSessions = () => {
+    setMobileNavOpen(false);
+    setSessionsOpen(true);
   };
 
   useEffect(() => {
@@ -30,14 +37,18 @@ export function DashboardLayout() {
   return (
     <div className="flex min-h-full">
       <aside className="sticky top-0 hidden h-dvh w-[312px] shrink-0 border-e border-(--panel-border) bg-(--panel) px-[15px] py-10 lg:block">
-        <SidebarContent onRequestLogout={requestLogout} />
+        <SidebarContent onRequestLogout={requestLogout} onRequestSessions={requestSessions} />
       </aside>
 
       <Drawer.Backdrop isOpen={isMobileNavOpen} onOpenChange={setMobileNavOpen}>
         {/* HeroUI mirrors left/right under RTL, so "left" opens from the right edge. */}
         <Drawer.Content className="lg:hidden" placement="left">
           <Drawer.Dialog aria-label="منوی اصلی" className="w-[290px] max-w-[85vw] bg-(--panel) px-5 py-8">
-            <SidebarContent onNavigate={() => setMobileNavOpen(false)} onRequestLogout={requestLogout} />
+            <SidebarContent
+              onNavigate={() => setMobileNavOpen(false)}
+              onRequestLogout={requestLogout}
+              onRequestSessions={requestSessions}
+            />
           </Drawer.Dialog>
         </Drawer.Content>
       </Drawer.Backdrop>
@@ -49,17 +60,15 @@ export function DashboardLayout() {
         </main>
       </div>
 
-      <ConfirmModal
-        confirmLabel="خروج"
-        confirmVariant="danger"
+      <LogoutDialog
         isOpen={isLogoutOpen}
-        message="آیا خروج را تأیید می‌کنید؟"
         onConfirm={() => {
           setLogoutOpen(false);
           logout();
         }}
         onOpenChange={setLogoutOpen}
       />
+      <ActiveSessionsDialog isOpen={isSessionsOpen} onOpenChange={setSessionsOpen} />
     </div>
   );
 }

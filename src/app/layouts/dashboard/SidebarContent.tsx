@@ -1,5 +1,4 @@
 import { Logout2Icon } from "@solar-icons/react/linear/logout-2";
-import { Avatar, Skeleton } from "@heroui/react";
 import { useMemo } from "react";
 import { NavLink } from "react-router";
 import { userMembershipCard } from "@/features/assemblies/user/api/user.api";
@@ -9,15 +8,17 @@ import { activeRoleOf, appRoleOf } from "@/features/profile/roles";
 import { cn } from "@/lib/cn";
 import { BrandLogo } from "@/shared/components/BrandLogo";
 import { navItemsFor } from "./nav-items";
+import { UserMenu } from "./UserMenu";
 
 type SidebarContentProps = {
   onNavigate?: () => void;
   onRequestLogout: () => void;
+  onRequestSessions: () => void;
 };
 
 const itemClassName = "flex h-12 items-center gap-3 rounded-full px-5 text-[15px] transition-colors";
 
-export function SidebarContent({ onNavigate, onRequestLogout }: SidebarContentProps) {
+export function SidebarContent({ onNavigate, onRequestLogout, onRequestSessions }: SidebarContentProps) {
   const profile = useProfile();
   const role = appRoleOf(activeRoleOf(profile.data));
   const visibleNavItems = navItemsFor(role);
@@ -37,24 +38,11 @@ export function SidebarContent({ onNavigate, onRequestLogout }: SidebarContentPr
 
   return (
     <div className="flex h-full flex-col overflow-y-auto">
-      <div className="flex items-center gap-3">
-        <Avatar className="size-12 shrink-0 bg-[#e0e0e0]">
-          <Avatar.Fallback className="bg-[#e0e0e0]" />
-        </Avatar>
-        {profile.data ? (
-          <div className="">
-            <p className="truncate text-[15px] font-bold">{profile.data.fullName}</p>
-            <p className="text-sm text-muted" dir="ltr">
-              {profile.data.phone}
-            </p>
-          </div>
-        ) : (
-          <div className="flex flex-col gap-2">
-            <Skeleton className="h-4 w-32 rounded-full" />
-            <Skeleton className="h-3 w-24 rounded-full" />
-          </div>
-        )}
-      </div>
+      <UserMenu
+        onNavigate={onNavigate}
+        onRequestLogout={onRequestLogout}
+        onRequestSessions={onRequestSessions}
+      />
 
       {userCard && (
         <div className="mt-6 ">

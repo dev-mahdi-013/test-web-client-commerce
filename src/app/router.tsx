@@ -24,6 +24,10 @@ export const router = createBrowserRouter([
             children: [
               { index: true, Component: RoleHome },
               {
+                path: "/profile",
+                lazy: async () => ({ Component: (await import("@/features/profile/pages/ProfilePage")).ProfilePage }),
+              },
+              {
                 element: <RequireAppRole roles={["chamber-president", "other"]} />,
                 children: [
                   {

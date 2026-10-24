@@ -1,6 +1,6 @@
 import { toast } from "@heroui/react";
 import { useEffect, useState } from "react";
-import { toEnglishDigits } from "@/lib/digits";
+import { sanitizeDigitsInput, toEnglishDigits } from "@/lib/digits";
 import { ApiError, getErrorMessage } from "@/lib/http";
 import { isValidPhone, normalizePhone, sanitizePhoneInput } from "@/lib/phone";
 import { useCaptcha } from "./useCaptcha";
@@ -21,10 +21,11 @@ export function usePhoneForm({ initialPhone = "", onCodeSent }: UsePhoneFormOpti
   const sendOtp = useSendOtp();
 
   const [phone, setPhoneValue] = useState(sanitizePhoneInput(initialPhone));
-  const [captchaValue, setCaptchaValue] = useState("");
+  const [captchaValue, setCaptchaValueState] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const setPhone = (value: string) => setPhoneValue(sanitizePhoneInput(value));
+  const setCaptchaValue = (value: string) => setCaptchaValueState(sanitizeDigitsInput(value));
 
   const phoneError = isSubmitted && !isValidPhone(phone) ? "شماره موبایل معتبر نیست" : null;
   const captchaError = captcha.isError

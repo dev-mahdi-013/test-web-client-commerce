@@ -4,6 +4,12 @@
 
 @theme {
   --font-sans: "Peyda", ui-sans-serif, system-ui, sans-serif;
+
+  /* Type scale for the cards, panels and dialogs (text-micro / text-caption / text-note / text-body) */
+  --text-micro: 0.625rem;
+  --text-caption: 0.6875rem;
+  --text-note: 0.8125rem;
+  --text-body: 0.9375rem;
 }
 
 :root {
@@ -21,6 +27,7 @@
   --icon-button: #ebebec;
   --icon-button-hover: #e0e0e2;
   --heading-bullet: #d9d9d9;
+  --avatar-placeholder: #c9c9c9;
   --card-action: #213a5c;
   --card-expiry-alert: #ef4444;
   --card-active: linear-gradient(150deg, #50e24b 0%, #2fcc51 30%, #11a452 65%, #068a4c 100%);

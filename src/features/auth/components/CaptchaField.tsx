@@ -25,6 +25,8 @@ export function CaptchaField({ captcha, value, onChange, error, isDisabled = fal
         <Input
           autoComplete="off"
           className="input-ltr-type h-[43px] w-[134px] shrink-0 rounded-xl bg-(--field-muted) text-sm shadow-none"
+          inputMode="numeric"
+          pattern="[0-9]*"
           placeholder="ورود کپچا"
         />
 
