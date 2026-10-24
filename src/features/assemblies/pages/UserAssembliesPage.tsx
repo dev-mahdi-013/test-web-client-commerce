@@ -37,7 +37,7 @@ export function UserAssembliesPage() {
     <div className="flex w-full  max-w-full flex-col gap-6 overflow-x-hidden">
       <section
         aria-label="مشاهده کارت ها"
-        className="flex  flex-col rounded-[28px] bg-(--panel) p-3 sm:p-4 lg:hidden"
+        className="flex w-full max-w-full flex-col rounded-[28px] bg-(--panel) p-3 sm:w-[350px] sm:p-4 lg:hidden"
       >
         <header className="mb-3 px-1">
           <SectionHeading>مشاهده کارت ها</SectionHeading>

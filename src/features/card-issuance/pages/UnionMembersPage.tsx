@@ -98,7 +98,7 @@ export function UnionMembersPage() {
 
       <section
         aria-label="مشاهده کارت ها"
-        className="order-1 flex flex-col rounded-[20px] bg-(--panel-cards) p-4 sm:p-5 2xl:order-none"
+        className="order-1 flex w-full max-w-full flex-col rounded-[20px] bg-(--panel-cards) p-4 sm:w-[350px] sm:p-5 2xl:order-none 2xl:w-auto"
       >
         <header ref={cards.ref} className="mb-4 scroll-mt-20 px-1 lg:scroll-mt-28">
           <SectionHeading>مشاهده کارت ها</SectionHeading>

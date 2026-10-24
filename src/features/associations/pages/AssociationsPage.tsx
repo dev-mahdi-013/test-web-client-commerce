@@ -108,7 +108,7 @@ export function AssociationsPage() {
 
       <section
         aria-label="اعضای انجمن انتخابی"
-        className="order-1 flex flex-col rounded-[28px] bg-(--panel) p-3 sm:p-4 2xl:order-none"
+        className="order-1 flex w-full max-w-full flex-col rounded-[28px] bg-(--panel) p-3 sm:w-[350px] sm:p-4 2xl:order-none 2xl:w-auto"
       >
         <header
           ref={membersPanel.ref}
