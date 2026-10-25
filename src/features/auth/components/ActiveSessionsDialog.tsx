@@ -17,10 +17,10 @@ export function ActiveSessionsDialog({ isOpen, onOpenChange }: ActiveSessionsDia
       <Modal.Container placement="center">
         <Modal.Dialog
           aria-label="نشست های فعال"
-          className="relative w-[344px] max-w-[calc(100vw-2rem)] rounded-[24px] p-5 shadow-(--box-shadow)"
+          className="relative h-[34rem] max-h-[calc(100dvh-2rem)] w-[344px] max-w-[calc(100vw-2rem)] rounded-[24px] p-5 shadow-(--box-shadow)"
         >
           <Modal.CloseTrigger className="start-auto end-auto right-4 top-4" />
-          <Modal.Body className="flex flex-col gap-5 p-0">
+          <Modal.Body className="flex flex-1 flex-col gap-5 p-0">
             <div className="flex flex-col items-center gap-3 px-2 pt-2 text-center">
               <DevicesIcon className="size-12 text-foreground" strokeWidth={1.6} />
               <h2 className="text-body font-bold text-foreground">نشست های فعال</h2>
@@ -43,9 +43,9 @@ export function ActiveSessionsDialog({ isOpen, onOpenChange }: ActiveSessionsDia
             ) : sessions.length === 0 ? (
               <p className="rounded-2xl bg-(--panel) px-4 py-6 text-center text-xs text-muted">نشست فعالی یافت نشد.</p>
             ) : (
-              <ul dir="ltr" className="flex max-h-[20.25rem] flex-col gap-3 overflow-y-auto pr-1">
+              <ul dir="ltr" className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto pr-1">
                 {sessions.map((session) => (
-                  <li key={session.id} className="flex h-[100px]  flex-col overflow-hidden rounded-2xl bg-(--panel)">
+                  <li key={session.id} className="flex h-[100px] shrink-0 flex-col overflow-hidden rounded-2xl bg-(--panel)">
                     <div className="flex flex-1 items-center justify-between gap-3 px-4">
                       <div className="min-w-0">
                         <p className="truncate text-base font-bold text-foreground">{session.deviceName}</p>
@@ -58,7 +58,7 @@ export function ActiveSessionsDialog({ isOpen, onOpenChange }: ActiveSessionsDia
                         </p>
                       </div>
                       {session.isCurrent ? (
-                        <span className="mt-2 flex h-[30px] min-w-[72px]  items-center justify-center self-start rounded-full bg-(--status-finished-bg) px-[10px] py-[5px] text-sm text-(--status-finished)">
+                        <span className="mt-2 flex h-[30px] min-w-[72px]  items-center justify-center self-start rounded-full bg-(--status-finished-bg) px-[10px] py-[5px] text-xs text-(--status-finished)">
                           دستگاه فعلی
                         </span>
                       ) : null}
@@ -66,7 +66,6 @@ export function ActiveSessionsDialog({ isOpen, onOpenChange }: ActiveSessionsDia
 
                     {session.isCurrent ? null : (
                       <button
-                        dir="rtl"
                         className="w-full  cursor-pointer bg-(--status-canceled-bg) px-4 py-2 text-right text-sm leading-5 text-(--status-canceled) transition-opacity hover:opacity-80 disabled:cursor-default disabled:opacity-50"
                         disabled={endingSessionId === session.id}
                         type="button"
