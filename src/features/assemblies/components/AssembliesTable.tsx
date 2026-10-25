@@ -38,7 +38,7 @@ export function AssembliesTable({ assemblies, startIndex, isLoading }: Assemblie
               <Table.Column className={headerCellClassName}>زمان شروع</Table.Column>
               <Table.Column className={headerCellClassName}>زمان پایان</Table.Column>
               <Table.Column className={`${headerCellClassName} min-w-[200px] text-center`}>
-                <AssemblyStatsColumnHeader />
+                <AssemblyStatsColumnHeader className="inline-flex w-full flex-col items-start gap-0.5 pr-[30px] leading-tight" />
               </Table.Column>
               <Table.Column className={`${headerCellClassName} w-24 text-center`}>مشاهده</Table.Column>
             </Table.Header>
@@ -78,7 +78,7 @@ export function AssembliesTable({ assemblies, startIndex, isLoading }: Assemblie
                     <span dir="ltr">{assembly.endsAt}</span>
                   </Table.Cell>
                   <Table.Cell className={`${cellClassName} text-center`}>
-                    <span className="inline-flex w-full justify-start">
+                    <span className="inline-flex w-full justify-start pr-[30px]">
                       <AssemblyStatsValue assembly={assembly} />
                     </span>
                   </Table.Cell>
