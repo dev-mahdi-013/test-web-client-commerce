@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import { formatJalali } from "@/lib/date";
-import { useLtrEllipsisWhenTruncated } from "@/shared/hooks/useLtrEllipsisWhenTruncated";
+import { useTruncation } from "@/shared/hooks/useTruncation";
+import { TruncationTooltip } from "./TruncationTooltip";
 import { memberKindLabel, type MembershipCardData } from "@/shared/types/membership";
 import { ChamberMark } from "./ChamberMark";
 
@@ -32,15 +33,30 @@ export function CardField({
   ltrEllipsisWhenTruncated = false,
   contentKey,
 }: CardFieldProps) {
-  const truncation = useLtrEllipsisWhenTruncated(ltrEllipsisWhenTruncated, contentKey);
+  const truncation = useTruncation<HTMLSpanElement>(ltrEllipsisWhenTruncated, contentKey);
 
   return (
     <div className={cn("", className)}>
-      <p className={cn("text-caption text-(--card-label)", labelClassName)}>{label}</p>
-      <p ref={truncation.ref} className="mt-0.5 truncate text-note font-bold" dir={truncation.dir}>
-        {value}
-      </p>
+      <TruncationTooltip content={label}>
+        <span className={cn("block text-caption text-(--card-label)", labelClassName)}>{label}</span>
+      </TruncationTooltip>
+      <TruncationTooltip content={value}>
+        <span ref={truncation.ref} className="mt-0.5 block truncate text-note font-bold" dir={truncation.dir}>
+          {value}
+        </span>
+      </TruncationTooltip>
     </div>
+  );
+}
+
+/** One association name in a card's expanded list; its full name shows in a tooltip when cut off. */
+export function CardAssociationName({ name }: { name: string }) {
+  return (
+    <TruncationTooltip content={name}>
+      <span className="block truncate">
+        {name}
+      </span>
+    </TruncationTooltip>
   );
 }
 

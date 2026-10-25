@@ -79,8 +79,11 @@ export function UserVotingAgendaCard({
     setSelectedIds(next);
     onSelectionChange?.(next);
 
-    // Selection is full: briefly show it, then move on to the next agenda.
-    if (next.length === maxSelections && onSelectionComplete) {
+    if (next.length !== maxSelections) return;
+
+    // Selection is full: submit it right away, then move on to the next agenda.
+    onConfirm?.(next);
+    if (onSelectionComplete) {
       if (advanceTimer.current) clearTimeout(advanceTimer.current);
       advanceTimer.current = setTimeout(onSelectionComplete, 300);
     }

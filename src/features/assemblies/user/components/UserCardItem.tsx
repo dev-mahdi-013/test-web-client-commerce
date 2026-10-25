@@ -3,7 +3,7 @@ import { Button, Spinner } from "@heroui/react";
 import { useState } from "react";
 import { cn } from "@/lib/cn";
 import { formatJalali } from "@/lib/date";
-import { CardExpiry, MembershipCard } from "@/shared/components/MembershipCard";
+import { CardAssociationName, CardExpiry, MembershipCard } from "@/shared/components/MembershipCard";
 import type { MembershipCardData } from "@/shared/types/membership";
 import { useUserCardAssociations } from "../hooks/useUserCardAssociations";
 
@@ -55,7 +55,7 @@ export function UserCardItem({ card }: UserCardItemProps) {
                   key={association.id}
                   className="flex justify-between gap-3 border-t border-white/30 py-2 text-note font-medium"
                 >
-                  <span className="truncate">{association.name}</span>
+                  <CardAssociationName name={association.name} />
                   <span dir="ltr">{formatJalali(association.joinedAt)}</span>
                 </li>
               ))}

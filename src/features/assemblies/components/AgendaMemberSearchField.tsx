@@ -42,19 +42,22 @@ export function AgendaMemberSearchField({
   const canSearch = currentCommerceScope() !== "pao" || Boolean(associationId);
   const members = useMembers({ page: 1, query: debouncedQuery, associationId }, canSearch);
 
+  // Association rows use a composite `memberId.roleId` id; the member id is only the part before the dot.
   const allCards = isSearchCurrent
-    ? (members.data?.items ?? []).flatMap((member) => member.cards.map((card) => ({ member, card })))
+    ? (members.data?.items ?? []).flatMap((member) =>
+        member.cards.map((card) => ({ memberId: member.id.split(".")[0], name: member.fullName, card })),
+      )
     : [];
   const candidates: AgendaMemberCandidate[] = allCards
-    .filter(({ member, card }) => {
-      const candidateId = `${member.id}.${card.id}`;
-      return !existingIds.includes(candidateId) && !existingMemberIds.includes(member.id);
+    .filter(({ memberId, card }) => {
+      const candidateId = `${memberId}.${card.id}`;
+      return !existingIds.includes(candidateId) && !existingMemberIds.includes(memberId);
     })
-    .map(({ member, card }) => ({
-      id: `${member.id}.${card.id}`,
-      name: member.fullName,
+    .map(({ memberId, name, card }) => ({
+      id: `${memberId}.${card.id}`,
+      name,
       cardNo: card.cardNo,
-      memberId: member.id,
+      memberId,
       memberRoleId: card.id,
     }));
 

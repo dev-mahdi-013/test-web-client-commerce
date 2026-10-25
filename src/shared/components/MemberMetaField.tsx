@@ -1,7 +1,8 @@
 import type { Icon } from "@solar-icons/react/lib/types";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
-import { useLtrEllipsisWhenTruncated } from "@/shared/hooks/useLtrEllipsisWhenTruncated";
+import { useTruncation } from "@/shared/hooks/useTruncation";
+import { TruncationTooltip } from "./TruncationTooltip";
 
 type MemberMetaFieldProps = {
   icon: Icon;
@@ -26,7 +27,7 @@ export function MemberMetaField({
   ltrEllipsisWhenTruncated = false,
   contentKey,
 }: MemberMetaFieldProps) {
-  const truncation = useLtrEllipsisWhenTruncated(ltrEllipsisWhenTruncated, contentKey);
+  const truncation = useTruncation<HTMLSpanElement>(ltrEllipsisWhenTruncated, contentKey);
 
   return (
     <div className={cn("flex items-center gap-2", className)}>
@@ -39,10 +40,14 @@ export function MemberMetaField({
         <FieldIcon className="size-3.5" />
       </span>
       <div className="min-w-0">
-        <p className="text-micro text-muted">{label}</p>
-        <p ref={truncation.ref} className="truncate text-xs font-bold" dir={truncation.dir}>
-          {value}
-        </p>
+        <TruncationTooltip content={label}>
+          <span className="block text-micro text-muted">{label}</span>
+        </TruncationTooltip>
+        <TruncationTooltip content={value}>
+          <span ref={truncation.ref} className="block truncate text-xs font-bold" dir={truncation.dir}>
+            {value}
+          </span>
+        </TruncationTooltip>
       </div>
     </div>
   );
