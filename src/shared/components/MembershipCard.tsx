@@ -34,13 +34,16 @@ export function CardField({
   contentKey,
 }: CardFieldProps) {
   const truncation = useTruncation<HTMLSpanElement>(ltrEllipsisWhenTruncated, contentKey);
+  const labelTruncation = useTruncation<HTMLSpanElement>(false);
 
   return (
     <div className={cn("", className)}>
-      <TruncationTooltip content={label}>
-        <span className={cn("block text-caption text-(--card-label)", labelClassName)}>{label}</span>
+      <TruncationTooltip content={label} isTruncated={labelTruncation.isTruncated}>
+        <span ref={labelTruncation.ref} className={cn("block text-caption text-(--card-label)", labelClassName)}>
+          {label}
+        </span>
       </TruncationTooltip>
-      <TruncationTooltip content={value}>
+      <TruncationTooltip content={value} isTruncated={truncation.isTruncated}>
         <span ref={truncation.ref} className="mt-0.5 block truncate text-note font-bold" dir={truncation.dir}>
           {value}
         </span>
@@ -51,9 +54,11 @@ export function CardField({
 
 /** One association name in a card's expanded list; its full name shows in a tooltip when cut off. */
 export function CardAssociationName({ name }: { name: string }) {
+  const truncation = useTruncation<HTMLSpanElement>(false, name);
+
   return (
-    <TruncationTooltip content={name}>
-      <span className="block truncate">
+    <TruncationTooltip content={name} isTruncated={truncation.isTruncated}>
+      <span ref={truncation.ref} className="block truncate">
         {name}
       </span>
     </TruncationTooltip>

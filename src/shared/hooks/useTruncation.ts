@@ -5,21 +5,30 @@ function isOverflowing(el: HTMLElement) {
 }
 
 /**
- * For a single-line truncated element: while the text is cut off and `ltrWhenTruncated` is set,
- * `dir` is "ltr" so the ellipsis sits on the right.
+ * Tracks whether a single-line truncated element is cut off.
+ * - `isTruncated` is true while the text is cut off, so a tooltip with the full text can be shown.
+ * - `dir` is "ltr" while cut off (when `ltrWhenTruncated`), so the ellipsis sits on the right.
  */
 export function useTruncation<T extends HTMLElement>(ltrWhenTruncated: boolean, contentKey?: string) {
   const ref = useRef<T>(null);
+  const [isTruncated, setTruncated] = useState(false);
   const [dir, setDir] = useState<"ltr" | undefined>();
+
+  // Re-check after every render, since the text may have changed without a resize.
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (el) setTruncated(isOverflowing(el));
+  });
 
   useLayoutEffect(() => {
     const el = ref.current;
-    if (!el || !ltrWhenTruncated) {
-      setDir(undefined);
-      return;
-    }
+    if (!el) return;
 
-    const update = () => setDir(isOverflowing(el) ? "ltr" : undefined);
+    const update = () => {
+      const overflowing = isOverflowing(el);
+      setTruncated(overflowing);
+      setDir(ltrWhenTruncated && overflowing ? "ltr" : undefined);
+    };
 
     update();
     const observer = new ResizeObserver(update);
@@ -27,5 +36,5 @@ export function useTruncation<T extends HTMLElement>(ltrWhenTruncated: boolean, 
     return () => observer.disconnect();
   }, [ltrWhenTruncated, contentKey]);
 
-  return { ref, dir };
+  return { ref, dir, isTruncated };
 }

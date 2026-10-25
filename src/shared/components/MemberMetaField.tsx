@@ -28,6 +28,7 @@ export function MemberMetaField({
   contentKey,
 }: MemberMetaFieldProps) {
   const truncation = useTruncation<HTMLSpanElement>(ltrEllipsisWhenTruncated, contentKey);
+  const labelTruncation = useTruncation<HTMLSpanElement>(false);
 
   return (
     <div className={cn("flex items-center gap-2", className)}>
@@ -40,10 +41,12 @@ export function MemberMetaField({
         <FieldIcon className="size-3.5" />
       </span>
       <div className="min-w-0">
-        <TruncationTooltip content={label}>
-          <span className="block text-micro text-muted">{label}</span>
+        <TruncationTooltip content={label} isTruncated={labelTruncation.isTruncated}>
+          <span ref={labelTruncation.ref} className="block text-micro text-muted">
+            {label}
+          </span>
         </TruncationTooltip>
-        <TruncationTooltip content={value}>
+        <TruncationTooltip content={value} isTruncated={truncation.isTruncated}>
           <span ref={truncation.ref} className="block truncate text-xs font-bold" dir={truncation.dir}>
             {value}
           </span>
