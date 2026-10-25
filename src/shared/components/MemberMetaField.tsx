@@ -8,6 +8,8 @@ type MemberMetaFieldProps = {
   label: string;
   value: ReactNode;
   className?: string;
+  /** Overrides the icon circle styling (e.g. a muted circle on a white surface). */
+  iconClassName?: string;
   /** When true, forces LTR only while truncated so ellipsis sits on the right. */
   ltrEllipsisWhenTruncated?: boolean;
   /** Re-measure truncation when this identity changes. */
@@ -20,6 +22,7 @@ export function MemberMetaField({
   label,
   value,
   className,
+  iconClassName,
   ltrEllipsisWhenTruncated = false,
   contentKey,
 }: MemberMetaFieldProps) {
@@ -27,11 +30,16 @@ export function MemberMetaField({
 
   return (
     <div className={cn("flex items-center gap-2", className)}>
-      <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-white text-muted">
+      <span
+        className={cn(
+          "flex size-6 shrink-0 items-center justify-center rounded-full bg-white text-muted",
+          iconClassName,
+        )}
+      >
         <FieldIcon className="size-3.5" />
       </span>
       <div className="min-w-0">
-        <p className="text-[10px] text-muted">{label}</p>
+        <p className="text-micro text-muted">{label}</p>
         <p ref={truncation.ref} className="truncate text-xs font-bold" dir={truncation.dir}>
           {value}
         </p>

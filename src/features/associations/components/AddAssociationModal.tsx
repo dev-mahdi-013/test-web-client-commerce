@@ -73,7 +73,7 @@ export function AddAssociationModal({ isOpen, onOpenChange }: AddAssociationModa
                   </TextField>
 
                   <div className="flex flex-col gap-1.5">
-                    <span className="text-sm font-bold text-foreground">تاریخ</span>
+                    <span className="text-sm font-bold text-foreground">تاریخ تأسیس</span>
                     <JalaliDateField
                       className={inputClassName}
                       label="تاریخ تأسیس انجمن"

@@ -1,5 +1,6 @@
 import { EyeIcon } from "@solar-icons/react/linear/eye";
 import { Button, Spinner, Table } from "@heroui/react";
+import { cn } from "@/lib/cn";
 import { selectableRowClassName, singleSelectionProps } from "@/shared/components/tableSelection";
 import type { ChamberMember } from "../types";
 
@@ -10,6 +11,8 @@ type MembersListProps = {
   isLoading: boolean;
   onSelect: (id: string) => void;
   showAssociationCount?: boolean;
+  /** Fill the parent's height and scroll rows (and columns) inside it, keeping the header sticky. */
+  fillHeight?: boolean;
 };
 
 export function MembersTable({
@@ -19,12 +22,20 @@ export function MembersTable({
   isLoading,
   onSelect,
   showAssociationCount = true,
+  fillHeight = false,
 }: MembersListProps) {
   const rows = members.map((member, index) => ({ ...member, rowNumber: startIndex + index }));
 
   return (
-    <Table className="flex min-w-0 flex-col bg-transparent p-0">
-      <Table.ScrollContainer className="w-full min-w-0 overflow-auto">
+    <Table
+      className={cn(
+        "flex min-w-0 flex-col bg-transparent p-0",
+        fillHeight && "relative min-h-0 flex-1 overflow-hidden",
+      )}
+    >
+      <Table.ScrollContainer
+        className={cn("w-full min-w-0 overflow-auto", fillHeight && "absolute inset-0 w-auto")}
+      >
         <Table.Content
           aria-label="لیست اعضا"
           className={showAssociationCount ? "min-w-[720px]" : "min-w-[560px]"}

@@ -40,7 +40,7 @@ export function DismissOfficerButton({ officer, unit, isOpen, onOpenChange }: Di
           ref={triggerRef}
           aria-expanded={isOpen}
           aria-label={`عزل ${officer.fullName}`}
-          className="h-8 min-w-[72px] gap-1.5 rounded-full px-4 text-[13px]"
+          className="h-8 min-w-[72px] gap-1.5 rounded-full px-4 text-note"
           isDisabled={!!officer.dismissedAt}
           size="sm"
           variant="danger"

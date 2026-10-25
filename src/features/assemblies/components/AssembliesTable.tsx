@@ -78,7 +78,7 @@ export function AssembliesTable({ assemblies, startIndex, isLoading }: Assemblie
                     <span dir="ltr">{assembly.endsAt}</span>
                   </Table.Cell>
                   <Table.Cell className={`${cellClassName} text-center`}>
-                    <span className="inline-flex w-full justify-center">
+                    <span className="inline-flex w-full justify-start">
                       <AssemblyStatsValue assembly={assembly} />
                     </span>
                   </Table.Cell>

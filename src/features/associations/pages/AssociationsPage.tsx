@@ -16,7 +16,7 @@ import { useChangeAssociationBoss, useUpdateAssociation } from "../hooks/useAsso
 import { useAssociationMembers, useAssociations } from "../hooks/useAssociations";
 import type { Association } from "../types";
 
-const addButtonClassName = "h-9 gap-2 rounded-full ps-4 pe-2 text-[13px]";
+const addButtonClassName = "h-9 gap-2 rounded-full ps-4 pe-2 text-note";
 
 export function AssociationsPage() {
   const profile = useProfile();
@@ -108,7 +108,7 @@ export function AssociationsPage() {
 
       <section
         aria-label="اعضای انجمن انتخابی"
-        className="order-1 flex w-full max-w-full flex-col rounded-[28px] bg-(--panel) p-3 sm:w-[350px] sm:p-4 2xl:order-none 2xl:w-auto"
+        className="order-1 flex w-full max-w-full flex-col rounded-[28px] bg-(--panel) p-3 sm:p-4 2xl:order-none 2xl:h-[727px]"
       >
         <header
           ref={membersPanel.ref}

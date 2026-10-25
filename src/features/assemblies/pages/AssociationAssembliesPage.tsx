@@ -10,7 +10,7 @@ import { OrganizationsAssembliesToolbar } from "../organizations/components/Orga
 import type { AssemblyStatus } from "../types";
 
 const ALL = "all";
-const addButtonClassName = "h-9 gap-2 rounded-full ps-4 pe-2 text-[13px]";
+const addButtonClassName = "h-9 gap-2 rounded-full ps-4 pe-2 text-note";
 const DETAIL_BASE_PATH = "/association/assemblies";
 
 /** Assemblies list for the association-head (رئیس انجمن مجامع) role. */

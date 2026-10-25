@@ -13,7 +13,7 @@ export function useSession() {
     isAuthenticated: session !== null,
     logout: () => {
       // Ending the session on the server is best-effort; the user is signed out locally either way.
-      if (session) authApi.logout(session.tokenId).catch(() => {});
+      if (session) authApi.logout(session.tokenId, session.accessToken).catch(() => {});
       clearSession();
       queryClient.clear();
     },

@@ -10,7 +10,7 @@ type AssociationAssemblyHeaderActionsProps = {
 };
 
 const buttonClassName =
-  "h-9 max-w-full gap-1.5 rounded-full px-2.5 text-[11px] sm:h-[46px] sm:gap-2 sm:px-4 sm:text-[13px]";
+  "h-9 max-w-full gap-1.5 rounded-full px-2.5 text-caption sm:h-[46px] sm:gap-2 sm:px-4 sm:text-note";
 
 /** Send / cancel review controls for association-head assembly detail. */
 export function AssociationAssemblyHeaderActions({

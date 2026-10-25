@@ -9,6 +9,7 @@ import { AssemblySummaryCard } from "../components/AssemblySummaryCard";
 import { VotersRingCard } from "../components/VotersRingCard";
 import { organizationsStatusMeta } from "../config";
 import { useAssembly } from "../hooks/useAssemblies";
+import { useAssemblyOwnerCheck } from "../hooks/useAssemblyOwnerCheck";
 import {
   useAddAgenda,
   useAddAgendaCandidate,
@@ -37,34 +38,8 @@ export function OrganizationsAssemblyDetailPage() {
 
   const statusBusy = updateStatus.isPending;
 
-  // The backend's `createdBy.data._id` is not guaranteed to equal the role id, so
-  // compare it against every identifier carried by the active role (id, roleId,
-  // _id, chamber/association ids, ...). If no id matches, fall back to comparing
-  // the creator's display name with the logged-in user's name.
-  const isCreatedByCurrentUser = useMemo(() => {
-    if (!detail) return false;
-    const activeRole =
-      session?.user.roles.find((role) => role.id === activeRoleId) ?? session?.user.roles[0];
-
-    const createdById = detail.createdById?.trim().toLowerCase();
-    if (createdById && activeRole) {
-      const matchesId = Object.values(activeRole).some(
-        (value) => typeof value === "string" && value.trim().toLowerCase() === createdById,
-      );
-      if (matchesId) return true;
-    }
-
-    const normalizeName = (value: string) =>
-      value
-        .replace(/\u200c/g, "")
-        .replace(/ي/g, "ی")
-        .replace(/ك/g, "ک")
-        .replace(/\s+/g, "")
-        .toLowerCase();
-    const creatorName = normalizeName(detail.createdBy ?? "");
-    const userName = normalizeName(session?.user.name ?? "");
-    return creatorName !== "" && creatorName !== "—" && creatorName === userName;
-  }, [activeRoleId, detail, session]);
+  const isOwner = useAssemblyOwnerCheck();
+  const isCreatedByCurrentUser = detail ? isOwner(detail) : false;
 
   const headerActions = useMemo(() => {
     if (!detail) return null;
@@ -168,6 +143,7 @@ export function OrganizationsAssemblyDetailPage() {
             <h3 className="text-right text-sm font-medium text-foreground">افزودن دستور</h3>
             <AddAgendaForm
               associationId={detail.associationId}
+              assemblyUnit={detail.unit}
               isPending={addAgenda.isPending}
               onSubmit={(input) => {
                 addAgenda.mutate(input);
@@ -180,6 +156,7 @@ export function OrganizationsAssemblyDetailPage() {
             <OrganizationsAgendaCard
               key={agenda.id}
               associationId={detail.associationId}
+              assemblyUnit={detail.unit}
               agenda={agenda}
               canEditFields={canEditAgendaFields}
               isDeleteBusy={removeAgenda.isPending || removeCandidate.isPending}

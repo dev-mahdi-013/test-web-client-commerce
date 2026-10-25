@@ -6,9 +6,11 @@ export type AssemblyUnit = "همه" | "حقیقی" | "حقوقی";
 export type AssemblyVoterStat = {
   /** `target.data.membersCount` — کل */
   total: number;
+  /** `target.data.allowedMembersCount` — واجدین */
+  eligible: number;
   /** `stats.votersCount` — رأی‌دهندگان */
   voted: number;
-  /** `stats.registeredCount` — حضوری / حاضرین */
+  /** `stats.registerCount` — حاضرین */
   present: number;
   /** `total - voted` */
   remaining: number;
@@ -50,6 +52,8 @@ export type AssemblyAgenda = {
   id: string;
   title: string;
   hasVoted?: boolean;
+  /** Candidate ids the current user already voted for (from `survey.voted`). */
+  votedOptionIds?: string[];
   kind: AgendaKind;
   unit: AssemblyUnit;
   minSelections: number;

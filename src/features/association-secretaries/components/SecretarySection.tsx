@@ -68,7 +68,7 @@ export function SecretarySection() {
           <span aria-hidden className="size-2 shrink-0 rounded-full bg-(--heading-bullet)" />
           {SECRETARY_SECTION_TITLE}
         </h2>
-        <Button className="h-8 gap-2 rounded-full ps-4 pe-2 text-[13px]" size="sm" onPress={addModal.open}>
+        <Button className="h-8 gap-2 rounded-full ps-4 pe-2 text-note" size="sm" onPress={addModal.open}>
           افزودن دبیر
           <AddCircleIcon className="size-5" />
         </Button>

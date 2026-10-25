@@ -38,7 +38,7 @@ export function UserCardItem({ card }: UserCardItemProps) {
     >
       {isOpen && (
         <div className="animate-fade-in mt-3">
-          <div className="flex justify-between pb-1.5 text-[11px] text-(--card-label)">
+          <div className="flex justify-between pb-1.5 text-caption text-(--card-label)">
             <span>نام انجمن</span>
             <span>تاریخ عضویت</span>
           </div>
@@ -53,7 +53,7 @@ export function UserCardItem({ card }: UserCardItemProps) {
               {(associations.data ?? []).map((association) => (
                 <li
                   key={association.id}
-                  className="flex justify-between gap-3 border-t border-white/30 py-2 text-[13px] font-medium"
+                  className="flex justify-between gap-3 border-t border-white/30 py-2 text-note font-medium"
                 >
                   <span className="truncate">{association.name}</span>
                   <span dir="ltr">{formatJalali(association.joinedAt)}</span>

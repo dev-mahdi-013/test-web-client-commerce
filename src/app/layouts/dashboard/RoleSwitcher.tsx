@@ -6,7 +6,7 @@ import { useNavigate } from "react-router";
 import { useAssociations } from "@/features/associations/hooks/useAssociations";
 import { useSessionStore } from "@/features/auth/stores/session.store";
 import { useProfile } from "@/features/profile/hooks/useProfile";
-import { appRoleOf, homePathFor, roleTitleOf, type AppRole } from "@/features/profile/roles";
+import { appRoleOf, homePathFor, roleAssociationNameOf, roleTitleOf, type AppRole } from "@/features/profile/roles";
 import type { UserRole } from "@/features/profile/types";
 import { cn } from "@/lib/cn";
 import { singleSelectedKeys } from "@/shared/components/tableSelection";
@@ -34,20 +34,9 @@ function isAssociationRole(role: UserRole) {
   return appRole !== "organizations" && ASSOCIATION_TITLE_PATTERN.test(roleTitleOf(role));
 }
 
-/** Drops the «اتاق بازرگانی» prefix so only the place name remains (e.g. «قزوین»). */
-function stripChamberPrefix(name: string) {
-  return name
-    .trim()
-    .replace(/^اتاق\s+بازرگانی[\s،,:-]*/u, "")
-    .replace(/^اتاق[\s،,:-]+/u, "")
-    .trim();
-}
-
-/** Place name of the role's chamber; falls back to the province name when the backend sends none. */
+/** Name stored on the role in localStorage: association name first, then the chamber name as the backend sent it. */
 function chamberLabelOf(role: UserRole) {
-  const chamberName = role.chamberName ? stripChamberPrefix(role.chamberName) : "";
-  if (chamberName) return chamberName;
-  return findProvince(role.province)?.name;
+  return roleAssociationNameOf(role) ?? (role.chamberName?.trim() || findProvince(role.province)?.name);
 }
 
 type RoleCopyProps = {
@@ -91,13 +80,15 @@ export function RoleSwitcher() {
   // The association endpoint is only valid for the real association app roles.
   const canFetchAssociation = activeRole !== undefined && ASSOCIATION_APP_ROLES.has(appRoleOf(activeRole));
   const associations = useAssociations({ page: 1 }, { enabled: canFetchAssociation });
-  // The name comes only from the association API response: nothing is shown until it arrives,
-  // and only for the active role (the one the response belongs to).
+  // The association name stored on the role in the persisted session (localStorage) always wins; the association
+  // API response is only a fallback for the active role when the role carries no name.
   const associationNameOf = (role: UserRole) =>
-    role.id === activeRole?.id && canFetchAssociation ? associations.data?.items[0]?.name || undefined : undefined;
-  // A dash keeps the subtitle line (and the item height) while the name is missing or loading.
+    roleAssociationNameOf(role) ??
+    (role.id === activeRole?.id && canFetchAssociation ? associations.data?.items[0]?.name || undefined : undefined);
+  // Every role gets a subtitle: association roles show the association name (a dash keeps the line and the item
+  // height while it is missing or loading), the others show their chamber name (association name first when present).
   const associationSubtitleOf = (role: UserRole) =>
-    isAssociationRole(role) ? associationNameOf(role) ?? NO_NAME_PLACEHOLDER : undefined;
+    isAssociationRole(role) ? associationNameOf(role) ?? NO_NAME_PLACEHOLDER : chamberLabelOf(role);
   // Association roles show the association name; every other role shows its chamber name.
   const triggerSubtitle = activeRole
     ? activeAssociationRole

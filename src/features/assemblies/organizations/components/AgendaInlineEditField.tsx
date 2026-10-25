@@ -16,6 +16,7 @@ type AgendaInlineEditFieldProps = {
   value: string;
   accessibleName: string;
   isEditable: boolean;
+  isEditDisabled?: boolean;
   valueMinWidth: 118 | 207;
   editor: Editor;
   className?: string;
@@ -27,6 +28,7 @@ export function AgendaInlineEditField({
   value,
   accessibleName,
   isEditable,
+  isEditDisabled = false,
   valueMinWidth,
   editor,
   className,
@@ -113,6 +115,7 @@ export function AgendaInlineEditField({
                   isIconOnly
                   aria-label={`ویرایش ${accessibleName}`}
                   className="size-4 min-w-4 shrink-0 rounded-full bg-accent text-white"
+                  isDisabled={isEditDisabled}
                   size="sm"
                   onPress={startEditing}
                 >

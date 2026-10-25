@@ -81,7 +81,7 @@ export type ApiPollTarget = {
 export type ApiPoll = {
   _id: string;
   title: string;
-  stats?: { registeredCount?: number; votersCount?: number };
+  stats?: { registerCount?: number; votersCount?: number };
   status: number;
   target?: ApiPollTarget;
   createdBy?: { type?: string; data?: { _id?: string; name?: string } };
@@ -119,7 +119,7 @@ export type ApiSurvey = {
   _id: string;
   pollId?: string;
   title: string;
-  voted?: { _id?: string } | null;
+  voted?: ({ _id?: string } & Record<string, unknown>) | null;
   maxSelection?: number;
   eligibilityScope?: number;
   orderItemSource?: { type?: string };
@@ -144,8 +144,9 @@ function createdByLabel(poll: ApiPoll) {
 
 export function toAssembly(poll: ApiPoll): Assembly {
   const total = poll.target?.data.membersCount ?? 0;
+  const eligible = poll.target?.data.allowedMembersCount ?? 0;
   const voted = poll.stats?.votersCount ?? 0;
-  const present = poll.stats?.registeredCount ?? 0;
+  const present = poll.stats?.registerCount ?? 0;
   const startIso = fromEpoch(poll.startDate ?? 0);
   const endIso = fromEpoch(poll.endDate ?? 0);
 
@@ -166,6 +167,7 @@ export function toAssembly(poll: ApiPoll): Assembly {
     unit: toAssemblyUnit(poll.target?.data.eligibilityScope),
     voters: {
       total,
+      eligible,
       voted,
       present,
       remaining: Math.max(0, total - voted),
@@ -193,23 +195,61 @@ function toCandidate(item: ApiSurveyItem): AgendaCandidate {
   };
 }
 
+const VOTED_OPTION_KEYS = ["voteOptions", "options", "items", "selectedItems", "selected", "votes", "answers"];
+
+function votedOptionId(value: unknown): string | null {
+  if (typeof value === "string") return value;
+  if (!value || typeof value !== "object") return null;
+  const record = value as Record<string, unknown>;
+  const data = record.data && typeof record.data === "object" ? (record.data as Record<string, unknown>) : {};
+  for (const candidate of [record.itemId, record.optionId, record._id, record.id, data._id]) {
+    if (typeof candidate === "string") return candidate;
+  }
+  return null;
+}
+
+/** Candidate ids the current user already voted for, matched on item id or member id. */
+function toVotedOptionIds(survey: ApiSurvey, candidates: AgendaCandidate[]): string[] {
+  const voted = survey.voted;
+  if (!voted) return [];
+
+  const raw: string[] = [];
+  for (const key of VOTED_OPTION_KEYS) {
+    const list = voted[key];
+    if (!Array.isArray(list)) continue;
+    for (const entry of list) {
+      const id = votedOptionId(entry);
+      if (id) raw.push(id);
+    }
+  }
+
+  const ids = new Set<string>();
+  for (const id of raw) {
+    const match = candidates.find((candidate) => candidate.id === id || candidate.memberId === id);
+    if (match) ids.add(match.id);
+  }
+  return [...ids];
+}
+
 export function toAgenda(survey: ApiSurvey): AssemblyAgenda {
   const kind: AgendaKind = survey.orderItemSource?.type === "FromMembers" ? "person" : "text";
+  const candidates = (survey.items ?? []).map(toCandidate);
   return {
     id: survey._id,
     title: survey.title,
     hasVoted: Boolean(survey.voted?._id),
+    votedOptionIds: toVotedOptionIds(survey, candidates),
     kind,
     unit: toAssemblyUnit(survey.eligibilityScope),
     minSelections: survey.maxSelection ?? 1,
-    candidates: (survey.items ?? []).map(toCandidate),
+    candidates,
   };
 }
 
 function toVoterStats(poll: ApiPoll): AssemblyVoters {
   const total = poll.target?.data.membersCount ?? 0;
   const eligible = poll.target?.data.allowedMembersCount ?? 0;
-  const present = poll.stats?.registeredCount ?? 0;
+  const present = poll.stats?.registerCount ?? 0;
   const voted = poll.stats?.votersCount ?? 0;
   return {
     total,

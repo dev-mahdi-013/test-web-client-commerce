@@ -118,3 +118,11 @@ export function activeRoleOf(profile: Profile | undefined): UserRole | undefined
   if (!profile) return undefined;
   return profile.roles.find((role) => role.id === profile.activeRoleId) ?? profile.roles[0];
 }
+
+/** Association name carried on the role in the persisted session (`hodhod.session`), if any. */
+export function roleAssociationNameOf(role: UserRole): string | undefined {
+  const association = role.association;
+  const nested = typeof association === "object" && association !== null ? (association as { name?: unknown }).name : undefined;
+  const value = [role.associationName, nested].find((item): item is string => typeof item === "string" && item.trim() !== "");
+  return value?.trim();
+}

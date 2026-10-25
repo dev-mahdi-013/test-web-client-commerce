@@ -5,8 +5,8 @@ type AssemblyStatsValueProps = {
 };
 
 /**
- * `کل | نوع | حاضرین | رأی‌دهندگان`
- * from membersCount, eligibilityScope, registeredCount, votersCount.
+ * `کل | نوع | حاضرین | رأی دهندگان`
+ * from membersCount, eligibilityScope, registerCount, votersCount.
  */
 export function AssemblyStatsValue({ assembly }: AssemblyStatsValueProps) {
   const total = Number(assembly.voters.total) || 0;
@@ -16,9 +16,8 @@ export function AssemblyStatsValue({ assembly }: AssemblyStatsValueProps) {
 
   return (
     <span
-      aria-label={`آمار ${total} کل، ${assembly.unit}، ${present} حاضر، ${voted} رأی‌دهنده`}
+      aria-label={`آمار ${total} کل، نوع ${assembly.unit}، ${present} حاضرین، ${voted} رأی دهندگان`}
       className="inline-flex items-center gap-1.5 whitespace-nowrap tabular-nums"
-      dir="ltr"
     >
       {parts.map((part, index) => (
         <span key={`${part}-${index}`} className="inline-flex items-center gap-1.5">
@@ -33,10 +32,10 @@ export function AssemblyStatsValue({ assembly }: AssemblyStatsValueProps) {
 /** Shared column header for the stats cell. */
 export function AssemblyStatsColumnHeader({ className }: { className?: string }) {
   return (
-    <span className={className ?? "inline-flex w-full flex-col items-center gap-0.5 leading-tight"}>
+    <span className={className ?? "inline-flex w-full flex-col items-start gap-0.5 pr-[28px] leading-tight"}>
       <span className="text-xs font-medium text-foreground">آمار</span>
-      <span className="text-[10px] font-normal text-muted" dir="ltr">
-        کل | نوع | حاضرین | رأی‌دهندگان
+      <span className="text-micro font-normal text-muted" dir="ltr">
+        کل | نوع | حاضرین | رأی دهندگان
       </span>
     </span>
   );

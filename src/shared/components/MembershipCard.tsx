@@ -36,8 +36,8 @@ export function CardField({
 
   return (
     <div className={cn("", className)}>
-      <p className={cn("text-[11px] text-(--card-label)", labelClassName)}>{label}</p>
-      <p ref={truncation.ref} className="mt-0.5 truncate text-[13px] font-bold" dir={truncation.dir}>
+      <p className={cn("text-caption text-(--card-label)", labelClassName)}>{label}</p>
+      <p ref={truncation.ref} className="mt-0.5 truncate text-note font-bold" dir={truncation.dir}>
         {value}
       </p>
     </div>
@@ -83,7 +83,7 @@ export function MembershipCard({ card, footer, children, dimWhenExpired = true, 
           <CardField
             contentKey={card.managerNationalId ?? undefined}
             label="کد ملی مدیر عامل"
-            labelClassName="whitespace-nowrap text-[10px]"
+            labelClassName="truncate text-micro"
             ltrEllipsisWhenTruncated
             value={<span dir="ltr">{card.managerNationalId ?? "—"}</span>}
           />
@@ -104,7 +104,7 @@ export function MembershipCard({ card, footer, children, dimWhenExpired = true, 
       </div>
 
       <div className="bg-white/8 px-4 py-3">
-        <div className="flex min-h-9 items-center justify-between gap-3">{footer}</div>
+        <div className="flex min-h-9 flex-wrap items-center justify-between gap-x-3 gap-y-2">{footer}</div>
         {children}
       </div>
     </article>
@@ -115,7 +115,10 @@ export function MembershipCardPlaceholder() {
   const bar = "h-2 rounded-full bg-white/60";
 
   return (
-    <div aria-hidden className={cn("overflow-hidden rounded-[20px] shadow-(--box-shadow)", expiredBackground)}>
+    <div
+      aria-hidden
+      className={cn("w-full max-w-100 overflow-hidden rounded-[20px] shadow-(--box-shadow) 2xl:max-w-none", expiredBackground)}
+    >
       <div className="grid grid-cols-3 gap-x-3 gap-y-5 px-4 pt-4 pb-5">
         <div className="flex flex-col gap-1.5">
           <span className={cn(bar, "w-10")} />

@@ -35,8 +35,9 @@ export function DashboardLayout() {
   }, [setMobileNavOpen]);
 
   return (
-    <div className="flex min-h-full">
-      <aside className="sticky top-0 hidden h-dvh w-[312px] shrink-0 border-e border-(--panel-border) bg-(--panel) px-[15px] py-10 lg:block">
+    // On desktop the shell is exactly one viewport tall: the sidebar stays put and only the content scrolls.
+    <div className="flex min-h-full lg:h-dvh lg:overflow-hidden">
+      <aside className="hidden h-full w-[312px] shrink-0 overflow-hidden border-e border-(--panel-border) bg-(--panel) px-[15px] py-10 lg:block">
         <SidebarContent onRequestLogout={requestLogout} onRequestSessions={requestSessions} />
       </aside>
 
@@ -53,7 +54,7 @@ export function DashboardLayout() {
         </Drawer.Content>
       </Drawer.Backdrop>
 
-      <div className="flex w-full flex-1 flex-col bg-(--background) px-6 pb-5 lg:px-10 lg:pb-0 2xl:px-24">
+      <div className="flex min-w-0 flex-1 flex-col bg-(--background) px-6 pb-5 lg:h-full lg:overflow-y-auto lg:px-10 lg:pb-0 2xl:px-24">
         <AppHeader />
         <main className="mt-1  lg:mt-6">
           <Outlet />

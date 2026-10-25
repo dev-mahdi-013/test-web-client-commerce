@@ -31,24 +31,36 @@ function AssociationMemberCard({
   const [memberId = "", memberRoleId = ""] = member.id.split(".");
 
   return (
-    <article className="overflow-hidden rounded-[20px] bg-(--field-muted) p-2 2xl:p-0">
-      <div className="grid grid-cols-2 gap-x-3 gap-y-3 rounded-2xl bg-white px-3 pt-3 pb-4 2xl:rounded-none 2xl:bg-transparent">
-        <MemberMetaField icon={UserIcon} label="نام و نام خانوادگی" value={member.fullName} />
+    <article className="overflow-hidden rounded-[20px] bg-white">
+      <div className="grid grid-cols-2 gap-x-3 gap-y-3 px-4 pt-4 pb-4">
+        <MemberMetaField
+          icon={UserIcon}
+          iconClassName="bg-(--field-muted)"
+          label="نام و نام خانوادگی"
+          value={member.fullName}
+        />
         <MemberMetaField
           icon={CalendarIcon}
+          iconClassName="bg-(--field-muted)"
           label="تاریخ عضویت"
           value={<span dir="ltr">{formatJalali(member.joinedAt)}</span>}
         />
-        <MemberMetaField icon={PhoneIcon} label="شماره تماس" value={<span dir="ltr">{member.phone}</span>} />
+        <MemberMetaField
+          icon={PhoneIcon}
+          iconClassName="bg-(--field-muted)"
+          label="شماره تماس"
+          value={<span dir="ltr">{member.phone}</span>}
+        />
         <MemberMetaField
           icon={UserIdIcon}
+          iconClassName="bg-(--field-muted)"
           label="کد ملی"
           value={<span dir="ltr">{member.card.managerNationalId ?? "------"}</span>}
         />
       </div>
       <MembershipCard
         card={member.card}
-        className="mt-2 shadow-none 2xl:mt-0"
+        className="shadow-none"
         dimWhenExpired={false}
         footer={
           canManageCards ? (
@@ -89,7 +101,7 @@ export function AssociationMembersColumn({
   }
 
   return (
-    <CardCarousel>
+    <CardCarousel peek>
       {members.map((member) => (
         <AssociationMemberCard
           key={member.id}

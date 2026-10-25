@@ -130,6 +130,7 @@ export function AssociationAssemblyDetailPage() {
             <h3 className="text-right text-sm font-medium text-foreground">افزودن دستور</h3>
             <AddAgendaForm
               associationId={detail.associationId}
+              assemblyUnit={detail.unit}
               isPending={addAgenda.isPending}
               onSubmit={(input) => {
                 addAgenda.mutate(input);
@@ -142,6 +143,7 @@ export function AssociationAssemblyDetailPage() {
             <OrganizationsAgendaCard
               key={agenda.id}
               associationId={detail.associationId}
+              assemblyUnit={detail.unit}
               agenda={agenda}
               canEditFields={canEditAgendaFields}
               isDeleteBusy={removeAgenda.isPending || removeCandidate.isPending}

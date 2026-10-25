@@ -1,5 +1,5 @@
 import { Button, Table, toast } from "@heroui/react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/cn";
 import { agendaKindLabel } from "../../config";
 import type { AssemblyAgenda } from "../../types";
@@ -8,6 +8,13 @@ import { AssemblyDetailField } from "../../components/AssemblyDetailField";
 type UserVotingAgendaCardProps = {
   agenda: AssemblyAgenda;
   isPending?: boolean;
+  /** Selection remembered locally after a successful vote, used when the server does not return one. */
+  fallbackSelectedIds?: string[];
+  /** Unconfirmed selection kept by the page, so it survives moving between agendas. */
+  draftSelectedIds?: string[];
+  onSelectionChange?: (selectedIds: string[]) => void;
+  /** Fired once the selection reaches the maximum; the page uses it to open the next agenda. */
+  onSelectionComplete?: () => void;
   onConfirm?: (selectedIds: string[]) => void;
 };
 
@@ -32,28 +39,73 @@ function SelectionDot({ selected }: { selected: boolean }) {
 }
 
 /** Voting agenda card — meta fields + chamber AgendaCard table with selectable rows. */
-export function UserVotingAgendaCard({ agenda, isPending, onConfirm }: UserVotingAgendaCardProps) {
+export function UserVotingAgendaCard({
+  agenda,
+  isPending,
+  fallbackSelectedIds,
+  draftSelectedIds,
+  onSelectionChange,
+  onSelectionComplete,
+  onConfirm,
+}: UserVotingAgendaCardProps) {
   const isPerson = agenda.kind === "person";
   const maxSelections = agenda.minSelections;
   const isVoteDisabled = isPending || agenda.hasVoted === true;
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const votedIds = agenda.votedOptionIds?.length ? agenda.votedOptionIds : (fallbackSelectedIds ?? []);
+  const votedKey = votedIds.join("|");
+  const [selectedIds, setSelectedIds] = useState<string[]>(
+    votedIds.length > 0 ? votedIds : (draftSelectedIds ?? []),
+  );
+  const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(
+    () => () => {
+      if (advanceTimer.current) clearTimeout(advanceTimer.current);
+    },
+    [],
+  );
+
+  // Show what was already voted (e.g. after the agenda refetches or the user comes back).
+  useEffect(() => {
+    if (votedKey) setSelectedIds(votedKey.split("|"));
+  }, [votedKey]);
 
   const rows = agenda.candidates.map((candidate, index) => ({
     ...candidate,
     rowNumber: index + 1,
   }));
 
+  const applySelection = (next: string[]) => {
+    setSelectedIds(next);
+    onSelectionChange?.(next);
+
+    // Selection is full: briefly show it, then move on to the next agenda.
+    if (next.length === maxSelections && onSelectionComplete) {
+      if (advanceTimer.current) clearTimeout(advanceTimer.current);
+      advanceTimer.current = setTimeout(onSelectionComplete, 300);
+    }
+  };
+
   const toggle = (candidateId: string) => {
     if (isVoteDisabled) return;
+
+    // Single choice: clicking any row simply selects that one (replacing the previous).
+    if (maxSelections === 1) {
+      applySelection([candidateId]);
+      return;
+    }
+
     if (selectedIds.includes(candidateId)) {
-      setSelectedIds((current) => current.filter((id) => id !== candidateId));
+      const next = selectedIds.filter((id) => id !== candidateId);
+      setSelectedIds(next);
+      onSelectionChange?.(next);
       return;
     }
     if (selectedIds.length >= maxSelections) {
       toast.danger(`حداکثر ${maxSelections} نفر قابل انتخاب است`);
       return;
     }
-    setSelectedIds((current) => [...current, candidateId]);
+    applySelection([...selectedIds, candidateId]);
   };
 
   const handleConfirm = () => {

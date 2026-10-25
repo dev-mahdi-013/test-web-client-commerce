@@ -11,6 +11,7 @@ import {
 } from "react";
 import { Link } from "react-router";
 import { InlineDatePicker } from "@/features/associations/components/InlineDatePicker";
+import { cn } from "@/lib/cn";
 import { formatJalali } from "@/lib/date";
 import { InlineEditControl } from "@/shared/components/InlineEditControl";
 import { InlineSelectEdit } from "@/shared/components/InlineSelectEdit";
@@ -28,6 +29,7 @@ import {
   useUpdateAssemblyTitle,
   useUpdateAssemblyUnit,
 } from "../../hooks/useAssemblyMutations";
+import { useAssemblyOwnerCheck } from "../../hooks/useAssemblyOwnerCheck";
 import type { Assembly, AssemblyUnit } from "../../types";
 import { DeleteAssemblyButton } from "./DeleteAssemblyButton";
 
@@ -49,12 +51,26 @@ function stopRowPress(event: MouseEvent | ReactPointerEvent) {
   event.stopPropagation();
 }
 
-function PencilButton({ label, onEdit }: { label: string; onEdit: () => void }) {
+function PencilButton({
+  label,
+  isHidden = false,
+  onEdit,
+}: {
+  label: string;
+  /** Non-owners: keep the pencil's space but make it invisible and unclickable. */
+  isHidden?: boolean;
+  onEdit: () => void;
+}) {
   return (
     <button
       type="button"
+      aria-hidden={isHidden || undefined}
       aria-label={label}
-      className="inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-full bg-accent text-white"
+      className={cn(
+        "inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-full bg-accent text-white",
+        isHidden && "pointer-events-none opacity-0",
+      )}
+      tabIndex={isHidden ? -1 : undefined}
       onPointerDown={stopRowPress}
       onClick={(event) => {
         stopRowPress(event);
@@ -85,6 +101,7 @@ export function OrganizationsAssembliesTable({
   const updateTitle = useUpdateAssemblyTitle();
   const updateNewsDate = useUpdateAssemblyNewsDate();
   const updateUnit = useUpdateAssemblyUnit();
+  const isOwner = useAssemblyOwnerCheck();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingField, setEditingField] = useState<EditField | null>(null);
   const [draftTitle, setDraftTitle] = useState("");
@@ -210,6 +227,7 @@ export function OrganizationsAssembliesTable({
               >
                 {(assembly) => {
                   const field = assembly.editingField;
+                  const canEdit = isOwner(assembly);
 
                   return (
                     <Table.Row id={assembly.id}>
@@ -232,6 +250,7 @@ export function OrganizationsAssembliesTable({
                           <EditableCell
                             action={
                               <PencilButton
+                                isHidden={!canEdit}
                                 label={`ویرایش عنوان ${assembly.title}`}
                                 onEdit={() => startEdit(assembly, "title")}
                               />
@@ -272,6 +291,7 @@ export function OrganizationsAssembliesTable({
                           <EditableCell
                             action={
                               <PencilButton
+                                isHidden={!canEdit}
                                 label={`ویرایش روز رای‌گیری ${assembly.title}`}
                                 onEdit={() => startEdit(assembly, "newsDate")}
                               />
@@ -288,9 +308,10 @@ export function OrganizationsAssembliesTable({
                         <span dir="ltr">{assembly.endsAt}</span>
                       </Table.Cell>
                       <Table.Cell className={`${cellClassName} text-center`}>
-                        <span className="inline-flex w-full justify-center">
+                        <span className="inline-flex w-full justify-start">
                           <InlineSelectEdit
                             accessibleName="واجدین"
+                            isHidden={!canEdit}
                             className="w-[220px]"
                             displayValue={<AssemblyStatsValue assembly={assembly} />}
                             editLabel={`ویرایش واجدین ${assembly.title}`}

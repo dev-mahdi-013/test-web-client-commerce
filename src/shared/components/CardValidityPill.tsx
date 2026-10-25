@@ -20,7 +20,7 @@ export function CardValidityPill({ card, withIcon = false }: CardValidityPillPro
       )}
     >
       {withIcon && <CheckCircleIcon className="size-4" />}
-      <span className="text-[10px] text-white/80">تاریخ انقضاء</span>
+      <span className="text-micro text-white/80">تاریخ انقضاء</span>
       <span className="text-xs font-bold" dir="ltr">
         {formatJalali(card.expiresAt || null)}
       </span>

@@ -6,7 +6,7 @@ import { ActiveSessionsDialog } from "@/features/auth/components/ActiveSessionsD
 import { toPersianDigits } from "@/lib/digits";
 import { SectionHeading } from "@/shared/components/SectionHeading";
 import { useProfile } from "../hooks/useProfile";
-import { activeRoleOf, roleTitleOf } from "../roles";
+import { activeRoleOf, roleAssociationNameOf, roleTitleOf } from "../roles";
 
 const cardClassName = "rounded-2xl bg-white px-4 py-3";
 
@@ -64,7 +64,9 @@ export function ProfilePage() {
               <li key={role.id} className="flex items-center justify-between gap-3 rounded-2xl bg-white px-4 py-3">
                 <div className="min-w-0">
                   <p className="truncate text-sm font-bold">{roleTitleOf(role)}</p>
-                  {role.chamberName ? <p className="mt-1 truncate text-caption text-muted">{role.chamberName}</p> : null}
+                  {(roleAssociationNameOf(role) ?? role.chamberName) ? (
+                    <p className="mt-1 truncate text-caption text-muted">{roleAssociationNameOf(role) ?? role.chamberName}</p>
+                  ) : null}
                 </div>
                 {role.id === activeRole?.id ? (
                   <span className="shrink-0 rounded-full bg-(--status-finished-bg) px-2.5 py-1 text-micro text-(--status-finished)">

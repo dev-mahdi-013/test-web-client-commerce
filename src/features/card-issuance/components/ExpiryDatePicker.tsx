@@ -45,7 +45,7 @@ export function ExpiryDatePicker({ memberId, card }: ExpiryDatePickerProps) {
         >
           <span className="flex flex-col items-start leading-tight mr-auto">
             <span className="text-xs text-muted ">تاریخ انقضاء</span>
-            <span className="text-[11px] font-bold" dir="ltr">
+            <span className="text-caption font-bold" dir="ltr">
               {formatJalali(card.expiresAt)}
             </span>
           </span>

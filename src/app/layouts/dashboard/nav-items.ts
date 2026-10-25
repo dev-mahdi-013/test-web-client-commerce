@@ -29,13 +29,8 @@ const menus: Record<AppRole, NavItem[]> = {
   "chamber-president": [hr, chamberMembers, associations, chamberAssemblies],
   "card-issuance": [cardIssuance],
   organizations: [organizationMembers, associations, organizationAssemblies],
-  "association-head": [organizationMembers, associations, associationAssemblies],
-  /** Only «رئیس انجمن» — منابع انسانی / اطلاعات / مجامع */
+  "association-head": [hrAssociation, associationInfo, associationAssemblies],
   "association-info": [hrAssociation, associationInfo, associationAssemblies],
-  /**
-   * دبیر تشکل (docs): same `/ap` as president except agents.
-   * → اطلاعات + انجمن‌ها + مجامع؛ بدون منابع انسانی (`/ap/agents` → 403).
-   */
   "association-secretary": [associationInfo, associations, associationAssemblies],
   user: [userElections],
   other: [hr, chamberMembers, associations, chamberAssemblies],

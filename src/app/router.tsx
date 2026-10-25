@@ -48,8 +48,7 @@ export const router = createBrowserRouter([
                 ],
               },
               {
-                /** اطلاعات انجمن — رئیس انجمن + دبیر (docs: secretary has `/ap` except agents) */
-                element: <RequireAppRole roles={["association-info", "association-secretary"]} />,
+                element: <RequireAppRole roles={["association-head", "association-info", "association-secretary"]} />,
                 children: [
                   {
                     path: "/association-information",
@@ -60,8 +59,7 @@ export const router = createBrowserRouter([
                 ],
               },
               {
-                /** منابع انسانی انجمن — فقط رئیس انجمن (docs: secretary → 403 on `/ap/agents`) */
-                element: <RequireAppRole roles={["association-info"]} />,
+                element: <RequireAppRole roles={["association-head", "association-info"]} />,
                 children: [
                   {
                     path: "/hr-association",

@@ -31,29 +31,29 @@ export function AssociationInfoCard({ className }: AssociationInfoCardProps) {
     <section
       aria-label="اطلاعات انجمن"
       className={cn(
-        "flex min-h-[133px] flex-col justify-center rounded-[10px] bg-white px-4 py-5 lg:shadow-[0px_2px_8px_0px_#0000000F] sm:px-6",
+        "flex min-h-[133px] flex-col justify-center rounded-[10px] bg-white px-4 py-5 sm:px-6 lg:shadow-[0px_2px_8px_0px_#0000000F]",
         className,
       )}
     >
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
-        <InfoField className="px-3 py-3 border-l-[3px] border-(--panel-cards)" label="نام انجمن" value={association?.name ?? "—"} />
+        <InfoField className="border-(--panel-cards) px-3 py-3 max-sm:border-b-[3px] sm:border-e-[3px]" label="نام انجمن" value={association?.name ?? "—"} />
         <InfoField
-          className="hidden lg:flex flex-col items-center justify-center border-l-[3px] border-(--panel-cards) px-3 py-2"
+          className="hidden flex-col items-center justify-center border-e-[3px] border-(--panel-cards) px-3 py-2 lg:flex"
           label="تاریخ تأسیس"
           value={formatJalali(association?.foundedAt ?? null)}
         />
         <InfoField
-          className="hidden lg:flex flex-col items-center justify-center border-l-[3px] border-(--panel-cards) px-3 py-2"
+          className="hidden flex-col items-center justify-center border-e-[3px] border-(--panel-cards) px-3 py-2 lg:flex"
           label="تاریخ آخرین مجمع"
           value={formatJalali(association?.lastMeetingAt ?? null)}
         />
         <InfoField
-          className="flex flex-col justify-center border-l-[3px] border-(--panel-cards) px-3 py-2 lg:items-center"
+          className="flex flex-col justify-center border-(--panel-cards) px-3 py-2 lg:items-center lg:border-e-[3px]"
           label="دبیر"
           value={association?.secretaryName ?? "—"}
         />
         <InfoField
-          className="hidden lg:flex flex-col items-center justify-center px-3 py-2"
+          className="hidden flex-col items-center justify-center px-3 py-2 lg:flex"
           label="تعداد اعضا"
           value={members.data ? `${members.data.total} نفر` : "—"}
         />

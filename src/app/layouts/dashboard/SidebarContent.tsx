@@ -1,4 +1,3 @@
-import { Logout2Icon } from "@solar-icons/react/linear/logout-2";
 import { useMemo } from "react";
 import { NavLink } from "react-router";
 import { userMembershipCard } from "@/features/assemblies/user/api/user.api";
@@ -70,17 +69,9 @@ export function SidebarContent({ onNavigate, onRequestLogout, onRequestSessions 
             {label}
           </NavLink>
         ))}
-        <button
-          className={cn(itemClassName, "cursor-pointer text-muted hover:bg-white/60")}
-          type="button"
-          onClick={onRequestLogout}
-        >
-          <Logout2Icon className="size-[22px] shrink-0" />
-          خروج
-        </button>
       </nav>
 
-      <BrandLogo className="mt-auto self-center pt-10" />
+      <BrandLogo className="mt-auto self-start pt-10" />
     </div>
   );
 }

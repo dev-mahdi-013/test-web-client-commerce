@@ -50,6 +50,8 @@ export function UserAssemblyDetailPage() {
   const detail = assembly.data;
   const [agendaIndex, setAgendaIndex] = useState(0);
   const vote = useVoteAssembly(assemblyId ?? "");
+  const [votedByAgenda, setVotedByAgenda] = useState<Record<string, string[]>>({});
+  const [draftsByAgenda, setDraftsByAgenda] = useState<Record<string, string[]>>({});
 
   if (assembly.isPending) {
     return (
@@ -100,9 +102,28 @@ export function UserAssemblyDetailPage() {
                 <UserVotingAgendaCard
                   key={currentAgenda.id}
                   agenda={currentAgenda}
+                  fallbackSelectedIds={votedByAgenda[currentAgenda.id]}
+                  draftSelectedIds={draftsByAgenda[currentAgenda.id]}
+                  onSelectionChange={(ids) =>
+                    setDraftsByAgenda((current) => ({ ...current, [currentAgenda.id]: ids }))
+                  }
+                  onSelectionComplete={
+                    canGoNext
+                      ? () => setAgendaIndex((index) => Math.min(agendas.length - 1, index + 1))
+                      : undefined
+                  }
                   isPending={vote.isPending}
                   onConfirm={(voteOptions) =>
-                    vote.mutate({ surveyId: currentAgenda.id, voteOptions })
+                    vote.mutate(
+                      { surveyId: currentAgenda.id, voteOptions },
+                      {
+                        onSuccess: () =>
+                          setVotedByAgenda((current) => ({
+                            ...current,
+                            [currentAgenda.id]: voteOptions,
+                          })),
+                      },
+                    )
                   }
                 />
               </AgendaCardStack>

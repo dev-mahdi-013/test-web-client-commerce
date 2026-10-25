@@ -47,7 +47,7 @@ export function UserAssemblySummaryBar({ assembly }: UserAssemblySummaryBarProps
       </Field>
       <Field label="وضعیت">
         <AssemblyStatusBadge
-          className="h-6 w-fit px-2.5 text-[11px]"
+          className="h-6 w-fit px-2.5 text-caption"
           label={assembly.status === "running" ? "در حال برگزاری" : undefined}
           status={assembly.status}
         />

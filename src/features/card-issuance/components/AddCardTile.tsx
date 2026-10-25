@@ -11,7 +11,7 @@ export function AddCardTile({ onPress, className }: AddCardTileProps) {
     <button
       aria-label="افزودن کارت"
       className={cn(
-        "flex h-full min-h-[188px] w-full shrink-0 cursor-pointer flex-col items-center justify-center gap-2 rounded-[20px] border-2 border-dashed border-(--panel-border) text-sm text-muted transition-colors hover:bg-white/60",
+        "flex min-h-[188px] self-stretch shrink-0 cursor-pointer flex-col items-center justify-center gap-2 rounded-[20px] border-2 border-dashed border-(--panel-border) text-sm text-muted transition-colors hover:bg-white/60",
         className,
       )}
       type="button"

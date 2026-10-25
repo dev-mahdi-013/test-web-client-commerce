@@ -40,8 +40,8 @@ export function CaptchaField({ captcha, value, onChange, error, isDisabled = fal
                 type="button"
                 onClick={() => captcha.refetch()}
               >
-                <span className="text-center text-[11px] leading-4 text-danger">خطا در بارگذاری</span>
-                <span className="text-[10px] text-accent">تلاش مجدد</span>
+                <span className="text-center text-caption leading-4 text-danger">خطا در بارگذاری</span>
+                <span className="text-micro text-accent">تلاش مجدد</span>
               </button>
             ) : (
               <img alt="کد امنیتی" className="size-full object-cover" src={captcha.data.image} />

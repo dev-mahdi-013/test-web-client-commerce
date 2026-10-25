@@ -71,18 +71,18 @@ export function MembersPage({ showAssociationInfo = false }: MembersPageProps) {
         </div>
       </section>
 
-       {showAssociationInfo && <AssociationInfoCard className="lg:hidden flex mb-0 shrink-0 pl-10" />}
+       {showAssociationInfo && <AssociationInfoCard className="mb-0 flex shrink-0 lg:hidden" />}
 
       <section
         aria-label="مشاهده کارت ها"
-        className="order-1 flex w-full max-w-full flex-col rounded-[28px] bg-(--panel) p-3 sm:w-[400px] sm:p-4 2xl:order-none 2xl:w-auto"
+        className="order-1 flex w-full max-w-full flex-col rounded-[28px] bg-(--panel) p-3 sm:p-4 2xl:order-none"
       >
         <header ref={cards.ref} className="mb-3 scroll-mt-20 px-1 lg:scroll-mt-28">
           <SectionHeading>مشاهده کارت ها</SectionHeading>
         </header>
 
         {selected && selected.cards.length > 0 ? (
-          <CardCarousel key={selected.id}>
+          <CardCarousel key={selected.id} peek>
             {selected.cards.map((card) => (
               <MemberCardItem key={card.id} card={card} memberId={selected.id} />
             ))}

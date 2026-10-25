@@ -11,7 +11,7 @@ import { OrganizationsAssembliesToolbar } from "../organizations/components/Orga
 import type { AssemblyStatus } from "../types";
 
 const ALL = "all";
-const addButtonClassName = "h-9 gap-2 rounded-full ps-4 pe-2 text-[13px]";
+const addButtonClassName = "h-9 gap-2 rounded-full ps-4 pe-2 text-note";
 
 /** Assemblies list for the organizations (امور تشکل‌ها) role. */
 export function OrganizationsAssembliesPage() {

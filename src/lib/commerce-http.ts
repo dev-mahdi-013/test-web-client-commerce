@@ -128,7 +128,7 @@ export async function commercePage<T, R>(
   const items = Array.isArray(data) ? data : [];
 
   return {
-    items: items.map(map),
+    items: items.map((item) => map(item)),
     page: meta?.current_page ?? page,
     pageSize: meta?.per_page ?? items.length,
     total: meta?.total_items ?? items.length,

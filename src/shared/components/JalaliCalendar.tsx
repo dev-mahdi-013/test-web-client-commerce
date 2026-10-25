@@ -69,7 +69,7 @@ export function JalaliCalendar({
         </div>
       </div>
 
-      <div className="grid grid-cols-7 gap-y-1 text-center text-[11px] text-muted">
+      <div className="grid grid-cols-7 gap-y-1 text-center text-caption text-muted">
         {persianWeekdays.map((day) => (
           <span key={day} className="py-1">
             {day}

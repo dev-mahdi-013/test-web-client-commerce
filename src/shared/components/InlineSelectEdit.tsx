@@ -13,6 +13,8 @@ type InlineSelectEditProps = {
   isEditing: boolean;
   canEdit?: boolean;
   isDisabled?: boolean;
+  /** Keep the pencil's space but make it invisible and unclickable. */
+  isHidden?: boolean;
   /** Aria / select label, e.g. ویرایش رئیس … */
   editLabel: string;
   accessibleName?: string;
@@ -37,6 +39,7 @@ export function InlineSelectEdit({
   isEditing,
   canEdit = true,
   isDisabled = false,
+  isHidden = false,
   editLabel,
   accessibleName,
   className = "w-[190px]",
@@ -74,8 +77,11 @@ export function InlineSelectEdit({
           className={cn(
             "inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-accent text-white",
             isDisabled ? "cursor-not-allowed opacity-50" : "cursor-pointer",
+            isHidden && "pointer-events-none opacity-0",
           )}
+          aria-hidden={isHidden || undefined}
           disabled={isDisabled}
+          tabIndex={isHidden ? -1 : undefined}
           onPointerDown={stopRowPress}
           onClick={(event) => {
             stopRowPress(event);

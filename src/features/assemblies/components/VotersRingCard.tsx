@@ -31,7 +31,7 @@ function Stat({ label, value, color }: { label: string; value: number; color: st
     <div className="flex items-start gap-2">
       <span aria-hidden className="mt-0.5 h-9 w-[3px] shrink-0 rounded-full" style={{ backgroundColor: color }} />
       <div className="flex flex-col gap-1">
-        <span className="text-[10px] sm:text-xs leading-none text-muted">{label}</span>
+        <span className="text-micro sm:text-xs leading-none text-muted">{label}</span>
         <p className="leading-none text-xs font-bold sm:text-sm">
           <span dir="ltr">{value}</span> <span>نفر</span>
         </p>
@@ -108,7 +108,7 @@ export function VotersRingCard({ voters, className }: VotersRingCardProps) {
             <p className="text-sm leading-none font-bold tracking-tight sm:text-base" dir="ltr">
               {voters.eligible}
             </p>
-            <p className="text-[10px] leading-none text-muted sm:text-[11px]">کل واجدین</p>
+            <p className="text-micro leading-none text-muted sm:text-caption">کل واجدین</p>
           </div>
         </div>
 

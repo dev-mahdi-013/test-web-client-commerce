@@ -25,6 +25,8 @@ type ApiRole = {
   name?: string;
   province?: string | number;
   chamberName?: string;
+  associationName?: string;
+  association?: { name?: string };
   chamber?: { name?: string };
   roomName?: string;
   room?: { name?: string };
@@ -38,18 +40,25 @@ type OtpVerifyResponse = {
   roles?: ApiRole[];
 };
 
+type ApiSessionDevice = {
+  name?: string;
+  os?: string;
+  os_version?: string;
+};
+
 type ApiSession = {
   [key: string]: unknown;
   id?: string | number;
   _id?: string;
   tokenId?: string;
-  device?: string;
+  device?: string | ApiSessionDevice;
   deviceName?: string;
   os?: string;
   browser?: string;
   userAgent?: string;
   ip?: string;
   ipAddress?: string;
+  lastAccess?: number | string;
   lastActiveAt?: string;
   lastSeenAt?: string;
   updatedAt?: string;
@@ -65,14 +74,35 @@ function textOf(...candidates: unknown[]) {
   return value ? value.trim() : null;
 }
 
+function dateOf(...candidates: unknown[]) {
+  for (const candidate of candidates) {
+    const time =
+      typeof candidate === "number"
+        ? candidate
+        : typeof candidate === "string" && candidate.trim() !== ""
+          ? /^\d+$/.test(candidate.trim())
+            ? Number(candidate)
+            : new Date(candidate).getTime()
+          : Number.NaN;
+    const date = new Date(time);
+    if (Number.isFinite(time) && !Number.isNaN(date.getTime())) return date.toISOString();
+  }
+  return null;
+}
+
 function toUserSession(session: ApiSession, index: number, currentTokenId: string | null): UserSession {
   const id = textOf(session.tokenId, session.id, session._id) ?? String(index);
-  const deviceName = textOf(session.deviceName, session.device, session.os, session.browser, session.userAgent) ?? "دستگاه نامشخص";
+  const device = typeof session.device === "object" ? session.device : null;
+  const deviceName =
+    [device?.name, session.deviceName, typeof session.device === "string" ? session.device : null, session.browser]
+      .map((value) => textOf(value))
+      .find((value) => value !== null) ?? "دستگاه نامشخص";
+  const operatingSystem = textOf(device?.os, session.os);
   return {
     id,
-    deviceName,
+    deviceName: operatingSystem && operatingSystem !== deviceName ? `${deviceName} - ${operatingSystem}` : deviceName,
     ip: textOf(session.ip, session.ipAddress),
-    lastActiveAt: textOf(session.lastActiveAt, session.lastSeenAt, session.updatedAt, session.createdAt),
+    lastActiveAt: dateOf(session.lastAccess, session.lastActiveAt, session.lastSeenAt, session.updatedAt, session.createdAt),
     isCurrent: session.isCurrent ?? session.current ?? (currentTokenId !== null && id === currentTokenId),
   };
 }
@@ -88,6 +118,10 @@ function chamberNameOf(role: ApiRole) {
   return name ? name.trim() : null;
 }
 
+function associationNameOf(role: ApiRole) {
+  return textOf(role.associationName, role.association?.name);
+}
+
 function toUserRole(role: ApiRole, index: number): UserRole {
   return {
     ...role,
@@ -96,6 +130,7 @@ function toUserRole(role: ApiRole, index: number): UserRole {
     title: role.title ?? role.name ?? "",
     province: role.province == null ? "" : String(role.province),
     chamberName: chamberNameOf(role),
+    associationName: associationNameOf(role),
   };
 }
 
@@ -122,18 +157,25 @@ export const authApi = {
     };
   },
 
-  logout: async (tokenId: string) => {
-    await accountsHttp(`/user/sessions/${tokenId}/logout`, { method: "POST" });
+  /**
+   * Ends the login with this token id. The access token is passed explicitly because the caller clears the stored
+   * session right after (the request interceptor reads the store later, when it would already be empty).
+   */
+  logout: async (tokenId: string, accessToken: string) => {
+    await accountsHttp(`/user/sessions/${encodeURIComponent(tokenId)}/logout`, {
+      method: "POST",
+      headers: { Authorization: accessToken },
+    });
   },
 
   /** The user's active logins; the current one is matched against the stored token id. */
   getSessions: async (currentTokenId: string | null): Promise<UserSession[]> => {
-    const list = await accountsHttp<ApiSessionList>("/user/sessions");
+    const list = await accountsHttp<ApiSessionList>("/user/sessions/list");
     return sessionListOf(list).map((session, index) => toUserSession(session, index, currentTokenId));
   },
 
   /** Ends one login; the current login uses the same route through `logout`. */
   logoutSession: async (id: string) => {
-    await accountsHttp(`/user/sessions/${id}/logout`, { method: "POST" });
+    await accountsHttp(`/user/sessions/${encodeURIComponent(id)}/logout`, { method: "POST" });
   },
 };

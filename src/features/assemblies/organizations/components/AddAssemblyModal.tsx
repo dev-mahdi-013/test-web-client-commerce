@@ -1,7 +1,7 @@
 import { Button, FieldError, Form, Input, Label, Modal, TextField } from "@heroui/react";
 import { JalaliDateField } from "@/shared/components/JalaliDateField";
 import { SelectField } from "@/shared/components/SelectField";
-import { ASSEMBLY_TITLE_MAX_CHARS, assemblyUnitOptions } from "../../config";
+import { ASSEMBLY_TITLE_MAX_CHARS, assemblyCreationUnitOptions } from "../../config";
 import { useAddAssemblyForm } from "../../hooks/useAddAssemblyForm";
 import type { AssemblyUnit } from "../../types";
 
@@ -82,7 +82,7 @@ export function AddAssemblyModal({ isOpen, onOpenChange }: AddAssemblyModalProps
                     className={`${inputClassName} w-full`}
                     isDisabled={form.isSubmitting}
                     label="واجدین"
-                    options={assemblyUnitOptions}
+                    options={assemblyCreationUnitOptions}
                     value={form.unit}
                     onChange={(value) => form.setUnit(value as AssemblyUnit)}
                   />

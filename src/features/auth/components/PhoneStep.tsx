@@ -19,7 +19,7 @@ export function PhoneStep({ initialPhone, onCodeSent }: PhoneStepProps) {
         form.submit();
       }}
     >
-      <p className="-mx-2 mb-1 text-center sm:-mx-5 text-[13px] leading-6 text-[#333]">
+      <p className="-mx-2 mb-1 text-center sm:-mx-5 text-note leading-6 text-[#333]">
         برای ورود به حساب کاربری شماره موبایل خود را وارد نمایید ورود شما به معنای پذیرش شرایط و حریم خصوصی هدهد است
       </p>
 

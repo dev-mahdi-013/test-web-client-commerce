@@ -42,7 +42,7 @@ export function AssemblySummaryCard({ assembly, statusLabel }: AssemblySummaryCa
         </Field>
         <Field className="col-start-1 row-start-2 lg:col-start-1 lg:row-start-2" label="وضعیت">
           <AssemblyStatusBadge
-            className="h-5 w-fit px-2.5 text-[11px] lg:h-6"
+            className="h-5 w-fit px-2.5 text-caption lg:h-6"
             label={badgeLabel}
             status={assembly.status}
           />

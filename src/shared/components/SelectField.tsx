@@ -78,7 +78,7 @@ export function SelectField({
           {options.map((option) => (
             <Dropdown.Item
               key={option.value}
-              className="items-center gap-2 rounded-xl px-3 py-2.5 text-[13px]"
+              className="items-center gap-2 rounded-xl px-3 py-2.5 text-note"
               id={option.value}
               textValue={option.label}
             >

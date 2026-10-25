@@ -8,6 +8,11 @@ export const assemblyUnitOptions: Array<{ value: AssemblyUnit; label: string }> 
   { value: "حقوقی", label: "حقوقی" },
 ];
 
+export const assemblyCreationUnitOptions: Array<{ value: AssemblyUnit; label: string }> = [
+  { value: "همه", label: "همه" },
+  ...assemblyUnitOptions,
+];
+
 /** Longest assembly title shown in the assemblies tables. */
 export const ASSEMBLY_TITLE_MAX_CHARS = 40;
 

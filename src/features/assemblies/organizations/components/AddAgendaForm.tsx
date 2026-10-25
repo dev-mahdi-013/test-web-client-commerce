@@ -3,6 +3,7 @@ import { CloseIcon } from "@solar-icons/react/linear/close";
 import { Button, Input, Label, TextField } from "@heroui/react";
 import { useState } from "react";
 import { AgendaMemberSearchField, type AgendaMemberCandidate } from "@/features/assemblies/components/AgendaMemberSearchField";
+import { sanitizeDigitsInput } from "@/lib/digits";
 import { SelectField } from "@/shared/components/SelectField";
 import type { AgendaCandidateInput } from "../../types";
 import { assemblyUnitOptions } from "../../config";
@@ -14,6 +15,7 @@ type DraftCandidate = AgendaCandidateInput & {
 
 type AddAgendaFormProps = {
   associationId?: string | null;
+  assemblyUnit: AssemblyUnit;
   isPending?: boolean;
   isDisabled?: boolean;
   onSubmit: (input: CreateAgendaInput) => void;
@@ -26,15 +28,26 @@ const kindOptions: Array<{ value: AgendaKind; label: string }> = [
   { value: "text", label: "نوشته" },
 ];
 
-export function AddAgendaForm({ associationId, isPending, isDisabled = false, onSubmit }: AddAgendaFormProps) {
+export function AddAgendaForm({
+  associationId,
+  assemblyUnit,
+  isPending,
+  isDisabled = false,
+  onSubmit,
+}: AddAgendaFormProps) {
   const [title, setTitle] = useState("");
-  const [maxSelections, setMaxSelections] = useState("3");
+  const [maxSelections, setMaxSelections] = useState("1");
   const [kind, setKind] = useState<AgendaKind>("person");
   const [unit, setUnit] = useState<AssemblyUnit>("حقیقی");
   const [candidateQuery, setCandidateQuery] = useState("");
   const [candidates, setCandidates] = useState<DraftCandidate[]>([]);
   const [error, setError] = useState<string | null>(null);
   const isFormDisabled = isPending || isDisabled;
+  const selectedUnit = assemblyUnit === "همه" ? unit : assemblyUnit;
+  const unitOptions =
+    assemblyUnit === "همه"
+      ? assemblyUnitOptions
+      : assemblyUnitOptions.filter((option) => option.value === assemblyUnit);
 
   const addTextCandidate = () => {
     if (isFormDisabled) return;
@@ -83,8 +96,8 @@ export function AddAgendaForm({ associationId, isPending, isDisabled = false, on
       setError("حداکثر تعداد انتخاب معتبر نیست");
       return;
     }
-    if (kind === "person" && candidates.length === 0) {
-      setError("نام کاندیدا را وارد کنید");
+    if (candidates.length === 0) {
+      setError(kind === "person" ? "نام کاندیدا را وارد کنید" : "حداقل یک گزینه برای دستور اضافه کنید");
       return;
     }
     setError(null);
@@ -92,17 +105,15 @@ export function AddAgendaForm({ associationId, isPending, isDisabled = false, on
       title: trimmedTitle,
       maxSelections: max,
       kind,
-      unit,
-      candidates:
-        kind === "person"
-          ? candidates.map(({ id: _id, ...candidate }) => candidate)
-          : [{ name: trimmedTitle }],
+      unit: selectedUnit,
+      // Only the candidates the user entered; the title belongs to the agenda, not to its items.
+      candidates: candidates.map(({ id: _id, ...candidate }) => candidate),
     });
 
     setTitle("");
-    setMaxSelections("3");
+    setMaxSelections("1");
     setKind("person");
-    setUnit("حقیقی");
+    setUnit(assemblyUnit === "همه" ? "حقیقی" : assemblyUnit);
     setCandidates([]);
     setCandidateQuery("");
   };
@@ -118,11 +129,16 @@ export function AddAgendaForm({ associationId, isPending, isDisabled = false, on
           <Input className={`${fieldClassName} mt-1`} placeholder="تیتر دستور" />
         </TextField>
 
-        <TextField isDisabled={isFormDisabled} value={maxSelections} onChange={setMaxSelections}>
+        <TextField
+          isDisabled={isFormDisabled}
+          value={maxSelections}
+          onChange={(value) => setMaxSelections(sanitizeDigitsInput(value))}
+        >
           <Label className="text-xs font-bold text-foreground">حداکثر انتخاب</Label>
           <Input
             className="h-9 rounded-[12px] bg-white text-sm  input-ltr-type"
             inputMode="numeric"
+            pattern="[0-9]*"
             placeholder="3"
           />
         </TextField>
@@ -145,12 +161,12 @@ export function AddAgendaForm({ associationId, isPending, isDisabled = false, on
           <span className="text-xs font-bold text-foreground">واجدین</span>
           <SelectField
             className={selectClassName}
-            isDisabled={isFormDisabled}
+            isDisabled={isFormDisabled || assemblyUnit !== "همه"}
             label="واجدین"
-            options={assemblyUnitOptions}
+            options={unitOptions}
             popoverClassName="z-[var(--z-index-overlay)] max-sm:!w-[200px]"
             showBackdrop
-            value={unit}
+            value={selectedUnit}
             onChange={(value) => setUnit(value as AssemblyUnit)}
           />
         </div>
@@ -215,7 +231,7 @@ export function AddAgendaForm({ associationId, isPending, isDisabled = false, on
 
         <Button
           className="h-9 w-full gap-2 rounded-full px-4 lg:w-auto"
-          isDisabled={isFormDisabled || !title.trim() || (kind === "person" && candidates.length === 0)}
+          isDisabled={isFormDisabled || !title.trim() || candidates.length === 0}
           onPress={handleSubmit}
         >
           افزودن

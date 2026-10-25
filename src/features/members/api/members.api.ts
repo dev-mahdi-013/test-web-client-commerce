@@ -65,8 +65,9 @@ function toAssociation(association: ApiJoinedAssociation): MemberAssociation {
   };
 }
 
-function toAssociationMember(member: ApiAssociationMember): ChamberMember {
-  const memberId = member.id ?? member._id;
+function toAssociationMember(member: ApiAssociationMember, id?: string): ChamberMember {
+  // `id` must be a string: never let an `Array.map` index leak in here.
+  const memberId = (typeof id === "string" ? id : undefined) ?? member.id ?? member._id;
   if (!memberId) {
     throw new Error("شناسه عضو انجمن در پاسخ سرویس موجود نیست");
   }
@@ -80,6 +81,18 @@ function toAssociationMember(member: ApiAssociationMember): ChamberMember {
   };
 }
 
+/**
+ * `/ap` answers with one row per membership, so a member with two cards comes back twice with the
+ * same `_id`; the row id adds the card role id to stay unique in the table.
+ */
+function apMemberId(member: ApiAssociationMember) {
+  const memberId = member.id ?? member._id;
+  if (!memberId) {
+    throw new Error("شناسه عضو انجمن در پاسخ سرویس موجود نیست");
+  }
+  return `${memberId}.${member.roleId}`;
+}
+
 export const membersApi = {
   listMembers: async ({ page, query, associationId }: ListMembersParams) => {
     const scope = currentCommerceScope();
@@ -87,7 +100,7 @@ export const membersApi = {
       return commercePage<ApiAssociationMember, ChamberMember>(
         `/pao/associations/${associationId}/members/list`,
         { page, searchKeyword: query },
-        toAssociationMember,
+        (member) => toAssociationMember(member),
       );
     }
 
@@ -107,7 +120,9 @@ export const membersApi = {
       const current = Math.min(page, totalPages);
       const start = (current - 1) * AP_MEMBERS_PAGE_SIZE;
       return {
-        items: matched.slice(start, start + AP_MEMBERS_PAGE_SIZE).map(toAssociationMember),
+        items: matched
+          .slice(start, start + AP_MEMBERS_PAGE_SIZE)
+          .map((member) => toAssociationMember(member, apMemberId(member))),
         page: current,
         pageSize: AP_MEMBERS_PAGE_SIZE,
         total: matched.length,
@@ -128,7 +143,7 @@ export const membersApi = {
       ]);
       const association = Array.isArray(info) ? info[0] : info;
       if (!association) return [];
-      const member = members.find((item) => item._id === memberId && item.roleId === cardId);
+      const member = members.find((item) => apMemberId(item) === memberId);
       return [
         {
           id: association._id,
