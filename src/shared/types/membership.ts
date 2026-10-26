@@ -12,6 +12,8 @@ export type MembershipCardData = {
   holderName: string;
   managerName: string | null;
   managerNationalId: string | null;
+  /** Holder's national code from `cardDetails.nationalCode` */
+  nationalCode: string | null;
   cardNo: string;
   expiresAt: string;
   expired: boolean;

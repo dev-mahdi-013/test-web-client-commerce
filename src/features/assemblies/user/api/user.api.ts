@@ -133,6 +133,7 @@ export function userMembershipCard(
     holderName: fullName,
     managerName: null,
     managerNationalId: null,
+    nationalCode: null,
     cardNo: "—",
     expiresAt: "",
     expired: false,

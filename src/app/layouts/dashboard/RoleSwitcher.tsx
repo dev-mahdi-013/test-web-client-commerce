@@ -131,7 +131,8 @@ export function RoleSwitcher() {
             const [roleId] = keys === "all" ? [] : [...keys];
             if (typeof roleId !== "string" || roleId === activeRole?.id) return;
             setActiveRole(roleId);
-            queryClient.resetQueries();
+            // Drop the cache instead of resetting it: resetting refetches the queries of the page being left.
+            queryClient.clear();
             const nextRole = roles.find((role) => role.id === roleId);
             if (nextRole) navigate(homePathFor(appRoleOf(nextRole)));
           }}

@@ -55,7 +55,7 @@ function AssociationMemberCard({
           icon={UserIdIcon}
           iconClassName="bg-(--field-muted)"
           label="کد ملی"
-          value={<span dir="ltr">{member.card.managerNationalId ?? "------"}</span>}
+          value={<span dir="ltr">{member.card.nationalCode ?? "------"}</span>}
         />
       </div>
       <WithAccentStrip>

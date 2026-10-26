@@ -23,6 +23,8 @@ export type CardPayload = {
   managerNationalId?: string;
   /** Holder's national code, required by the backend on natural cards */
   nationalCode?: string;
+  /** Commercial card expiry (Jalali yyyy/mm/dd), sent as `commerceExprDate` epoch; 0 when unset */
+  commerceExpiresAt?: string;
 };
 
 export type CreateMemberPayload = {
@@ -57,6 +59,7 @@ function toCardBody(card: CardPayload) {
       nationalCode: card.nationalCode ?? "",
       cardNum: card.cardNo,
       exprDate: jalaliToEpoch(card.expiresAt),
+      commerceExprDate: card.commerceExpiresAt ? jalaliToEpoch(card.commerceExpiresAt) : 0,
     },
   };
 }

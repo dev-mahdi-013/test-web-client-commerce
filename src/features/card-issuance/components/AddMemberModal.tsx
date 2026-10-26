@@ -202,6 +202,19 @@ export function AddMemberModal({
                   <FieldError>{form.expiresAtError}</FieldError>
                 </TextField>
               )}
+
+              <div className="flex flex-col gap-1.5 sm:col-span-2">
+                <span className="text-sm font-bold">تاریخ انقضای کارت بازرگانی</span>
+                <JalaliDateField
+                  isInvalid={!!form.commercialExpiresAtError}
+                  label="تاریخ انقضای کارت بازرگانی"
+                  value={form.commercialExpiresAt}
+                  onChange={form.setCommercialExpiresAt}
+                />
+                {form.commercialExpiresAtError && (
+                  <p className="text-xs text-danger">{form.commercialExpiresAtError}</p>
+                )}
+              </div>
             </Modal.Body>
 
             <Modal.Footer className="mt-3 justify-start gap-2">

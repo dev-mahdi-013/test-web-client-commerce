@@ -154,6 +154,7 @@ export type ApiCardDetails = {
   name: string;
   ceoName?: string;
   ceoNationalCode?: string;
+  nationalCode?: string;
   cardNum: string;
   exprDate: number;
 };
@@ -166,6 +167,7 @@ export function toMembershipCard(id: string, card: ApiCardDetails): MembershipCa
     holderName: card.name,
     managerName: isLegal ? (card.ceoName ?? null) : null,
     managerNationalId: isLegal ? (card.ceoNationalCode ?? null) : null,
+    nationalCode: card.nationalCode ?? null,
     cardNo: card.cardNum,
     // `exprDate: 0` means unset — avoid epoch → Jalali 1348/10/11.
     expiresAt: fromEpoch(card.exprDate) ?? "",

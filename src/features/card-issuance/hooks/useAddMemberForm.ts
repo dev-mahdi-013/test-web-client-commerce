@@ -31,6 +31,7 @@ export function useAddMemberForm({ onSuccess }: UseAddMemberFormOptions) {
   const [managerNationalId, setManagerNationalIdValue] = useState("");
   const [cardNo, setCardNoValue] = useState("");
   const [expiresAt, setExpiresAtValue] = useState("");
+  const [commercialExpiresAt, setCommercialExpiresAtValue] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const isLegal = kind === "legal";
@@ -43,6 +44,7 @@ export function useAddMemberForm({ onSuccess }: UseAddMemberFormOptions) {
   const isNationalIdValid = !isLegal || managerNationalId === "" || isValidNationalCode(managerNationalId);
   const isCardNoValid = cardNo.length >= MIN_CARD_NO_LENGTH && cardNo.length <= MAX_CARD_NO_LENGTH;
   const isExpiryValid = isValidJalaliDate(expiresAt);
+  const isCommercialExpiryValid = isValidJalaliDate(commercialExpiresAt);
 
   const isValid =
     isNameValid &&
@@ -52,7 +54,8 @@ export function useAddMemberForm({ onSuccess }: UseAddMemberFormOptions) {
     isManagerNameValid &&
     isNationalIdValid &&
     isCardNoValid &&
-    isExpiryValid;
+    isExpiryValid &&
+    isCommercialExpiryValid;
 
   const reset = () => {
     setKind("natural");
@@ -64,6 +67,7 @@ export function useAddMemberForm({ onSuccess }: UseAddMemberFormOptions) {
     setManagerNationalIdValue("");
     setCardNoValue("");
     setExpiresAtValue("");
+    setCommercialExpiresAtValue("");
     setIsSubmitted(false);
   };
 
@@ -80,6 +84,7 @@ export function useAddMemberForm({ onSuccess }: UseAddMemberFormOptions) {
           kind,
           name: isLegal ? companyName.trim() : fullName.trim(),
           nationalCode,
+          commerceExpiresAt: commercialExpiresAt,
           cardNo,
           expiresAt,
           managerName: isLegal ? managerName.trim() : undefined,
@@ -115,6 +120,8 @@ export function useAddMemberForm({ onSuccess }: UseAddMemberFormOptions) {
     setCardNo: (value: string) => setCardNoValue(sanitizeDigitsInput(value)),
     expiresAt,
     setExpiresAt: (value: string) => setExpiresAtValue(sanitizeJalaliInput(value)),
+    commercialExpiresAt,
+    setCommercialExpiresAt: (value: string) => setCommercialExpiresAtValue(sanitizeJalaliInput(value)),
     fullNameError: isSubmitted && !isNameValid ? "نام و نام خانوادگی را کامل وارد کنید" : null,
     nationalCodeError:
       isSubmitted && !isNationalCodeValid ? "کد ملی معتبر نیست" : null,
@@ -126,6 +133,12 @@ export function useAddMemberForm({ onSuccess }: UseAddMemberFormOptions) {
     cardNoError:
       isSubmitted && !isCardNoValid
         ? `شماره کارت باید ${MIN_CARD_NO_LENGTH} تا ${MAX_CARD_NO_LENGTH} رقم باشد`
+        : null,
+    commercialExpiresAtError:
+      isSubmitted && !isCommercialExpiryValid
+        ? commercialExpiresAt === ""
+          ? "تاریخ انقضای کارت بازرگانی الزامی است"
+          : "تاریخ انقضای کارت بازرگانی را به شکل 1404/03/12 وارد کنید"
         : null,
     expiresAtError: isSubmitted && !isExpiryValid
       ? expiresAt === ""
