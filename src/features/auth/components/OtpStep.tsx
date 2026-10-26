@@ -11,12 +11,13 @@ type OtpStepProps = {
   onEditPhone: () => void;
   /** Sending a new code needs a fresh captcha, so this returns to the phone step */
   onResend: () => void;
+  onNoRole: () => void;
 };
 
 const slotClassName = "size-[41px] rounded-xl border-0 bg-white shadow-none";
 
-export function OtpStep({ phone, resendIn, onVerified, onEditPhone, onResend }: OtpStepProps) {
-  const form = useOtpForm({ phone, resendIn, onVerified });
+export function OtpStep({ phone, resendIn, onVerified, onEditPhone, onResend, onNoRole }: OtpStepProps) {
+  const form = useOtpForm({ phone, resendIn, onVerified, onNoRole });
 
   return (
     <Form

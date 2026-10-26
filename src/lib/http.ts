@@ -35,6 +35,22 @@ const FALLBACK_MESSAGE = "خطایی در ارتباط با سرور رخ داد
 const NETWORK_ERROR_MESSAGE = "ارتباط با سرور برقرار نشد، اتصال اینترنت را بررسی کنید";
 const REQUEST_TIMEOUT_MS = 3_000;
 
+type SessionRejectedHandler = (error: ApiError) => void;
+let onSessionRejected: SessionRejectedHandler = () => {};
+
+/** Called when the backend rejects the session (expired token) or the user's permission. */
+export function setSessionRejectedHandler(handler: SessionRejectedHandler) {
+  onSessionRejected = handler;
+}
+
+const SESSION_REJECTED_MESSAGES = ["authentication error", "access denied", "no access"];
+
+function isSessionRejection(status: number, rawMessage: string | null) {
+  if (status === 401 || status === 403) return true;
+  const raw = rawMessage?.trim().toLowerCase() ?? "";
+  return SESSION_REJECTED_MESSAGES.some((text) => raw.includes(text));
+}
+
 let getAccessToken: () => string | null = () => null;
 let getActiveRoleId: () => string | null = () => null;
 export function setAccessTokenGetter(getter: () => string | null) {
@@ -74,7 +90,9 @@ export function createHttpClient({ baseUrl, authorization, unwrapEnvelope, trans
 
   const toApiError = (status: number, data: unknown) => {
     const message = readMessage(data);
-    return new ApiError((message && translateMessage?.(message)) || message || FALLBACK_MESSAGE, status, data);
+    const error = new ApiError((message && translateMessage?.(message)) || message || FALLBACK_MESSAGE, status, data);
+    if (isSessionRejection(status, message)) onSessionRejected(error);
+    return error;
   };
 
   return async function request<T>(

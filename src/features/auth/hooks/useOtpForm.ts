@@ -2,7 +2,7 @@ import { useState } from "react";
 import { getErrorMessage } from "@/lib/http";
 import { useCountdown } from "@/shared/hooks/useCountdown";
 import type { AuthSession } from "../types";
-import { useVerifyOtp } from "./useAuthMutations";
+import { NoRoleError, useVerifyOtp } from "./useAuthMutations";
 
 export const OTP_LENGTH = 6;
 
@@ -10,9 +10,11 @@ type UseOtpFormOptions = {
   phone: string;
   resendIn: number;
   onVerified: (session: AuthSession) => void;
+  /** The code was right but the account has no role, so the user goes back to the phone step */
+  onNoRole: () => void;
 };
 
-export function useOtpForm({ phone, resendIn, onVerified }: UseOtpFormOptions) {
+export function useOtpForm({ phone, resendIn, onVerified, onNoRole }: UseOtpFormOptions) {
   const verifyOtp = useVerifyOtp();
   const countdown = useCountdown(resendIn);
 
@@ -30,7 +32,10 @@ export function useOtpForm({ phone, resendIn, onVerified }: UseOtpFormOptions) {
       { phone, code: value },
       {
         onSuccess: onVerified,
-        onError: () => setCode(""),
+        onError: (error) => {
+          setCode("");
+          if (error instanceof NoRoleError) onNoRole();
+        },
       },
     );
   };
@@ -39,7 +44,8 @@ export function useOtpForm({ phone, resendIn, onVerified }: UseOtpFormOptions) {
     code,
     changeCode,
     isComplete: code.length === OTP_LENGTH,
-    error: verifyOtp.error ? getErrorMessage(verifyOtp.error) : null,
+    error:
+      verifyOtp.error && !(verifyOtp.error instanceof NoRoleError) ? getErrorMessage(verifyOtp.error) : null,
     isVerifying: verifyOtp.isPending,
     submit,
     resendSeconds: countdown.seconds,

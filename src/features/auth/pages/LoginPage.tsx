@@ -23,6 +23,7 @@ export function LoginPage() {
             resendIn={otpState.resendIn}
             onEditPhone={() => setOtpState(null)}
             onResend={() => setOtpState(null)}
+            onNoRole={() => setOtpState(null)}
             onVerified={() => navigate("/", { replace: true })}
           />
         ) : (
