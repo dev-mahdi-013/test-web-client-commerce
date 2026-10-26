@@ -223,7 +223,6 @@ export const assembliesApi = {
       body: {
         title: input.title.trim(),
         maxSelection: input.maxSelections,
-        eligibilityScope: toEligibilityCode(input.unit),
         orderItemSource: { type: sourceType },
       },
     });
