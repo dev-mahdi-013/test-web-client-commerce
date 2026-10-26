@@ -1,5 +1,6 @@
 import { Button, FieldError, Form, Input, Label, Modal, TextField } from "@heroui/react";
 import { JalaliDateField } from "@/shared/components/JalaliDateField";
+import { groupCardNumber } from "@/lib/digits";
 import { SelectField } from "@/shared/components/SelectField";
 import type { MemberKind } from "@/shared/types/membership";
 import { memberKindOptions, useAddMemberForm } from "../hooks/useAddMemberForm";
@@ -56,6 +57,25 @@ export function AddMemberModal({
                 <Label className="text-sm font-bold">نام و نام خانوادگی</Label>
                 <Input className={inputClassName} placeholder="نام و نام خانوادگی" />
                 <FieldError>{form.fullNameError}</FieldError>
+              </TextField>
+
+              <TextField
+                className="sm:col-span-2"
+                isInvalid={!!form.nationalCodeError}
+                name="nationalCode"
+                value={form.nationalCode}
+                onChange={form.setNationalCode}
+              >
+                <Label className="text-sm font-bold">کد ملی</Label>
+                <Input
+                  autoComplete="off"
+                  className={`${inputClassName} input-ltr-type`}
+                  inputMode="numeric"
+                  maxLength={10}
+                  pattern="[0-9]*"
+                  placeholder="کد ملی"
+                />
+                <FieldError>{form.nationalCodeError}</FieldError>
               </TextField>
 
               <TextField
@@ -137,7 +157,7 @@ export function AddMemberModal({
                 className={form.isLegal ? undefined : "sm:col-span-2"}
                 isInvalid={!!form.cardNoError}
                 name="cardNo"
-                value={form.cardNo}
+                value={groupCardNumber(form.cardNo)}
                 onChange={form.setCardNo}
               >
                 <Label className="text-sm font-bold">شماره کارت</Label>
@@ -145,7 +165,7 @@ export function AddMemberModal({
                   autoComplete="off"
                   className={`${inputClassName} input-ltr-type`}
                   inputMode="numeric"
-                  maxLength={16}
+                  maxLength={19}
                   pattern="[0-9]*"
                   placeholder="شماره کارت"
                 />
@@ -155,7 +175,12 @@ export function AddMemberModal({
               {pickExpiryDate ? (
                 <div className={`flex flex-col gap-1.5 ${form.isLegal ? "" : "sm:col-span-2"}`}>
                   <span className="text-sm font-bold">تاریخ انقضا</span>
-                  <JalaliDateField label="تاریخ انقضا" value={form.expiresAt} onChange={form.setExpiresAt} />
+                  <JalaliDateField
+                    isInvalid={!!form.expiresAtError}
+                    label="تاریخ انقضا"
+                    value={form.expiresAt}
+                    onChange={form.setExpiresAt}
+                  />
                   {form.expiresAtError && <p className="text-xs text-danger">{form.expiresAtError}</p>}
                 </div>
               ) : (

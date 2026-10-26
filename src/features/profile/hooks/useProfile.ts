@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { useSessionStore } from "@/features/auth/stores/session.store";
+import { resolveActiveRoleId } from "../roles";
 import type { Profile } from "../types";
 
 /** The Account Service has no profile endpoint; the user's details come with the login response. */
@@ -14,7 +15,7 @@ export function useProfile() {
             fullName: session.user.name,
             phone: session.user.phone,
             roles: session.user.roles,
-            activeRoleId,
+            activeRoleId: resolveActiveRoleId(session.user.roles, activeRoleId),
           }
         : undefined,
     [session, activeRoleId],

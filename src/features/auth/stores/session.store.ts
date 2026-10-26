@@ -2,7 +2,7 @@ import { toast } from "@heroui/react";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { queryClient } from "@/app/query-client";
-import { setAccessTokenGetter, setActiveRoleIdGetter, setSessionRejectedHandler } from "@/lib/http";
+import { setAccessTokenGetter, setActiveRoleIdGetter, setSessionExpiredHandler } from "@/lib/http";
 import type { AuthSession } from "../types";
 
 type SessionState = {
@@ -41,13 +41,12 @@ setActiveRoleIdGetter(() => {
 });
 
 const SESSION_EXPIRED_MESSAGE = "نشست شما منقضی شده است، دوباره وارد شوید";
-const ACCESS_DENIED_MESSAGE = "شما دسترسی لازم برای این بخش را ندارید";
 
-/** A rejected token or permission signs the user out; RequireAuth then sends them to the login page. */
-setSessionRejectedHandler((error) => {
+/** An expired token signs the user out; RequireAuth then sends them to the login page. */
+setSessionExpiredHandler(() => {
   const { session, clearSession } = useSessionStore.getState();
   if (!session) return;
   clearSession();
   queryClient.clear();
-  toast.danger(error.status === 401 ? SESSION_EXPIRED_MESSAGE : ACCESS_DENIED_MESSAGE);
+  toast.danger(SESSION_EXPIRED_MESSAGE);
 });

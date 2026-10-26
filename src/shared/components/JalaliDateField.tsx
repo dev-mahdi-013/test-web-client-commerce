@@ -13,6 +13,8 @@ type JalaliDateFieldProps = {
   value: string;
   onChange: (value: string) => void;
   className?: string;
+  /** Paints the field with the error border. */
+  isInvalid?: boolean;
 };
 
 function partsOf(value: string): JalaliParts {
@@ -24,7 +26,7 @@ function partsOf(value: string): JalaliParts {
 }
 
 /** A muted field that opens the Jalali calendar on click. */
-export function JalaliDateField({ label, value, onChange, className }: JalaliDateFieldProps) {
+export function JalaliDateField({ label, value, onChange, className, isInvalid }: JalaliDateFieldProps) {
   const triggerRef = useRef<HTMLButtonElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const [isOpen, setOpen] = useState(false);
@@ -45,7 +47,8 @@ export function JalaliDateField({ label, value, onChange, className }: JalaliDat
           aria-expanded={isOpen}
           aria-label={label}
           className={cn(
-            "flex h-9 w-full cursor-pointer items-center rounded-xl bg-(--field-muted) px-3 text-sm shadow-none",
+            "flex h-9 w-full cursor-pointer items-center rounded-xl border bg-(--field-muted) px-3 text-sm shadow-none",
+            isInvalid ? "border-danger" : "border-transparent",
             className,
           )}
           type="button"

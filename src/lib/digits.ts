@@ -16,3 +16,8 @@ export function sanitizeDigitsInput(value: string) {
 export function toPersianDigits(value: string | number) {
   return String(value).replace(/\d/g, (digit) => PERSIAN_DIGITS[Number(digit)] ?? digit);
 }
+
+/** Shows a card number in groups of four digits, e.g. 6037997112345678 -> 6037-9971-1234-5678 */
+export function groupCardNumber(value: string) {
+  return value.replace(/(\d{4})(?=\d)/g, "$1-");
+}

@@ -96,13 +96,13 @@ export function appRoleOf(role: Pick<UserRole, "id" | "roleTypeId" | "title"> | 
 export function homePathFor(role: AppRole) {
   switch (role) {
     case "chamber-president":
-      return "/assemblies";
+      return "/hr";
     case "card-issuance":
       return "/union-members";
     case "organizations":
-      return "/organizations/assemblies";
+      return "/members";
     case "association-head":
-      return "/association/assemblies";
+      return "/hr-association";
     case "association-info":
       return "/hr-association";
     case "association-secretary":
@@ -112,6 +112,11 @@ export function homePathFor(role: AppRole) {
     default:
       return "/hr";
   }
+}
+
+/** The role that is really active: the stored choice when it still exists, otherwise the first role. */
+export function resolveActiveRoleId(roles: UserRole[], activeRoleId: string | null): string | null {
+  return roles.find((role) => role.id === activeRoleId)?.id ?? roles[0]?.id ?? null;
 }
 
 export function activeRoleOf(profile: Profile | undefined): UserRole | undefined {

@@ -21,10 +21,13 @@ export type CardPayload = {
   expiresAt: string;
   managerName?: string;
   managerNationalId?: string;
+  /** Holder's national code, required by the backend on natural cards */
+  nationalCode?: string;
 };
 
 export type CreateMemberPayload = {
   fullName: string;
+  nationalCode: string;
   phone: string;
   card: CardPayload;
 };
@@ -51,6 +54,7 @@ function toCardBody(card: CardPayload) {
     type: "Real" as const,
     data: {
       name: card.name.trim(),
+      nationalCode: card.nationalCode ?? "",
       cardNum: card.cardNo,
       exprDate: jalaliToEpoch(card.expiresAt),
     },

@@ -3,7 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { authApi } from "../api";
 import { useSessionStore } from "../stores/session.store";
 
-export const NO_ROLE_MESSAGE = "شما دسترسی ندارید";
+export const NO_ROLE_MESSAGE = "شما دسترسی ندارید برای وارد شدن";
 
 /** Thrown when the login succeeds but the account has no role, so no session is stored */
 export class NoRoleError extends Error {}

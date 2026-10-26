@@ -10,6 +10,7 @@ function invalidateMembers(queryClient: ReturnType<typeof useQueryClient>) {
 
 function cardErrorMessage(error: unknown, isLegal: boolean) {
   const message = getErrorMessage(error);
+  if (/national code is not valid/i.test(message)) return "کد ملی معتبر نیست";
   if (isLegal && !/[\u0600-\u06ff]/.test(message)) {
     return "افزودن کارت حقوقی انجام نشد؛ لطفاً اطلاعات کارت و مدیرعامل را بررسی کنید.";
   }

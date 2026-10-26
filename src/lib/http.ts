@@ -35,20 +35,20 @@ const FALLBACK_MESSAGE = "خطایی در ارتباط با سرور رخ داد
 const NETWORK_ERROR_MESSAGE = "ارتباط با سرور برقرار نشد، اتصال اینترنت را بررسی کنید";
 const REQUEST_TIMEOUT_MS = 3_000;
 
-type SessionRejectedHandler = (error: ApiError) => void;
-let onSessionRejected: SessionRejectedHandler = () => {};
+type SessionExpiredHandler = (error: ApiError) => void;
+let onSessionExpired: SessionExpiredHandler = () => {};
 
-/** Called when the backend rejects the session (expired token) or the user's permission. */
-export function setSessionRejectedHandler(handler: SessionRejectedHandler) {
-  onSessionRejected = handler;
+/** Called when the backend says the token is no longer valid. Permission errors (403) do not trigger it. */
+export function setSessionExpiredHandler(handler: SessionExpiredHandler) {
+  onSessionExpired = handler;
 }
 
-const SESSION_REJECTED_MESSAGES = ["authentication error", "access denied", "no access"];
+const SESSION_EXPIRED_MESSAGES = ["authentication error"];
 
-function isSessionRejection(status: number, rawMessage: string | null) {
-  if (status === 401 || status === 403) return true;
+function isSessionExpired(status: number, rawMessage: string | null) {
+  if (status === 401) return true;
   const raw = rawMessage?.trim().toLowerCase() ?? "";
-  return SESSION_REJECTED_MESSAGES.some((text) => raw.includes(text));
+  return SESSION_EXPIRED_MESSAGES.some((text) => raw.includes(text));
 }
 
 let getAccessToken: () => string | null = () => null;
@@ -91,7 +91,7 @@ export function createHttpClient({ baseUrl, authorization, unwrapEnvelope, trans
   const toApiError = (status: number, data: unknown) => {
     const message = readMessage(data);
     const error = new ApiError((message && translateMessage?.(message)) || message || FALLBACK_MESSAGE, status, data);
-    if (isSessionRejection(status, message)) onSessionRejected(error);
+    if (isSessionExpired(status, message)) onSessionExpired(error);
     return error;
   };
 

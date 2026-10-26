@@ -1,4 +1,6 @@
 import { Button, FieldError, Form, Input, Label, Modal, TextField } from "@heroui/react";
+import { groupCardNumber } from "@/lib/digits";
+import { JalaliDateField } from "@/shared/components/JalaliDateField";
 import { SelectField } from "@/shared/components/SelectField";
 import type { MemberKind } from "@/shared/types/membership";
 import { memberKindOptions, useCardFieldsForm } from "../hooks/useCardFieldsForm";
@@ -53,6 +55,7 @@ export function AddCardModal({ isOpen, memberId, memberName, onOpenChange }: Add
                     expiresAt: form.expiresAt,
                     managerName: form.isLegal ? form.managerName.trim() : undefined,
                     managerNationalId: form.isLegal ? form.managerNationalId : undefined,
+                    nationalCode: form.isLegal ? undefined : form.nationalCode,
                   },
                   {
                     onSuccess: () => {
@@ -125,12 +128,34 @@ export function AddCardModal({ isOpen, memberId, memberName, onOpenChange }: Add
                 </TextField>
               )}
 
+              {!form.isLegal && (
+                <TextField
+                  className="sm:col-span-2"
+                  isDisabled={addCard.isPending}
+                  isInvalid={!!form.nationalCodeError}
+                  name="nationalCode"
+                  value={form.nationalCode}
+                  onChange={form.setNationalCode}
+                >
+                  <Label className="text-sm font-bold">کد ملی</Label>
+                  <Input
+                    autoComplete="off"
+                    className={`${inputClassName} input-ltr-type`}
+                    inputMode="numeric"
+                    maxLength={10}
+                    pattern="[0-9]*"
+                    placeholder="کد ملی"
+                  />
+                  <FieldError>{form.nationalCodeError}</FieldError>
+                </TextField>
+              )}
+
               <TextField
                 className={form.isLegal ? undefined : "sm:col-span-2"}
                 isDisabled={addCard.isPending}
                 isInvalid={!!form.cardNoError}
                 name="cardNo"
-                value={form.cardNo}
+                value={groupCardNumber(form.cardNo)}
                 onChange={form.setCardNo}
               >
                 <Label className="text-sm font-bold">شماره کارت</Label>
@@ -138,31 +163,23 @@ export function AddCardModal({ isOpen, memberId, memberName, onOpenChange }: Add
                   autoComplete="off"
                   className={`${inputClassName} input-ltr-type`}
                   inputMode="numeric"
-                  maxLength={16}
+                  maxLength={19}
                   pattern="[0-9]*"
                   placeholder="شماره کارت"
                 />
                 <FieldError>{form.cardNoError}</FieldError>
               </TextField>
 
-              <TextField
-                className={form.isLegal ? undefined : "sm:col-span-2"}
-                isDisabled={addCard.isPending}
-                isInvalid={!!form.expiresAtError}
-                name="expiresAt"
-                value={form.expiresAt}
-                onChange={form.setExpiresAt}
-              >
-                <Label className="text-sm font-bold">تاریخ انقضا</Label>
-                <Input
-                  autoComplete="off"
-                  className={`${inputClassName} input-ltr-type`}
-                  inputMode="numeric"
-                  maxLength={10}
-                  placeholder="1404/03/12"
+              <div className={`flex flex-col gap-1.5 ${form.isLegal ? "" : "sm:col-span-2"}`}>
+                <span className="text-sm font-bold">تاریخ انقضا</span>
+                <JalaliDateField
+                  isInvalid={!!form.expiresAtError}
+                  label="تاریخ انقضا"
+                  value={form.expiresAt}
+                  onChange={form.setExpiresAt}
                 />
-                <FieldError>{form.expiresAtError}</FieldError>
-              </TextField>
+                {form.expiresAtError && <p className="text-xs text-danger">{form.expiresAtError}</p>}
+              </div>
             </Modal.Body>
 
             <Modal.Footer className="mt-3 justify-start gap-2">
