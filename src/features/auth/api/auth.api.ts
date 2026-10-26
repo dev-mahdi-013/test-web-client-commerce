@@ -65,6 +65,7 @@ type ApiSession = {
   createdAt?: string;
   current?: boolean;
   isCurrent?: boolean;
+  loginType?: number | string;
 };
 
 type ApiSessionList = ApiSession[] | { items?: ApiSession[]; sessions?: ApiSession[] };
@@ -90,6 +91,17 @@ function dateOf(...candidates: unknown[]) {
   return null;
 }
 
+/** Panel labels by backend login type; only the commerce type is known so far. */
+const panelByLoginType: Record<number, string> = {
+  [COMMERCE_LOGIN_TYPE]: "پنل بازرگانی",
+};
+
+/** Sessions without a login type were created by this (commerce) app, so they default to its panel. */
+function panelOf(loginType: number | string | undefined) {
+  if (loginType == null || loginType === "") return panelByLoginType[COMMERCE_LOGIN_TYPE] ?? null;
+  return panelByLoginType[Number(loginType)] ?? null;
+}
+
 function toUserSession(session: ApiSession, index: number, currentTokenId: string | null): UserSession {
   const id = textOf(session.tokenId, session.id, session._id) ?? String(index);
   const device = typeof session.device === "object" ? session.device : null;
@@ -104,6 +116,7 @@ function toUserSession(session: ApiSession, index: number, currentTokenId: strin
     ip: textOf(session.ip, session.ipAddress),
     lastActiveAt: dateOf(session.lastAccess, session.lastActiveAt, session.lastSeenAt, session.updatedAt, session.createdAt),
     isCurrent: session.isCurrent ?? session.current ?? (currentTokenId !== null && id === currentTokenId),
+    panel: panelOf(session.loginType),
   };
 }
 

@@ -17,7 +17,7 @@ export function ActiveSessionsDialog({ isOpen, onOpenChange }: ActiveSessionsDia
       <Modal.Container placement="center">
         <Modal.Dialog
           aria-label="نشست های فعال"
-          className="relative h-[34rem] max-h-[calc(100dvh-2rem)] w-[344px] max-w-[calc(100vw-2rem)] rounded-[24px] p-5 shadow-(--box-shadow)"
+          className="relative h-[34rem] max-h-[calc(100dvh-2rem)] w-[400px] max-w-[calc(100vw-2rem)] rounded-[24px] p-5 shadow-(--box-shadow)"
         >
           <Modal.CloseTrigger className="start-auto end-auto right-4 top-4" />
           <Modal.Body className="flex flex-1 flex-col gap-5 p-0">
@@ -45,20 +45,31 @@ export function ActiveSessionsDialog({ isOpen, onOpenChange }: ActiveSessionsDia
             ) : (
               <ul dir="ltr" className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto pr-1">
                 {sessions.map((session) => (
-                  <li key={session.id} className="flex h-[100px] shrink-0 flex-col overflow-hidden rounded-2xl bg-(--panel)">
-                    <div className="flex flex-1 items-center justify-between gap-3 px-4">
+                  <li key={session.id} className="flex min-h-[100px] shrink-0 flex-col overflow-hidden rounded-2xl bg-(--panel)">
+                    <div className="relative flex flex-1 items-center justify-between gap-3 px-4 py-4">
                       <div className="min-w-0">
                         <p className="truncate text-base font-bold text-foreground">{session.deviceName}</p>
-                        <p className="mt-1 flex items-center gap-1.5 text-sm text-muted">
+                        <p className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-1 whitespace-nowrap text-sm text-muted">
                           {session.ip ? <span dir="ltr">{session.ip}</span> : null}
                           {session.ip && session.lastActiveAt ? (
-                            <span aria-hidden className="size-1  rounded-full bg-current" />
+                            <span aria-hidden className="size-1 shrink-0 rounded-full bg-current" />
                           ) : null}
                           {session.lastActiveAt ? <span dir="rtl">{relativeTimeFromNow(session.lastActiveAt)}</span> : null}
+                          {session.panel && (session.ip || session.lastActiveAt) ? (
+                            <span aria-hidden className="size-1 shrink-0 rounded-full bg-current" />
+                          ) : null}
+                          {session.panel ? (
+                            <span
+                              dir="rtl"
+                              className="rounded-full bg-(--heading-bullet) px-2.5 py-0.5 text-xs leading-5 text-foreground"
+                            >
+                              {session.panel}
+                            </span>
+                          ) : null}
                         </p>
                       </div>
                       {session.isCurrent ? (
-                        <span className="mt-2 flex h-[30px] min-w-[72px]  items-center justify-center self-start rounded-full bg-(--status-finished-bg) px-[10px] py-[5px] text-xs text-(--status-finished)">
+                        <span className="absolute right-4 top-[6px] flex h-[30px] min-w-[72px] items-center justify-center whitespace-nowrap rounded-full bg-(--status-finished-bg) px-[10px] py-[5px] text-xs text-(--status-finished)">
                           دستگاه فعلی
                         </span>
                       ) : null}
