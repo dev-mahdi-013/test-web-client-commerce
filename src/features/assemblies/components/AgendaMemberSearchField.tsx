@@ -45,7 +45,7 @@ export function AgendaMemberSearchField({
   // Association rows use a composite `memberId.roleId` id; the member id is only the part before the dot.
   const allCards = isSearchCurrent
     ? (members.data?.items ?? []).flatMap((member) =>
-        member.cards.map((card) => ({ memberId: member.id.split(".")[0], name: member.fullName, card })),
+        member.cards.map((card) => ({ memberId: member.id.split(".")[0] ?? member.id, name: member.fullName, card })),
       )
     : [];
   const candidates: AgendaMemberCandidate[] = allCards
