@@ -7,7 +7,7 @@ import { formatJalali } from "@/lib/date";
 import { CardCarousel } from "@/shared/components/CardCarousel";
 import { CardValidityPill } from "@/shared/components/CardValidityPill";
 import { MemberMetaField } from "@/shared/components/MemberMetaField";
-import { MembershipCard } from "@/shared/components/MembershipCard";
+import { MembershipCard, WithAccentStrip } from "@/shared/components/MembershipCard";
 import type { AssociationMember } from "../types";
 import { RemoveAssociationMemberButton } from "./RemoveAssociationMemberButton";
 
@@ -58,26 +58,28 @@ function AssociationMemberCard({
           value={<span dir="ltr">{member.card.managerNationalId ?? "------"}</span>}
         />
       </div>
-      <MembershipCard
-        card={member.card}
-        className="shadow-none"
-        dimWhenExpired={false}
-        footer={
-          canManageCards ? (
-            <>
-              <RemoveAssociationMemberButton
-                associationId={associationId}
-                cardNo={member.card.cardNo}
-                memberId={memberId}
-                memberRoleId={memberRoleId}
-              />
-              <CardValidityPill withIcon card={member.card} />
-            </>
-          ) : (
-            <CardValidityPill card={member.card} />
-          )
-        }
-      />
+      <WithAccentStrip>
+        <MembershipCard
+          card={member.card}
+          className="shadow-none"
+          dimWhenExpired={false}
+          footer={
+            canManageCards ? (
+              <>
+                <RemoveAssociationMemberButton
+                  associationId={associationId}
+                  cardNo={member.card.cardNo}
+                  memberId={memberId}
+                  memberRoleId={memberRoleId}
+                />
+                <CardValidityPill withIcon card={member.card} />
+              </>
+            ) : (
+              <CardValidityPill card={member.card} />
+            )
+          }
+        />
+      </WithAccentStrip>
     </article>
   );
 }

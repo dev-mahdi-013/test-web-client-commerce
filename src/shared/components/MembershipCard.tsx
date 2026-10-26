@@ -132,6 +132,20 @@ export function MembershipCard({ card, footer, children, dimWhenExpired = true, 
   );
 }
 
+/** Puts the accent strip peeking out under a membership card. */
+export function WithAccentStrip({ children }: { children: ReactNode }) {
+  return (
+    <div className="relative isolate pb-2">
+      <div
+        aria-hidden
+        className="absolute inset-x-3 bottom-0 -z-10 h-4 rounded-b-[20px]"
+        style={{ background: "linear-gradient(298.67deg, #05308E 0%, #4981E9 100%)" }}
+      />
+      {children}
+    </div>
+  );
+}
+
 export function MembershipCardPlaceholder() {
   const bar = "h-2 rounded-full bg-white/60";
 

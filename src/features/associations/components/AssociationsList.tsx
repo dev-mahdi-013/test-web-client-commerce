@@ -127,7 +127,8 @@ export function AssociationsTable({
   };
 
   useEffect(() => {
-    if (editingField !== "presidentName" || !editingId || editMembersQuery.isLoading) return;
+    // Wait for the refetch that starts when the picker opens, so the draft is not built from the cached list.
+    if (editingField !== "presidentName" || !editingId || editMembersQuery.isFetching) return;
     if (editMembersQuery.isError) return;
     if (editMembers.length === 0) {
       toast.danger("عضوی برای انتخاب نیست");
@@ -141,7 +142,7 @@ export function AssociationsTable({
     associations,
     editMembers,
     editMembersQuery.isError,
-    editMembersQuery.isLoading,
+    editMembersQuery.isFetching,
     editingField,
     editingId,
   ]);
@@ -190,7 +191,7 @@ export function AssociationsTable({
   };
 
   const saveBoss = (association: Association) => {
-    if (isSaving || editMembersQuery.isLoading) return;
+    if (isSaving || editMembersQuery.isFetching) return;
     if (editMembersQuery.isError) {
       toast.danger(getErrorMessage(editMembersQuery.error, "دریافت اعضای انجمن انجام نشد"));
       return;

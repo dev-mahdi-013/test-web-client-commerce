@@ -24,10 +24,13 @@ export function useAssociationMembers(associationId: string | null, page: number
   });
 }
 
+/** The president picker reads this list every time it opens, so it always fetches the current members. */
 export function useAllAssociationMembers(associationId: string | null) {
   return useQuery({
     queryKey: associationKeys.allMembers(associationId ?? "none"),
     queryFn: () => associationsApi.listAllMembers(associationId!),
     enabled: associationId !== null,
+    staleTime: 0,
+    refetchOnMount: "always",
   });
 }
