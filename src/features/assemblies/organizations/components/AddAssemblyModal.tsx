@@ -1,9 +1,9 @@
 import { Button, FieldError, Form, Input, Label, Modal, TextField } from "@heroui/react";
 import { JalaliDateField } from "@/shared/components/JalaliDateField";
 import { SelectField } from "@/shared/components/SelectField";
-import { ASSEMBLY_TITLE_MAX_CHARS, assemblyCreationUnitOptions } from "../../config";
+import { ASSEMBLY_TITLE_MAX_CHARS, assemblyCardTypeOptions, assemblyCreationUnitOptions } from "../../config";
 import { useAddAssemblyForm } from "../../hooks/useAddAssemblyForm";
-import type { AssemblyUnit } from "../../types";
+import type { AssemblyCardType, AssemblyUnit } from "../../types";
 
 type AddAssemblyModalProps = {
   isOpen: boolean;
@@ -75,7 +75,7 @@ export function AddAssemblyModal({ isOpen, onOpenChange }: AddAssemblyModalProps
                 {form.dateError && <p className="text-xs text-danger">{form.dateError}</p>}
               </div>
 
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)]">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="flex flex-col gap-1.5">
                   <span className="text-sm font-bold text-foreground">واجدین</span>
                   <SelectField
@@ -88,17 +88,29 @@ export function AddAssemblyModal({ isOpen, onOpenChange }: AddAssemblyModalProps
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <span className="text-sm font-bold text-foreground">تارگت</span>
+                  <span className="text-sm font-bold text-foreground">نوع کارت</span>
                   <SelectField
                     className={`${inputClassName} w-full`}
-                    isDisabled={form.isSubmitting || form.associationsLoading || form.associationOptions.length === 0}
-                    label="تارگت"
-                    options={form.associationOptions}
-                    value={form.associationId}
-                    onChange={form.setAssociationId}
+                    isDisabled={form.isSubmitting}
+                    label="نوع کارت"
+                    options={assemblyCardTypeOptions}
+                    value={form.cardType}
+                    onChange={(value) => form.setCardType(value as AssemblyCardType)}
                   />
-                  {form.associationError && <p className="text-xs text-danger">{form.associationError}</p>}
                 </div>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <span className="text-sm font-bold text-foreground">تارگت</span>
+                <SelectField
+                  className={`${inputClassName} w-full`}
+                  isDisabled={form.isSubmitting || form.associationsLoading || form.associationOptions.length === 0}
+                  label="تارگت"
+                  options={form.associationOptions}
+                  value={form.associationId}
+                  onChange={form.setAssociationId}
+                />
+                {form.associationError && <p className="text-xs text-danger">{form.associationError}</p>}
               </div>
             </Modal.Body>
 

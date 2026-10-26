@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { currentCommerceScope } from "@/lib/commerce-scope";
 import { formatJalaliParts, isValidJalaliDate, toJalali } from "@/lib/date";
 import { ASSEMBLY_TITLE_MAX_CHARS } from "../config";
-import type { AssemblyUnit, CreateAssemblyInput } from "../types";
+import type { AssemblyCardType, AssemblyUnit, CreateAssemblyInput } from "../types";
 import { useAssemblyAssociationOptions } from "./useAssemblyAssociationOptions";
 import { useCreateAssembly } from "./useAssemblyMutations";
 
@@ -31,6 +31,7 @@ export function useAddAssemblyForm({ onSuccess }: UseAddAssemblyFormOptions) {
   const [votingDay, setVotingDay] = useState(today);
   const [associationId, setAssociationId] = useState("");
   const [unit, setUnit] = useState<AssemblyUnit>("حقوقی");
+  const [cardType, setCardType] = useState<AssemblyCardType>("همه");
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   useEffect(() => {
@@ -48,6 +49,7 @@ export function useAddAssemblyForm({ onSuccess }: UseAddAssemblyFormOptions) {
     setVotingDay(today());
     setAssociationId(options[0]?.value ?? "");
     setUnit("حقوقی");
+    setCardType("همه");
     setIsSubmitted(false);
   };
 
@@ -60,6 +62,7 @@ export function useAddAssemblyForm({ onSuccess }: UseAddAssemblyFormOptions) {
       votingDay,
       associationId,
       unit,
+      cardType,
     };
 
     createAssembly.mutate(input, {
@@ -81,6 +84,8 @@ export function useAddAssemblyForm({ onSuccess }: UseAddAssemblyFormOptions) {
     associationsLoading: associations.isPending,
     unit,
     setUnit,
+    cardType,
+    setCardType,
     titleError: isSubmitted && !isTitleValid ? titleErrorMessage(title) : null,
     dateError: isSubmitted && !isDateValid ? "روز رأی‌گیری را انتخاب کنید" : null,
     associationError: isSubmitted && !isAssociationValid ? "تارگت را انتخاب کنید" : null,

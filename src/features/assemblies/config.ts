@@ -1,4 +1,4 @@
-import type { AgendaKind, AssemblyStatus, AssemblyUnit } from "./types";
+import type { AgendaKind, AssemblyCardType, AssemblyStatus, AssemblyUnit } from "./types";
 
 export const ASSEMBLIES_PAGE_SIZE = 9;
 
@@ -11,6 +11,12 @@ export const assemblyUnitOptions: Array<{ value: AssemblyUnit; label: string }> 
 export const assemblyCreationUnitOptions: Array<{ value: AssemblyUnit; label: string }> = [
   { value: "همه", label: "همه" },
   ...assemblyUnitOptions,
+];
+
+/** Card types an assembly can be limited to (نوع کارت). */
+export const assemblyCardTypeOptions: Array<{ value: AssemblyCardType; label: string }> = [
+  { value: "همه", label: "همه" },
+  { value: "بازرگانی", label: "بازرگانی" },
 ];
 
 /** Longest assembly title shown in the assemblies tables. */

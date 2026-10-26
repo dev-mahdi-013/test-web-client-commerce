@@ -3,6 +3,9 @@ export type AssemblyStatus = "published" | "running" | "pending" | "finished" | 
 /** Backend eligibilityScope: All `0x01` / RealCardsOnly `0x02` / LegalCardsOnly `0x03`. */
 export type AssemblyUnit = "همه" | "حقیقی" | "حقوقی";
 
+/** نوع کارت chosen when creating an assembly. */
+export type AssemblyCardType = "همه" | "بازرگانی";
+
 export type AssemblyVoterStat = {
   /** `target.data.membersCount` — کل */
   total: number;
@@ -85,6 +88,8 @@ export type CreateAssemblyInput = {
   votingDay: string;
   associationId: string;
   unit: AssemblyUnit;
+  /** Not sent to the API yet — backend has no card-type field on poll creation. */
+  cardType?: AssemblyCardType;
 };
 
 export type CreateAgendaInput = {
