@@ -37,14 +37,15 @@ export function useAddMemberForm({ onSuccess }: UseAddMemberFormOptions) {
   const isLegal = kind === "legal";
 
   const isNameValid = fullName.trim().length >= MIN_NAME_LENGTH;
-  const isNationalCodeValid = isValidNationalCode(nationalCode);
+  const isNationalCodeValid = isLegal || isValidNationalCode(nationalCode);
   const isPhoneValid = isValidPhone(phone);
   const isCompanyValid = !isLegal || companyName.trim().length >= MIN_COMPANY_LENGTH;
   const isManagerNameValid = !isLegal || managerName.trim().length >= MIN_NAME_LENGTH;
-  const isNationalIdValid = !isLegal || managerNationalId === "" || isValidNationalCode(managerNationalId);
+  const isNationalIdValid = !isLegal || isValidNationalCode(managerNationalId);
   const isCardNoValid = cardNo.length >= MIN_CARD_NO_LENGTH && cardNo.length <= MAX_CARD_NO_LENGTH;
   const isExpiryValid = isValidJalaliDate(expiresAt);
-  const isCommercialExpiryValid = isValidJalaliDate(commercialExpiresAt);
+  const isCommercialExpiryValid =
+    commercialExpiresAt === "" || isValidJalaliDate(commercialExpiresAt);
 
   const isValid =
     isNameValid &&
@@ -129,16 +130,18 @@ export function useAddMemberForm({ onSuccess }: UseAddMemberFormOptions) {
     companyNameError: isSubmitted && !isCompanyValid ? "نام شرکت را وارد کنید" : null,
     managerNameError: isSubmitted && !isManagerNameValid ? "نام مدیرعامل را کامل وارد کنید" : null,
     managerNationalIdError:
-      isSubmitted && !isNationalIdValid ? "کد ملی مدیرعامل معتبر نیست" : null,
+      isSubmitted && !isNationalIdValid
+        ? managerNationalId === ""
+          ? "کد ملی مدیرعامل الزامی است"
+          : "کد ملی مدیرعامل معتبر نیست"
+        : null,
     cardNoError:
       isSubmitted && !isCardNoValid
         ? `شماره کارت باید ${MIN_CARD_NO_LENGTH} تا ${MAX_CARD_NO_LENGTH} رقم باشد`
         : null,
     commercialExpiresAtError:
       isSubmitted && !isCommercialExpiryValid
-        ? commercialExpiresAt === ""
-          ? "تاریخ انقضای کارت بازرگانی الزامی است"
-          : "تاریخ انقضای کارت بازرگانی را به شکل 1404/03/12 وارد کنید"
+        ? "تاریخ انقضای کارت بازرگانی را به شکل 1404/03/12 وارد کنید"
         : null,
     expiresAtError: isSubmitted && !isExpiryValid
       ? expiresAt === ""

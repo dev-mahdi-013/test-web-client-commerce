@@ -137,6 +137,8 @@ export function userMembershipCard(
     cardNo: "—",
     expiresAt: "",
     expired: false,
+    hasCommerceCard: false,
+    commerceExpiresAt: null,
   };
 }
 

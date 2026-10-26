@@ -88,7 +88,7 @@ export type CreateAssemblyInput = {
   votingDay: string;
   associationId: string;
   unit: AssemblyUnit;
-  /** Not sent to the API yet — backend has no card-type field on poll creation. */
+  /** Sent as the poll's `cardScope`: همه → all cards, بازرگانی → commerce cards only. */
   cardType?: AssemblyCardType;
 };
 

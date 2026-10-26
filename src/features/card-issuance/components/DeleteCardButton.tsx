@@ -7,9 +7,11 @@ type DeleteCardButtonProps = {
   memberId: string;
   cardId: string;
   cardNo: string;
+  /** Called after the card was removed on the server. */
+  onRemoved?: (cardId: string) => void;
 };
 
-export function DeleteCardButton({ memberId, cardId, cardNo }: DeleteCardButtonProps) {
+export function DeleteCardButton({ memberId, cardId, cardNo, onRemoved }: DeleteCardButtonProps) {
   const confirm = useOverlayState();
   const removeCard = useRemoveCard(memberId);
 
@@ -32,7 +34,12 @@ export function DeleteCardButton({ memberId, cardId, cardNo }: DeleteCardButtonP
         isPending={removeCard.isPending}
         message="آیا حذف را تأیید می‌کنید؟"
         onConfirm={() => {
-          removeCard.mutate(cardId, { onSuccess: () => confirm.close() });
+          removeCard.mutate(cardId, {
+            onSuccess: () => {
+              confirm.close();
+              onRemoved?.(cardId);
+            },
+          });
         }}
         onOpenChange={confirm.setOpen}
       />

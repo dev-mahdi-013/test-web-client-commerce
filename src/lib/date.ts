@@ -70,6 +70,10 @@ export function persianMonthName(jm: number) {
   return persianMonths[jm - 1] ?? "";
 }
 
+export function jalaliMonthLength(jy: number, jm: number) {
+  return jalaaliMonthLength(jy, jm);
+}
+
 export function shiftJalaliMonth(jy: number, jm: number, delta: number) {
   const index = jy * 12 + (jm - 1) + delta;
   const monthIndex = ((index % 12) + 12) % 12;

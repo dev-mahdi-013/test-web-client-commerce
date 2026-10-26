@@ -18,6 +18,7 @@ import {
   toAgenda,
   toAssembly,
   toAssemblyDetail,
+  toCardScopeCode,
   toEligibilityCode,
   toPollStatusCode,
   type ApiPoll,
@@ -127,6 +128,7 @@ export const assembliesApi = {
         title: input.title.trim(),
         pollDate: jalaliToEpoch(input.votingDay),
         eligibilityScope: toEligibilityCode(input.unit),
+        cardScope: toCardScopeCode(input.cardType ?? "همه"),
         // The association-president endpoint is bound to its own association.
         associationId: scope === "ap" ? undefined : input.associationId,
       },
@@ -168,6 +170,7 @@ export const assembliesApi = {
         title: poll.title,
         pollDate: jalaliToEpoch(votingDay),
         eligibilityScope: poll.target?.data.eligibilityScope ?? toEligibilityCode("حقوقی"),
+        cardScope: poll.target?.data.cardScope ?? toCardScopeCode("همه"),
       },
     });
     const refreshed = await fetchPoll(assemblyId);
@@ -184,6 +187,7 @@ export const assembliesApi = {
         title: title.trim(),
         pollDate: poll.pollDate ?? 0,
         eligibilityScope: poll.target?.data.eligibilityScope ?? toEligibilityCode("حقوقی"),
+        cardScope: poll.target?.data.cardScope ?? toCardScopeCode("همه"),
       },
     });
     const refreshed = await fetchPoll(assemblyId);
@@ -200,6 +204,7 @@ export const assembliesApi = {
         title: poll.title,
         pollDate: poll.pollDate ?? 0,
         eligibilityScope: toEligibilityCode(unit),
+        cardScope: poll.target?.data.cardScope ?? toCardScopeCode("همه"),
       },
     });
     const refreshed = await fetchPoll(assemblyId);

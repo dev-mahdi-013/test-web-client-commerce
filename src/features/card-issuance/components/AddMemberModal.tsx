@@ -59,24 +59,26 @@ export function AddMemberModal({
                 <FieldError>{form.fullNameError}</FieldError>
               </TextField>
 
-              <TextField
-                className="sm:col-span-2"
-                isInvalid={!!form.nationalCodeError}
-                name="nationalCode"
-                value={form.nationalCode}
-                onChange={form.setNationalCode}
-              >
-                <Label className="text-sm font-bold">کد ملی</Label>
-                <Input
-                  autoComplete="off"
-                  className={`${inputClassName} input-ltr-type`}
-                  inputMode="numeric"
-                  maxLength={10}
-                  pattern="[0-9]*"
-                  placeholder="کد ملی"
-                />
-                <FieldError>{form.nationalCodeError}</FieldError>
-              </TextField>
+              {!form.isLegal && (
+                <TextField
+                  className="sm:col-span-2"
+                  isInvalid={!!form.nationalCodeError}
+                  name="nationalCode"
+                  value={form.nationalCode}
+                  onChange={form.setNationalCode}
+                >
+                  <Label className="text-sm font-bold">کد ملی</Label>
+                  <Input
+                    autoComplete="off"
+                    className={`${inputClassName} input-ltr-type`}
+                    inputMode="numeric"
+                    maxLength={10}
+                    pattern="[0-9]*"
+                    placeholder="کد ملی"
+                  />
+                  <FieldError>{form.nationalCodeError}</FieldError>
+                </TextField>
+              )}
 
               <TextField
                 className="sm:col-span-2"
@@ -204,10 +206,10 @@ export function AddMemberModal({
               )}
 
               <div className="flex flex-col gap-1.5 sm:col-span-2">
-                <span className="text-sm font-bold">تاریخ انقضای کارت بازرگانی</span>
+                <span className="text-sm font-bold">تاریخ انقضای کارت بازرگانی (اختیاری)</span>
                 <JalaliDateField
                   isInvalid={!!form.commercialExpiresAtError}
-                  label="تاریخ انقضای کارت بازرگانی"
+                  label="تاریخ انقضای کارت بازرگانی (اختیاری)"
                   value={form.commercialExpiresAt}
                   onChange={form.setCommercialExpiresAt}
                 />

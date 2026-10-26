@@ -6,7 +6,6 @@ import { AgendaMemberSearchField, type AgendaMemberCandidate } from "@/features/
 import { sanitizeDigitsInput } from "@/lib/digits";
 import { SelectField } from "@/shared/components/SelectField";
 import type { AgendaCandidateInput } from "../../types";
-import { assemblyUnitOptions } from "../../config";
 import type { AgendaKind, AssemblyUnit, CreateAgendaInput } from "../../types";
 
 type DraftCandidate = AgendaCandidateInput & {
@@ -38,16 +37,10 @@ export function AddAgendaForm({
   const [title, setTitle] = useState("");
   const [maxSelections, setMaxSelections] = useState("1");
   const [kind, setKind] = useState<AgendaKind>("person");
-  const [unit, setUnit] = useState<AssemblyUnit>("حقیقی");
   const [candidateQuery, setCandidateQuery] = useState("");
   const [candidates, setCandidates] = useState<DraftCandidate[]>([]);
   const [error, setError] = useState<string | null>(null);
   const isFormDisabled = isPending || isDisabled;
-  const selectedUnit = assemblyUnit === "همه" ? unit : assemblyUnit;
-  const unitOptions =
-    assemblyUnit === "همه"
-      ? assemblyUnitOptions
-      : assemblyUnitOptions.filter((option) => option.value === assemblyUnit);
 
   const addTextCandidate = () => {
     if (isFormDisabled) return;
@@ -105,7 +98,8 @@ export function AddAgendaForm({
       title: trimmedTitle,
       maxSelections: max,
       kind,
-      unit: selectedUnit,
+      // واجدین انتخاب نمی‌شود؛ دستور هم‌واحد با خود مجمع ساخته می‌شود.
+      unit: assemblyUnit,
       // Only the candidates the user entered; the title belongs to the agenda, not to its items.
       candidates: candidates.map(({ id: _id, ...candidate }) => candidate),
     });
@@ -113,7 +107,6 @@ export function AddAgendaForm({
     setTitle("");
     setMaxSelections("1");
     setKind("person");
-    setUnit(assemblyUnit === "همه" ? "حقیقی" : assemblyUnit);
     setCandidates([]);
     setCandidateQuery("");
   };
@@ -123,7 +116,7 @@ export function AddAgendaForm({
       className="bg-transparent p-0 shadow-none max-lg:!pb-0"
       style={{ paddingBottom: candidates.length > 0 ? `${candidates.length * 32 + 44}px` : undefined }}
     >
-      <div className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1.4fr)_110px_140px_140px_minmax(0,1.2fr)_auto] lg:items-end">
+      <div className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1.4fr)_110px_140px_minmax(0,1.2fr)_auto] lg:items-end">
         <TextField isDisabled={isFormDisabled} value={title} onChange={setTitle}>
           <Label className="text-xs font-bold text-foreground">تیتر دستور</Label>
           <Input className={`${fieldClassName} mt-1`} placeholder="تیتر دستور" />
@@ -154,20 +147,6 @@ export function AddAgendaForm({
             showBackdrop
             value={kind}
             onChange={changeKind}
-          />
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <span className="text-xs font-bold text-foreground">واجدین</span>
-          <SelectField
-            className={selectClassName}
-            isDisabled={isFormDisabled || assemblyUnit !== "همه"}
-            label="واجدین"
-            options={unitOptions}
-            popoverClassName="z-[var(--z-index-overlay)] max-sm:!w-[200px]"
-            showBackdrop
-            value={selectedUnit}
-            onChange={(value) => setUnit(value as AssemblyUnit)}
           />
         </div>
 

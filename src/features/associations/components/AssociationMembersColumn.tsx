@@ -3,13 +3,16 @@ import { PhoneIcon } from "@solar-icons/react/linear/phone";
 import { UserIcon } from "@solar-icons/react/linear/user";
 import { UserIdIcon } from "@solar-icons/react/linear/user-id";
 import { Spinner } from "@heroui/react";
+import { useQueryClient } from "@tanstack/react-query";
 import { formatJalali } from "@/lib/date";
 import { CardCarousel } from "@/shared/components/CardCarousel";
 import { CardValidityPill } from "@/shared/components/CardValidityPill";
 import { MemberMetaField } from "@/shared/components/MemberMetaField";
-import { MembershipCard, WithAccentStrip } from "@/shared/components/MembershipCard";
+import { MembershipCard } from "@/shared/components/MembershipCard";
+import { DeleteCommerceCardButton } from "@/features/card-issuance/components/DeleteCommerceCardButton";
 import type { AssociationMember } from "../types";
 import { RemoveAssociationMemberButton } from "./RemoveAssociationMemberButton";
+import { associationKeys } from "../api";
 
 type AssociationMembersColumnProps = {
   associationId: string | null;
@@ -29,6 +32,7 @@ function AssociationMemberCard({
   canManageCards: boolean;
 }) {
   const [memberId = "", memberRoleId = ""] = member.id.split(".");
+  const queryClient = useQueryClient();
 
   return (
     <article className="overflow-hidden rounded-[20px] bg-white">
@@ -58,28 +62,45 @@ function AssociationMemberCard({
           value={<span dir="ltr">{member.card.nationalCode ?? "------"}</span>}
         />
       </div>
-      <WithAccentStrip>
-        <MembershipCard
-          card={member.card}
-          className="shadow-none"
-          dimWhenExpired={false}
-          footer={
-            canManageCards ? (
-              <>
-                <RemoveAssociationMemberButton
-                  associationId={associationId}
-                  cardNo={member.card.cardNo}
-                  memberId={memberId}
-                  memberRoleId={memberRoleId}
-                />
-                <CardValidityPill withIcon card={member.card} />
-              </>
-            ) : (
+      <MembershipCard
+        stacked
+        card={member.card}
+        className="shadow-none"
+        commerceFooter={
+          <>
+            {canManageCards && (
+              <DeleteCommerceCardButton
+                cardId={memberRoleId}
+                cardNo={member.card.cardNo}
+                memberId={memberId}
+                onSuccess={async () => {
+                  await queryClient.invalidateQueries({
+                    queryKey: [...associationKeys.all, "members", associationId],
+                  });
+                }}
+              />
+            )}
+            <CardValidityPill card={member.card} expiresAt={member.card.commerceExpiresAt} />
+          </>
+        }
+        dimWhenExpired={false}
+        footer={
+          canManageCards ? (
+            <>
+              <RemoveAssociationMemberButton
+                associationId={associationId}
+                cardNo={member.card.cardNo}
+                memberId={memberId}
+                memberRoleId={memberRoleId}
+              />
               <CardValidityPill card={member.card} />
-            )
-          }
-        />
-      </WithAccentStrip>
+            </>
+          ) : (
+            <CardValidityPill card={member.card} />
+          )
+        }
+        missingCommerceFooter={<span className="text-note font-bold">کارت بازرگانی ندارد</span>}
+      />
     </article>
   );
 }

@@ -56,6 +56,7 @@ export function AddCardModal({ isOpen, memberId, memberName, onOpenChange }: Add
                     managerName: form.isLegal ? form.managerName.trim() : undefined,
                     managerNationalId: form.isLegal ? form.managerNationalId : undefined,
                     nationalCode: form.isLegal ? undefined : form.nationalCode,
+                    commerceExpiresAt: form.isLegal ? undefined : form.commercialExpiresAt || undefined,
                   },
                   {
                     onSuccess: () => {
@@ -180,6 +181,21 @@ export function AddCardModal({ isOpen, memberId, memberName, onOpenChange }: Add
                 />
                 {form.expiresAtError && <p className="text-xs text-danger">{form.expiresAtError}</p>}
               </div>
+
+              {!form.isLegal && (
+                <div className="flex flex-col gap-1.5 sm:col-span-2">
+                  <span className="text-sm font-bold">تاریخ انقضای کارت بازرگانی (اختیاری)</span>
+                  <JalaliDateField
+                    isInvalid={!!form.commercialExpiresAtError}
+                    label="تاریخ انقضای کارت بازرگانی (اختیاری)"
+                    value={form.commercialExpiresAt}
+                    onChange={form.setCommercialExpiresAt}
+                  />
+                  {form.commercialExpiresAtError && (
+                    <p className="text-xs text-danger">{form.commercialExpiresAtError}</p>
+                  )}
+                </div>
+              )}
             </Modal.Body>
 
             <Modal.Footer className="mt-3 justify-start gap-2">

@@ -3,7 +3,12 @@ import { accountsHttp } from "@/lib/accounts-http";
 import type { UserRole } from "@/features/profile/types";
 import type { AuthSession, Captcha, SendOtpPayload, SendOtpResponse, UserSession, VerifyOtpPayload } from "../types";
 
-const COMMERCE_LOGIN_TYPE = 0xff36;
+/** Account Service login types, as listed in its API docs. */
+const LOGIN_TYPE = {
+  admin: 0xff16,
+  town: 0xff26,
+  commerce: 0xff36,
+} as const;
 
 type CaptchaResponse = {
   captchaId: string;
@@ -91,15 +96,30 @@ function dateOf(...candidates: unknown[]) {
   return null;
 }
 
-/** Panel labels by backend login type; only the commerce type is known so far. */
+/** Panel labels by backend login type; the docs name the types but not their Persian labels. */
 const panelByLoginType: Record<number, string> = {
-  [COMMERCE_LOGIN_TYPE]: "پنل بازرگانی",
+  [LOGIN_TYPE.admin]: "پنل ادمین",
+  [LOGIN_TYPE.town]: "پنل شهر",
+  [LOGIN_TYPE.commerce]: "پنل بازرگانی",
 };
 
-/** Sessions without a login type were created by this (commerce) app, so they default to its panel. */
+/** Reads the numeric login type, accepting plain numbers, decimal strings and hex strings. */
+function loginTypeCode(loginType: number | string | undefined) {
+  if (typeof loginType === "number") return Number.isFinite(loginType) ? loginType : null;
+  const raw = loginType?.trim();
+  if (!raw) return null;
+  const code = /^0x/i.test(raw)
+    ? Number.parseInt(raw.slice(2), 16)
+    : /^\d+$/.test(raw)
+      ? Number(raw)
+      : Number.NaN;
+  return Number.isFinite(code) ? code : null;
+}
+
+/** The badge text follows the login type the sessions service reports, never the current app. */
 function panelOf(loginType: number | string | undefined) {
-  if (loginType == null || loginType === "") return panelByLoginType[COMMERCE_LOGIN_TYPE] ?? null;
-  return panelByLoginType[Number(loginType)] ?? null;
+  const code = loginTypeCode(loginType);
+  return code === null ? null : (panelByLoginType[code] ?? null);
 }
 
 function toUserSession(session: ApiSession, index: number, currentTokenId: string | null): UserSession {
@@ -156,7 +176,7 @@ export const authApi = {
   sendOtp: async ({ phone, captchaId, captchaValue }: SendOtpPayload): Promise<SendOtpResponse> => {
     const { ttl } = await accountsHttp<OtpSendResponse>("/auth/otp/send", {
       method: "POST",
-      body: { phone, appHash: env.otpAppHash, captchaId, captchaAnswer: captchaValue, loginType: COMMERCE_LOGIN_TYPE },
+      body: { phone, appHash: env.otpAppHash, captchaId, captchaAnswer: captchaValue, loginType: LOGIN_TYPE.commerce },
     });
     return { resendIn: ttl };
   },

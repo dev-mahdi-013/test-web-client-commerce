@@ -32,6 +32,10 @@
   --card-expiry-alert: #ef4444;
   --card-active: linear-gradient(150deg, #50e24b 0%, #2fcc51 30%, #11a452 65%, #068a4c 100%);
   --card-expired: linear-gradient(155deg, #e2e2e2 0%, #c9c9c9 55%, #adadad 100%);
+  /* The blue copy of a card that peeks out from behind in the stacked card deck. */
+  --card-accent: linear-gradient(298.67deg, #05308e 0%, #4981e9 100%);
+  /* Dark copy shown behind a card that has no commerce card yet */
+  --card-missing: linear-gradient(155deg, #7b7b7b 0%, #5e5e5e 55%, #474747 100%);
 
   /* Assembly status pills */
   --status-running: #ff8000;

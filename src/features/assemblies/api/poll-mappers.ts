@@ -4,6 +4,7 @@ import type {
   AgendaKind,
   Assembly,
   AssemblyAgenda,
+  AssemblyCardType,
   AssemblyDetail,
   AssemblyStatus,
   AssemblyUnit,
@@ -35,6 +36,12 @@ export const eligibilityCode: Record<AssemblyUnit, number> = {
   حقوقی: 0x03,
 };
 
+/** Backend card scopes (AllCards / CommerceCardsOnly). */
+export const cardScopeCode: Record<AssemblyCardType, number> = {
+  همه: 0x01,
+  بازرگانی: 0x02,
+};
+
 const unitByCode: Record<number, AssemblyUnit> = {
   0x01: "همه",
   0x02: "حقیقی",
@@ -61,6 +68,10 @@ export function toEligibilityCode(unit: AssemblyUnit) {
   return eligibilityCode[unit];
 }
 
+export function toCardScopeCode(cardType: AssemblyCardType) {
+  return cardScopeCode[cardType];
+}
+
 export function toAssemblyUnit(code: number | string | undefined): AssemblyUnit {
   if (code == null || code === "") return "حقوقی";
   const normalized = typeof code === "string" ? Number(code) : code;
@@ -75,6 +86,7 @@ export type ApiPollTarget = {
     membersCount?: number;
     allowedMembersCount?: number;
     eligibilityScope?: number;
+    cardScope?: number;
   };
 };
 

@@ -43,6 +43,6 @@ export type UserSession = {
   /** ISO date of the last activity, missing when the backend sends no timestamp */
   lastActiveAt: string | null;
   isCurrent: boolean;
-  /** Panel the login belongs to (e.g. پنل بازرگانی); null when the backend names an unknown panel */
+  /** Panel label from the session's loginType (e.g. پنل بازرگانی); null when it is missing or unknown */
   panel: string | null;
 };

@@ -19,6 +19,8 @@ const messages: Record<string, string> = {
   "the card number already exists": "این شماره کارت قبلاً ثبت شده است",
   "the input card nums already exists": "این شماره کارت قبلاً ثبت شده است",
   "invalid (national code is not valid)": "کد ملی مدیرعامل معتبر نیست",
+  "exprdate must be greater than current time": "تاریخ انقضا باید بعد از زمان حال باشد",
+  "member not found with this card role id": "کارت عضو پیدا نشد",
   "your card expired": "کارت شما منقضی شده است و اجازه دسترسی به رأی‌گیری را ندارید",
   "this poll is not draft to send to review": "فقط مجمع پیش‌نویس قابل ارسال برای بازبینی است",
   "this poll is not in reviewing or waiting to re-draft it": "این مجمع در وضعیت بازبینی یا انتظار نیست",
@@ -157,20 +159,25 @@ export type ApiCardDetails = {
   nationalCode?: string;
   cardNum: string;
   exprDate: number;
+  /** Present only on natural (real) cards that have a commerce (بازرگانی) card */
+  commerceCard?: { exprDate: number } | null;
 };
 
 export function toMembershipCard(id: string, card: ApiCardDetails): MembershipCardData {
   const isLegal = card.cardType === LEGAL_CARD_TYPE;
+  const hasCommerceCard = !isLegal && Boolean(card.commerceCard);
   return {
     id,
     kind: isLegal ? "legal" : "natural",
     holderName: card.name,
     managerName: isLegal ? (card.ceoName ?? null) : null,
-    managerNationalId: isLegal ? (card.ceoNationalCode ?? null) : null,
+    managerNationalId: isLegal ? (card.ceoNationalCode ?? card.nationalCode ?? null) : null,
     nationalCode: card.nationalCode ?? null,
     cardNo: card.cardNum,
     // `exprDate: 0` means unset — avoid epoch → Jalali 1348/10/11.
     expiresAt: fromEpoch(card.exprDate) ?? "",
     expired: Boolean(card.exprDate) && card.exprDate < Date.now(),
+    hasCommerceCard,
+    commerceExpiresAt: hasCommerceCard ? fromEpoch(card.commerceCard?.exprDate ?? 0) : null,
   };
 }

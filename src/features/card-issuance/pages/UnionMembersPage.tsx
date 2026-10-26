@@ -32,8 +32,21 @@ export function UnionMembersPage() {
   useEffect(() => {
     if (!selected) return;
     const updatedMember = items.find((member) => member.id === selected.id);
-    if (updatedMember) setSelected((current) => (current?.id === updatedMember.id ? updatedMember : current));
-  }, [items, selected?.id]);
+    if (updatedMember) {
+      setSelected((current) => (current?.id === updatedMember.id ? updatedMember : current));
+      return;
+    }
+    // The member's last card was deleted and the member is gone from the refreshed list:
+    // drop the stale selection so its removed card doesn't linger in "مشاهده کارت ها".
+    if (!members.isFetching && selected.cards.length === 0) setSelected(null);
+  }, [items, selected, members.isFetching]);
+
+  const handleCardRemoved = (cardId: string) => {
+    // Remove the card from view right away; the refetch then confirms the server state.
+    setSelected((current) =>
+      current ? { ...current, cards: current.cards.filter((card) => card.id !== cardId) } : current,
+    );
+  };
 
   const handleSelect = (id: string) => {
     setSelected(items.find((member) => member.id === id) ?? null);
@@ -104,7 +117,7 @@ export function UnionMembersPage() {
           <CardCarousel key={selected?.id} peek wideLayout="grid">
             <AddCardTile className={hasCards ? undefined : "2xl:col-span-2"} onPress={handleAddCard} />
             {selected?.cards.map((card) => (
-              <IssuanceCard key={card.id} card={card} memberId={selected.id} />
+              <IssuanceCard key={card.id} card={card} memberId={selected.id} onCardRemoved={handleCardRemoved} />
             ))}
           </CardCarousel>
         )}

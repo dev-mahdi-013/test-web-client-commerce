@@ -54,12 +54,52 @@ export function useExtendCardExpiry(memberId: string) {
   });
 }
 
+type ExpiryInput = { cardRoleId: string; expiresAt: string };
+
+export function useExtendCommerceExpiry(memberId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ cardRoleId, expiresAt }: ExpiryInput) =>
+      cardIssuanceApi.extendCommerceExpiry(memberId, cardRoleId, expiresAt),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: memberKeys.all });
+      toast.success("تاریخ انقضای کارت بازرگانی به‌روز شد");
+    },
+    onError: (error) => toast.danger(getErrorMessage(error)),
+  });
+}
+
+export function useAddCommerceCard(memberId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ cardRoleId, expiresAt }: ExpiryInput) =>
+      cardIssuanceApi.extendCommerceExpiry(memberId, cardRoleId, expiresAt),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: memberKeys.all });
+      toast.success("کارت بازرگانی افزوده شد");
+    },
+    onError: (error) => toast.danger(getErrorMessage(error)),
+  });
+}
+
+export function useDisableCommerceCard(memberId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (cardRoleId: string) => cardIssuanceApi.disableCommerceCard(memberId, cardRoleId),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: memberKeys.all });
+      toast.success("کارت بازرگانی حذف شد");
+    },
+    onError: (error) => toast.danger(getErrorMessage(error)),
+  });
+}
+
 export function useRemoveCard(memberId: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (cardRoleId: string) => cardIssuanceApi.removeCard(memberId, cardRoleId),
-    onSuccess: () => {
-      invalidateMembers(queryClient);
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: memberKeys.all });
       toast.success("کارت حذف شد");
     },
     onError: (error) => toast.danger(getErrorMessage(error)),

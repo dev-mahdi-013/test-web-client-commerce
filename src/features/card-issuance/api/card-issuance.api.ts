@@ -15,15 +15,12 @@ type ApiMember = {
 
 export type CardPayload = {
   kind: MemberKind;
-  /** Natural card holder / legal company name */
   name: string;
   cardNo: string;
   expiresAt: string;
   managerName?: string;
   managerNationalId?: string;
-  /** Holder's national code, required by the backend on natural cards */
   nationalCode?: string;
-  /** Commercial card expiry (Jalali yyyy/mm/dd), sent as `commerceExprDate` epoch; 0 when unset */
   commerceExpiresAt?: string;
 };
 
@@ -46,7 +43,8 @@ function toCardBody(card: CardPayload) {
       data: {
         companyName: card.name.trim(),
         ceoName: card.managerName?.trim() ?? "",
-        ceoNationalCode: card.managerNationalId ?? "",
+        // The request body names the CEO's national code `nationalCode`; only responses use `ceoNationalCode`.
+        nationalCode: card.managerNationalId ?? "",
         cardNum: card.cardNo,
         exprDate: jalaliToEpoch(card.expiresAt),
       },
@@ -104,4 +102,15 @@ export const cardIssuanceApi = {
 
   removeCard: (memberId: string, cardRoleId: string) =>
     commerceHttp(`/cio/members/${memberId}/${cardRoleId}/remove`, { method: "DELETE" }),
+
+  extendCommerceExpiry: async (memberId: string, cardRoleId: string, expiresAt: string) => {
+    await commerceHttp(`/cio/members/${memberId}/${cardRoleId}/commerceCard/expireExtension`, {
+      method: "POST",
+      body: { exprDate: jalaliToEpoch(expiresAt) },
+    });
+  },
+
+  disableCommerceCard: async (memberId: string, cardRoleId: string) => {
+    await commerceHttp(`/cio/members/${memberId}/${cardRoleId}/commerceCard/disable`, { method: "POST" });
+  },
 };

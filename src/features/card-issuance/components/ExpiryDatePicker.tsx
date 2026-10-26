@@ -6,24 +6,29 @@ import { OpaqueBackdrop } from "@/shared/components/OpaqueBackdrop";
 import { JalaliCalendar } from "@/shared/components/JalaliCalendar";
 import type { MembershipCardData } from "@/shared/types/membership";
 import { useAutoPopoverPlacement } from "@/shared/hooks/useAutoPopoverPlacement";
-import { useExtendCardExpiry } from "../hooks/useCardIssuanceMutations";
+import { useExtendCardExpiry, useExtendCommerceExpiry } from "../hooks/useCardIssuanceMutations";
 
 type ExpiryDatePickerProps = {
   memberId: string;
   card: MembershipCardData;
+  target?: "card" | "commerce";
 };
 
-export function ExpiryDatePicker({ memberId, card }: ExpiryDatePickerProps) {
+export function ExpiryDatePicker({ memberId, card, target = "card" }: ExpiryDatePickerProps) {
+  const isCommerce = target === "commerce";
+  const expiresAt = isCommerce ? card.commerceExpiresAt : card.expiresAt;
   const triggerRef = useRef<HTMLButtonElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const initial = useMemo(() => {
-    const date = card.expiresAt ? new Date(card.expiresAt) : new Date();
+    const date = expiresAt ? new Date(expiresAt) : new Date();
     return toJalali(Number.isNaN(date.getTime()) ? new Date() : date);
-  }, [card.expiresAt]);
+  }, [expiresAt]);
   const [isOpen, setOpen] = useState(false);
   const [selected, setSelected] = useState(initial);
   const { maxHeight, placement } = useAutoPopoverPlacement(isOpen, triggerRef, contentRef);
-  const extendExpiry = useExtendCardExpiry(memberId);
+  const extendCard = useExtendCardExpiry(memberId);
+  const extendCommerce = useExtendCommerceExpiry(memberId);
+  const extendExpiry = isCommerce ? extendCommerce : extendCard;
 
   const handleOpenChange = (open: boolean) => {
     if (!open && extendExpiry.isPending) return;
@@ -38,7 +43,7 @@ export function ExpiryDatePicker({ memberId, card }: ExpiryDatePickerProps) {
         <button
           ref={triggerRef}
           aria-expanded={isOpen}
-          aria-label="تغییر تاریخ انقضا"
+          aria-label={isCommerce ? "تغییر تاریخ انقضای کارت بازرگانی" : "تغییر تاریخ انقضا"}
           className="flex h-[33px] w-[118px] shrink-0 cursor-pointer items-center justify-between gap-1.5 rounded-full bg-white ps-3 pe-1 text-foreground"
           type="button"
           onClick={() => handleOpenChange(!isOpen)}
@@ -46,7 +51,7 @@ export function ExpiryDatePicker({ memberId, card }: ExpiryDatePickerProps) {
           <span className="flex flex-col items-start leading-tight mr-auto">
             <span className="text-xs text-muted ">تاریخ انقضاء</span>
             <span className="text-caption font-bold" dir="ltr">
-              {formatJalali(card.expiresAt)}
+              {formatJalali(expiresAt)}
             </span>
           </span>
           <span className="flex size-[25px] shrink-0 items-center justify-center rounded-full border border-muted/40 text-muted">

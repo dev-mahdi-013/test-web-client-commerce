@@ -104,7 +104,7 @@ export function AddAssemblyModal({ isOpen, onOpenChange }: AddAssemblyModalProps
                 <span className="text-sm font-bold text-foreground">تارگت</span>
                 <SelectField
                   className={`${inputClassName} w-full`}
-                  isDisabled={form.isSubmitting || form.associationsLoading || form.associationOptions.length === 0}
+                  isDisabled={form.isSubmitting}
                   label="تارگت"
                   options={form.associationOptions}
                   value={form.associationId}
