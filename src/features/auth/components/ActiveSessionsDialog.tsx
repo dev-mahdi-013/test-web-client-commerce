@@ -17,7 +17,7 @@ export function ActiveSessionsDialog({ isOpen, onOpenChange }: ActiveSessionsDia
       <Modal.Container placement="center">
         <Modal.Dialog
           aria-label="نشست های فعال"
-          className="relative h-[34rem] max-h-[calc(100dvh-2rem)] w-[400px] max-w-[calc(100vw-2rem)] rounded-[24px] p-5 shadow-(--box-shadow)"
+          className="relative h-[34rem] max-h-[calc(100dvh-2rem)] w-[370px] max-w-[calc(100vw-2rem)] rounded-[24px] p-5 shadow-(--box-shadow)"
         >
           <Modal.CloseTrigger className="start-auto end-auto right-4 top-4" />
           <Modal.Body className="flex flex-1 flex-col gap-5 p-0">
