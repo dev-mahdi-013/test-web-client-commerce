@@ -61,6 +61,7 @@ export function OrganizationsAgendaCard({
         >
           <AgendaInlineEditField
             accessibleName="عنوان دستور"
+            className="col-span-3"
             editor={{ type: "text" }}
             isEditable={canEditFields}
             label="عنوان دستور"
