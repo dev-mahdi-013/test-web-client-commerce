@@ -250,9 +250,9 @@ export function OrganizationsAssembliesTable({
                 {(assembly) => {
                   const field = assembly.editingField;
                   const canEdit = isOwner(assembly);
-                  // A finished vote can no longer be edited: its pencils keep their space but are invisible.
-                  const isFinished = assembly.status === "finished";
-                  const canEditPencil = canEdit && !isFinished;
+                  // Running and finished votes can no longer be edited: their pencils keep their space but are invisible.
+                  const isLocked = assembly.status === "running" || assembly.status === "finished";
+                  const canEditPencil = canEdit && !isLocked;
 
                   return (
                     <Table.Row id={assembly.id}>
