@@ -130,11 +130,6 @@ export function UserAssemblyDetailPage() {
                   onSelectionChange={(ids) =>
                     setDraftsByAgenda((current) => ({ ...current, [currentAgenda.id]: ids }))
                   }
-                  onSelectionComplete={
-                    canGoNext
-                      ? () => setAgendaIndex((index) => Math.min(agendas.length - 1, index + 1))
-                      : undefined
-                  }
                   isPending={vote.isPending}
                   onConfirm={(voteOptions) =>
                     vote.mutate(

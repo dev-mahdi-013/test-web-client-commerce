@@ -86,27 +86,51 @@ export function CardExpiry({ expiresAt }: { expiresAt: string | null }) {
 
 function CommerceBody({ card, footer }: { card: MembershipCardData; footer?: ReactNode }) {
   const expired = Boolean(card.commerceExpiresAt) && new Date(card.commerceExpiresAt ?? "").getTime() < Date.now();
+  const isLegal = card.kind === "legal";
+  const cardNoField = (
+    <CardField
+      className="text-end"
+      contentKey={card.cardNo}
+      label="شماره کارت"
+      ltrEllipsisWhenTruncated
+      value={
+        <span className="[word-spacing:0.35em]" dir="ltr">
+          {formatCardNo(card.cardNo)}
+        </span>
+      }
+    />
+  );
 
   return (
     <>
       <div className="grid grid-cols-3 gap-x-3 gap-y-4 px-4 pt-4 pb-5">
-        <CardField label="نوع کارت" value={memberKindLabel[card.kind]} />
-        <span />
-        <ChamberMark className="size-9 justify-self-end" />
+        {isLegal ? (
+          <>
+            <CardField label="نوع کارت" value={memberKindLabel[card.kind]} />
+            <CardField label="مدیر عامل" value={card.managerName ?? "—"} />
+            <ChamberMark className="size-9 justify-self-end" />
 
-        <CardField label="نام" value={card.holderName} />
-        <span />
-        <CardField
-          className="text-end"
-          contentKey={card.cardNo}
-          label="شماره کارت"
-          ltrEllipsisWhenTruncated
-          value={
-            <span className="[word-spacing:0.35em]" dir="ltr">
-              {formatCardNo(card.cardNo)}
-            </span>
-          }
-        />
+            <CardField label="نام شرکت" value={card.holderName} />
+            <CardField
+              contentKey={card.managerNationalId ?? undefined}
+              label="کد ملی مدیر عامل"
+              labelClassName="truncate text-micro"
+              ltrEllipsisWhenTruncated
+              value={<span dir="ltr">{card.managerNationalId ?? "—"}</span>}
+            />
+            {cardNoField}
+          </>
+        ) : (
+          <>
+            <CardField label="نوع کارت" value={memberKindLabel[card.kind]} />
+            <span />
+            <ChamberMark className="size-9 justify-self-end" />
+
+            <CardField label="نام" value={card.holderName} />
+            <span />
+            {cardNoField}
+          </>
+        )}
       </div>
 
       <div className="bg-white/8 px-4 py-3">

@@ -1,5 +1,5 @@
 import { toast } from "@heroui/react";
-import { agendaKindLabel, assemblyUnitOptions } from "../../config";
+import { agendaKindLabel } from "../../config";
 import type { AgendaCandidateInput, AssemblyAgenda, UpdateAgendaInput } from "../../types";
 import { AgendaCandidatesTable } from "../../components/AgendaCandidatesTable";
 import { AssemblyDetailField } from "../../components/AssemblyDetailField";
@@ -55,8 +55,8 @@ export function OrganizationsAgendaCard({
         <dl
           className={
             isEditable
-              ? "mt-6 grid grid-cols-2 gap-x-3 gap-y-5 px-0 sm:mt-3 sm:gap-x-8 sm:px-4 sm:pe-8"
-              : "mt-6 grid grid-cols-2 gap-x-3 gap-y-5 px-0 sm:mt-3 sm:gap-x-8 sm:px-4"
+              ? "mt-6 grid grid-cols-3 gap-x-3 gap-y-5 px-0 sm:mt-3 sm:gap-x-8 sm:px-4 sm:pe-8"
+              : "mt-6 grid grid-cols-3 gap-x-3 gap-y-5 px-0 sm:mt-3 sm:gap-x-8 sm:px-4"
           }
         >
           <AgendaInlineEditField
@@ -73,21 +73,6 @@ export function OrganizationsAgendaCard({
                 return false;
               }
               if (title !== agenda.title) onUpdateAgenda?.(agenda.id, { title });
-              return true;
-            }}
-          />
-          <AgendaInlineEditField
-            accessibleName="واحدها"
-            className={canEditFields ? "mr-auto" : "mr-auto w-[121px]"}
-            editor={{ type: "select", options: assemblyUnitOptions }}
-            isEditable={canEditFields}
-            isEditDisabled
-            label="واحدها"
-            valueMinWidth={118}
-            value={agenda.unit}
-            onSave={(value) => {
-              if (value !== "همه" && value !== "حقیقی" && value !== "حقوقی") return false;
-              if (value !== agenda.unit) onUpdateAgenda?.(agenda.id, { unit: value });
               return true;
             }}
           />

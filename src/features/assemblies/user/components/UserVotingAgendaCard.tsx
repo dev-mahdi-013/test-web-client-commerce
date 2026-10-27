@@ -1,5 +1,5 @@
 import { Button, Table, toast } from "@heroui/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/cn";
 import { agendaKindLabel } from "../../config";
 import type { AssemblyAgenda } from "../../types";
@@ -13,8 +13,6 @@ type UserVotingAgendaCardProps = {
   /** Unconfirmed selection kept by the page, so it survives moving between agendas. */
   draftSelectedIds?: string[];
   onSelectionChange?: (selectedIds: string[]) => void;
-  /** Fired once the selection reaches the maximum; the page uses it to open the next agenda. */
-  onSelectionComplete?: () => void;
   onConfirm?: (selectedIds: string[]) => void;
 };
 
@@ -45,7 +43,6 @@ export function UserVotingAgendaCard({
   fallbackSelectedIds,
   draftSelectedIds,
   onSelectionChange,
-  onSelectionComplete,
   onConfirm,
 }: UserVotingAgendaCardProps) {
   const isPerson = agenda.kind === "person";
@@ -56,14 +53,6 @@ export function UserVotingAgendaCard({
   const votedKey = votedIds.join("|");
   const [selectedIds, setSelectedIds] = useState<string[]>(
     votedIds.length > 0 ? votedIds : (draftSelectedIds ?? []),
-  );
-  const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(
-    () => () => {
-      if (advanceTimer.current) clearTimeout(advanceTimer.current);
-    },
-    [],
   );
 
   // Show what was already voted (e.g. after the agenda refetches or the user comes back).
@@ -79,15 +68,6 @@ export function UserVotingAgendaCard({
   const applySelection = (next: string[]) => {
     setSelectedIds(next);
     onSelectionChange?.(next);
-
-    if (next.length !== maxSelections) return;
-
-    // Selection is full: submit it right away, then move on to the next agenda.
-    onConfirm?.(next);
-    if (onSelectionComplete) {
-      if (advanceTimer.current) clearTimeout(advanceTimer.current);
-      advanceTimer.current = setTimeout(onSelectionComplete, 300);
-    }
   };
 
   const toggle = (candidateId: string) => {

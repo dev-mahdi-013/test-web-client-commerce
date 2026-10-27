@@ -86,7 +86,7 @@ export function AppHeader() {
         </div>
 
         {headerActions && (
-          <div className="hidden justify-end lg:col-start-3 lg:row-start-1 lg:flex">
+          <div className="hidden justify-end xl:col-start-3 xl:row-start-1 xl:flex">
             {headerActions}
           </div>
         )}
@@ -95,7 +95,7 @@ export function AppHeader() {
           className="col-start-3 row-start-1 ms-auto flex items-center gap-2 lg:col-start-4 lg:gap-3"
         >
           {showBackButton && (
-            <div className="hidden lg:block">
+            <div className={headerActions ? "hidden xl:block" : "hidden lg:block"}>
               <BackButtonForPage onPress={() => navigate(-1)} />
             </div>
           )}
@@ -110,9 +110,15 @@ export function AppHeader() {
         </div>
       </header>
       <div
-        className="flex flex-row-reverse flex-wrap items-center justify-start gap-2 px-6 pb-2 lg:hidden"
+        className={`flex flex-row-reverse flex-wrap items-center justify-start gap-2 px-6 pb-2 ${
+          headerActions ? "xl:hidden" : "lg:hidden"
+        }`}
       >
-        {showBackButton && <BackButtonForPage onPress={() => navigate(-1)} />}
+        {showBackButton && (
+          <div className={headerActions ? "xl:hidden" : "lg:hidden"}>
+            <BackButtonForPage onPress={() => navigate(-1)} />
+          </div>
+        )}
         {headerActions && <div className="flex min-w-0 flex-1 justify-start">{headerActions}</div>}
       </div>
     </div>

@@ -88,7 +88,6 @@ export const router = createBrowserRouter([
                       "chamber-president",
                       "organizations",
                       "association-head",
-                      "association-secretary",
                       "other",
                     ]}
                   />

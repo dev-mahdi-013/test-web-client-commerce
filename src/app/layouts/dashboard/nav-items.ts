@@ -31,7 +31,7 @@ const menus: Record<AppRole, NavItem[]> = {
   organizations: [organizationMembers, associations, organizationAssemblies],
   "association-head": [hrAssociation, associationInfo, associationAssemblies],
   "association-info": [hrAssociation, associationInfo, associationAssemblies],
-  "association-secretary": [associationInfo, associations, associationAssemblies],
+  "association-secretary": [associationInfo, associationAssemblies],
   user: [userElections],
   other: [hr, chamberMembers, associations, chamberAssemblies],
 };
