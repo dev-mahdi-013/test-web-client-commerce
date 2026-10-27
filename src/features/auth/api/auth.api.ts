@@ -103,6 +103,7 @@ const panelByLoginType: Record<number, string> = {
   [LOGIN_TYPE.commerce]: "پنل بازرگانی",
 };
 
+
 /** Reads the numeric login type, accepting plain numbers, decimal strings and hex strings. */
 function loginTypeCode(loginType: number | string | undefined) {
   if (typeof loginType === "number") return Number.isFinite(loginType) ? loginType : null;
