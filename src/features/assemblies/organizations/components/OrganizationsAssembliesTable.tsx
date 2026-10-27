@@ -250,8 +250,9 @@ export function OrganizationsAssembliesTable({
                 {(assembly) => {
                   const field = assembly.editingField;
                   const canEdit = isOwner(assembly);
-                  // A finished vote can no longer be edited, so its pencils are not rendered at all.
+                  // A finished vote can no longer be edited: its pencils keep their space but are invisible.
                   const isFinished = assembly.status === "finished";
+                  const canEditPencil = canEdit && !isFinished;
 
                   return (
                     <Table.Row id={assembly.id}>
@@ -273,13 +274,11 @@ export function OrganizationsAssembliesTable({
                         ) : (
                           <EditableCell
                             action={
-                              isFinished ? null : (
-                                <PencilButton
-                                  isHidden={!canEdit}
-                                  label={`ویرایش عنوان ${assembly.title}`}
-                                  onEdit={() => startEdit(assembly, "title")}
-                                />
-                              )
+                              <PencilButton
+                                isHidden={!canEditPencil}
+                                label={`ویرایش عنوان ${assembly.title}`}
+                                onEdit={() => startEdit(assembly, "title")}
+                              />
                             }
                           >
                             <span className="inline-flex items-center gap-1">
@@ -299,11 +298,10 @@ export function OrganizationsAssembliesTable({
                       <Table.Cell className={cellClassName}>
                         <InlineSelectEdit
                           accessibleName="نوع کارت"
-                          canEdit={!isFinished}
                           displayValue={assembly.cardType}
                           editLabel={`ویرایش نوع کارت ${assembly.title}`}
                           isEditing={field === "cardType"}
-                          isHidden={!canEdit}
+                          isHidden={!canEditPencil}
                           options={assemblyCardTypeOptions}
                           value={draftCardType}
                           onCancel={cancelEdit}
@@ -332,13 +330,11 @@ export function OrganizationsAssembliesTable({
                         ) : (
                           <EditableCell
                             action={
-                              isFinished ? null : (
-                                <PencilButton
-                                  isHidden={!canEdit}
-                                  label={`ویرایش روز رای‌گیری ${assembly.title}`}
-                                  onEdit={() => startEdit(assembly, "newsDate")}
-                                />
-                              )
+                              <PencilButton
+                                isHidden={!canEditPencil}
+                                label={`ویرایش روز رای‌گیری ${assembly.title}`}
+                                onEdit={() => startEdit(assembly, "newsDate")}
+                              />
                             }
                           >
                             <span dir="ltr">{formatJalali(assembly.newsDate)}</span>
@@ -355,8 +351,7 @@ export function OrganizationsAssembliesTable({
                         <span className="inline-flex w-full justify-start">
                           <InlineSelectEdit
                             accessibleName="واجدین"
-                            canEdit={!isFinished}
-                            isHidden={!canEdit}
+                            isHidden={!canEditPencil}
                             className="w-[220px]"
                             displayValue={<AssemblyStatsValue assembly={assembly} />}
                             editLabel={`ویرایش واجدین ${assembly.title}`}
