@@ -13,7 +13,7 @@ export type AssemblyVoterStat = {
   eligible: number;
   /** `stats.votersCount` — رأی‌دهندگان */
   voted: number;
-  /** `stats.registerCount` — حاضرین */
+  /** `stats.registeredCount` — حاضرین */
   present: number;
   /** `total - voted` */
   remaining: number;

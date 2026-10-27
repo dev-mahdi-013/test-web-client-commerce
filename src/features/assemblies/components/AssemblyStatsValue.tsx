@@ -6,7 +6,7 @@ type AssemblyStatsValueProps = {
 
 /**
  * `کل | نوع | حاضرین | رأی دهندگان`
- * from membersCount, eligibilityScope, registerCount, votersCount.
+ * from membersCount, eligibilityScope, registeredCount, votersCount.
  */
 export function AssemblyStatsValue({ assembly }: AssemblyStatsValueProps) {
   const total = Number(assembly.voters.total) || 0;

@@ -22,7 +22,7 @@ import {
   ASSEMBLY_CREATED_BY_MAX_CHARS,
   ASSEMBLY_TITLE_MAX_CHARS,
   assemblyCardTypeOptions,
-  assemblyUnitOptions,
+  assemblyCreationUnitOptions,
   organizationsStatusMeta,
   isChamberCreator,
 } from "../../config";
@@ -366,7 +366,7 @@ export function OrganizationsAssembliesTable({
                             displayValue={<AssemblyStatsValue assembly={assembly} />}
                             editLabel={`ویرایش واجدین ${assembly.title}`}
                             isEditing={field === "unit"}
-                            options={assemblyUnitOptions}
+                            options={assemblyCreationUnitOptions}
                             selectPopoverClassName="max-sm:!w-[200px]"
                             value={draftUnit}
                             onCancel={cancelEdit}

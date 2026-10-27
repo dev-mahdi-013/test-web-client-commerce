@@ -105,7 +105,7 @@ export type ApiPollTarget = {
 export type ApiPoll = {
   _id: string;
   title: string;
-  stats?: { registerCount?: number; votersCount?: number };
+  stats?: { registeredCount?: number; votersCount?: number };
   status: number;
   target?: ApiPollTarget;
   createdBy?: { type?: string; data?: { _id?: string; name?: string } };
@@ -170,7 +170,7 @@ export function toAssembly(poll: ApiPoll): Assembly {
   const total = poll.target?.data.membersCount ?? 0;
   const eligible = poll.target?.data.allowedMembersCount ?? 0;
   const voted = poll.stats?.votersCount ?? 0;
-  const present = poll.stats?.registerCount ?? 0;
+  const present = poll.stats?.registeredCount ?? 0;
   const startIso = fromEpoch(poll.startDate ?? 0);
   const endIso = fromEpoch(poll.endDate ?? 0);
 
@@ -274,7 +274,7 @@ export function toAgenda(survey: ApiSurvey): AssemblyAgenda {
 function toVoterStats(poll: ApiPoll): AssemblyVoters {
   const total = poll.target?.data.membersCount ?? 0;
   const eligible = poll.target?.data.allowedMembersCount ?? 0;
-  const present = poll.stats?.registerCount ?? 0;
+  const present = poll.stats?.registeredCount ?? 0;
   const voted = poll.stats?.votersCount ?? 0;
   return {
     total,
