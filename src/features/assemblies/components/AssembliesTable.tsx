@@ -32,6 +32,7 @@ export function AssembliesTable({ assemblies, startIndex, isLoading }: Assemblie
               </Table.Column>
               <Table.Column className={headerCellClassName}>وضعیت</Table.Column>
               <Table.Column className={headerCellClassName}>تارگت</Table.Column>
+              <Table.Column className={headerCellClassName}>نوع کارت</Table.Column>
               <Table.Column className={headerCellClassName}>توسط</Table.Column>
               <Table.Column className={headerCellClassName}>تاریخ ساخت</Table.Column>
               <Table.Column className={headerCellClassName}>روز رای‌گیری</Table.Column>
@@ -62,6 +63,7 @@ export function AssembliesTable({ assemblies, startIndex, isLoading }: Assemblie
                     <AssemblyStatusBadge status={assembly.status} />
                   </Table.Cell>
                   <Table.Cell className={cellClassName}>{assembly.association}</Table.Cell>
+                  <Table.Cell className={cellClassName}>{assembly.cardType}</Table.Cell>
                   <Table.Cell className={cellClassName}>
                     <TruncatedText maxChars={ASSEMBLY_CREATED_BY_MAX_CHARS} value={assembly.createdBy} />
                   </Table.Cell>

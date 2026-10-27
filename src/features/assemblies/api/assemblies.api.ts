@@ -5,6 +5,7 @@ import { ApiError } from "@/lib/http";
 import type { Paginated } from "@/shared/types/api";
 import type {
   Assembly,
+  AssemblyCardType,
   AssemblyDetail,
   AssemblyStatus,
   CreateAgendaInput,
@@ -212,6 +213,23 @@ export const assembliesApi = {
     return toAssembly(refreshed);
   },
 
+  updateAssemblyCardType: async (assemblyId: string, cardType: AssemblyCardType) => {
+    const poll = await fetchPoll(assemblyId);
+    if (!poll) throw new Error("مجمعی پیدا نشد");
+    await commerceHttp(`${pollsBase()}/${assemblyId}/update`, {
+      method: "POST",
+      body: {
+        title: poll.title,
+        pollDate: poll.pollDate ?? 0,
+        eligibilityScope: poll.target?.data.eligibilityScope ?? toEligibilityCode("حقوقی"),
+        cardScope: toCardScopeCode(cardType),
+      },
+    });
+    const refreshed = await fetchPoll(assemblyId);
+    if (!refreshed) throw new Error("مجمعی پیدا نشد");
+    return toAssembly(refreshed);
+  },
+
   addAgenda: async (assemblyId: string, input: CreateAgendaInput) => {
     if (input.kind === "person" && input.candidates.some((candidate) => !candidate.memberId || !candidate.memberRoleId)) {
       throw new Error("برای دستور عضو، کاندیدا باید از فهرست اعضا انتخاب شود");
@@ -264,7 +282,6 @@ export const assembliesApi = {
       body: {
         title: input.title?.trim() ?? agenda.title,
         maxSelection: input.minSelections ?? agenda.minSelections,
-        eligibilityScope: toEligibilityCode(input.unit ?? agenda.unit),
       },
     });
 

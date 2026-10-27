@@ -143,7 +143,6 @@ export function AssociationAssemblyDetailPage() {
             <OrganizationsAgendaCard
               key={agenda.id}
               associationId={detail.associationId}
-              assemblyUnit={detail.unit}
               agenda={agenda}
               canEditFields={canEditAgendaFields}
               isDeleteBusy={removeAgenda.isPending || removeCandidate.isPending}

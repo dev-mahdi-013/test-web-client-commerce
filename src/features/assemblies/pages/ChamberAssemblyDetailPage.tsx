@@ -59,7 +59,7 @@ export function ChamberAssemblyDetailPage() {
         ) : (
           <div className="grid gap-3 xl:grid-cols-2 2xl:gap-6">
             {detail.agendas.map((agenda) => (
-              <OrganizationsAgendaCard key={agenda.id} assemblyUnit={detail.unit} agenda={agenda} />
+              <OrganizationsAgendaCard key={agenda.id} agenda={agenda} />
             ))}
           </div>
         )}

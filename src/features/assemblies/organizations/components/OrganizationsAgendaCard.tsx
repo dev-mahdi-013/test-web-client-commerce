@@ -1,6 +1,6 @@
 import { toast } from "@heroui/react";
 import { agendaKindLabel, assemblyUnitOptions } from "../../config";
-import type { AgendaCandidateInput, AssemblyAgenda, AssemblyUnit, UpdateAgendaInput } from "../../types";
+import type { AgendaCandidateInput, AssemblyAgenda, UpdateAgendaInput } from "../../types";
 import { AgendaCandidatesTable } from "../../components/AgendaCandidatesTable";
 import { AssemblyDetailField } from "../../components/AssemblyDetailField";
 import { DeleteConfirmPopoverButton } from "../../components/DeleteConfirmPopoverButton";
@@ -8,7 +8,6 @@ import { AgendaInlineEditField } from "./AgendaInlineEditField";
 
 type OrganizationsAgendaCardProps = {
   associationId?: string | null;
-  assemblyUnit?: AssemblyUnit;
   agenda: AssemblyAgenda;
   isEditable?: boolean;
   canEditFields?: boolean;
@@ -25,7 +24,6 @@ type OrganizationsAgendaCardProps = {
 /** Agenda card for organizations role — same layout as AgendaCard, with delete actions. */
 export function OrganizationsAgendaCard({
   associationId,
-  assemblyUnit,
   agenda,
   isEditable = false,
   canEditFields = false,
@@ -83,7 +81,7 @@ export function OrganizationsAgendaCard({
             className={canEditFields ? "mr-auto" : "mr-auto w-[121px]"}
             editor={{ type: "select", options: assemblyUnitOptions }}
             isEditable={canEditFields}
-            isEditDisabled={assemblyUnit !== undefined && assemblyUnit !== "همه"}
+            isEditDisabled
             label="واحدها"
             valueMinWidth={118}
             value={agenda.unit}

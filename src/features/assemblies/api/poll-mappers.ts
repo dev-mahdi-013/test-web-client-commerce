@@ -48,6 +48,11 @@ const unitByCode: Record<number, AssemblyUnit> = {
   0x03: "حقوقی",
 };
 
+const cardTypeByCode: Record<number, AssemblyCardType> = {
+  0x01: "همه",
+  0x02: "بازرگانی",
+};
+
 export const pollOperation = {
   sendToReview: 0x01,
   reDraft: 0x02,
@@ -76,6 +81,13 @@ export function toAssemblyUnit(code: number | string | undefined): AssemblyUnit 
   if (code == null || code === "") return "حقوقی";
   const normalized = typeof code === "string" ? Number(code) : code;
   return unitByCode[normalized] ?? "حقوقی";
+}
+
+/** Polls that carry no card scope are open to every card. */
+export function toAssemblyCardType(code: number | string | undefined): AssemblyCardType {
+  if (code == null || code === "") return "همه";
+  const normalized = typeof code === "string" ? Number(code) : code;
+  return cardTypeByCode[normalized] ?? "همه";
 }
 
 export type ApiPollTarget = {
@@ -177,6 +189,7 @@ export function toAssembly(poll: ApiPoll): Assembly {
     endsAt: formatClock(endIso),
     endsAtDate: endIso,
     unit: toAssemblyUnit(poll.target?.data.eligibilityScope),
+    cardType: toAssemblyCardType(poll.target?.data.cardScope),
     voters: {
       total,
       eligible,

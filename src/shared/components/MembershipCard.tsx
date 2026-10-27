@@ -1,6 +1,6 @@
 import { Button } from "@heroui/react";
 import { AddCircleIcon } from "@solar-icons/react/linear/add-circle";
-import { useState, type CSSProperties, type ReactNode } from "react";
+import { useState, type CSSProperties, type MouseEvent, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import { formatJalali } from "@/lib/date";
 import { useTruncation } from "@/shared/hooks/useTruncation";
@@ -17,6 +17,10 @@ const accentLabel = "rgb(255 255 255 / 0.62)";
 function formatCardNo(value: string) {
   const digits = value.replace(/\D/g, "");
   return digits.length === 6 ? `${digits.slice(0, 3)} ${digits.slice(3)}` : value;
+}
+
+function isCardControl(target: EventTarget | null) {
+  return target instanceof Element && Boolean(target.closest("button, a, input, select, textarea"));
 }
 
 type CardFieldProps = {
@@ -167,16 +171,22 @@ export function MembershipCard({
   const [blueInFront, setBlueInFront] = useState(false);
   const commerceInFront = deck && blueInFront;
   const cardBackground = card.expired && dimWhenExpired ? expiredBackground : activeBackground;
+  const toggleDeck = () => setBlueInFront((inFront) => !inFront);
+
+  const handleCardClick = (event: MouseEvent<HTMLElement>) => {
+    if (!isCardControl(event.target)) toggleDeck();
+  };
 
   const content = (
     <article
       className={cn(
         "overflow-hidden rounded-[20px] text-white shadow-(--box-shadow)",
         cardBackground,
-        deck && "relative isolate transition-transform duration-300 ease-out",
+        deck && "relative isolate cursor-pointer transition-transform duration-300 ease-out",
         deck && blueInFront && "-translate-x-3",
         className,
       )}
+      onClick={deck ? handleCardClick : undefined}
       style={deck && blueInFront ? ({ "--card-label": accentLabel } as CSSProperties) : undefined}
     >
       {deck && (
@@ -244,11 +254,11 @@ export function MembershipCard({
         aria-label="جابه‌جایی کارت‌ها"
         aria-pressed={blueInFront}
         className={cn(
-          "absolute top-3 bottom-0 left-0 right-3 -z-10 cursor-pointer overflow-hidden rounded-[20px] shadow-(--box-shadow) transition-transform duration-300 ease-out",
+          "absolute inset-y-3 left-0 right-3 -z-10 cursor-pointer overflow-hidden rounded-[20px] shadow-(--box-shadow) transition-transform duration-300 ease-out",
           blueInFront && "translate-x-3",
         )}
         type="button"
-        onClick={() => setBlueInFront((inFront) => !inFront)}
+        onClick={toggleDeck}
       >
         <span
           aria-hidden

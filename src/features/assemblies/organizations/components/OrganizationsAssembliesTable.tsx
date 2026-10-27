@@ -21,16 +21,18 @@ import { AssemblyStatusBadge } from "../../components/AssemblyStatusBadge";
 import {
   ASSEMBLY_CREATED_BY_MAX_CHARS,
   ASSEMBLY_TITLE_MAX_CHARS,
+  assemblyCardTypeOptions,
   assemblyUnitOptions,
   organizationsStatusMeta,
 } from "../../config";
 import {
+  useUpdateAssemblyCardType,
   useUpdateAssemblyNewsDate,
   useUpdateAssemblyTitle,
   useUpdateAssemblyUnit,
 } from "../../hooks/useAssemblyMutations";
 import { useAssemblyOwnerCheck } from "../../hooks/useAssemblyOwnerCheck";
-import type { Assembly, AssemblyUnit } from "../../types";
+import type { Assembly, AssemblyCardType, AssemblyUnit } from "../../types";
 import { DeleteAssemblyButton } from "./DeleteAssemblyButton";
 
 type OrganizationsAssembliesTableProps = {
@@ -41,7 +43,7 @@ type OrganizationsAssembliesTableProps = {
   detailBasePath?: string;
 };
 
-type EditField = "title" | "newsDate" | "unit";
+type EditField = "title" | "newsDate" | "unit" | "cardType";
 
 const MIN_TITLE_LENGTH = 3;
 const headerCellClassName = "text-start text-xs font-normal text-muted whitespace-nowrap";
@@ -101,12 +103,14 @@ export function OrganizationsAssembliesTable({
   const updateTitle = useUpdateAssemblyTitle();
   const updateNewsDate = useUpdateAssemblyNewsDate();
   const updateUnit = useUpdateAssemblyUnit();
+  const updateCardType = useUpdateAssemblyCardType();
   const isOwner = useAssemblyOwnerCheck();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingField, setEditingField] = useState<EditField | null>(null);
   const [draftTitle, setDraftTitle] = useState("");
   const [draftNewsDate, setDraftNewsDate] = useState("");
   const [draftUnit, setDraftUnit] = useState<AssemblyUnit>("حقیقی");
+  const [draftCardType, setDraftCardType] = useState<AssemblyCardType>("همه");
   const [deleteTarget, setDeleteTarget] = useState<Assembly | null>(null);
   const editorRef = useRef<HTMLDivElement>(null);
 
@@ -121,6 +125,7 @@ export function OrganizationsAssembliesTable({
     setDraftTitle(assembly.title);
     setDraftNewsDate(assembly.newsDate ? formatJalali(assembly.newsDate) : "");
     setDraftUnit(assembly.unit);
+    setDraftCardType(assembly.cardType);
   };
 
   useEffect(() => {
@@ -189,6 +194,22 @@ export function OrganizationsAssembliesTable({
     );
   };
 
+  const confirmCardType = (assembly: Assembly) => {
+    if (draftCardType === assembly.cardType) {
+      cancelEdit();
+      return;
+    }
+
+    updateCardType.mutate(
+      { assemblyId: assembly.id, cardType: draftCardType },
+      {
+        onSuccess: () => {
+          cancelEdit();
+        },
+      },
+    );
+  };
+
   const rows = assemblies.map((assembly, index) => ({
     ...assembly,
     rowNumber: startIndex + index,
@@ -207,6 +228,7 @@ export function OrganizationsAssembliesTable({
                 </Table.Column>
                 <Table.Column className={headerCellClassName}>وضعیت</Table.Column>
                 <Table.Column className={headerCellClassName}>تارگت</Table.Column>
+                <Table.Column className={headerCellClassName}>نوع کارت</Table.Column>
                 <Table.Column className={headerCellClassName}>توسط</Table.Column>
                 <Table.Column className={headerCellClassName}>تاریخ ثبت</Table.Column>
                 <Table.Column className={headerCellClassName}>روز رای‌گیری</Table.Column>
@@ -270,6 +292,21 @@ export function OrganizationsAssembliesTable({
                         />
                       </Table.Cell>
                       <Table.Cell className={cellClassName}>{assembly.association}</Table.Cell>
+                      <Table.Cell className={cellClassName}>
+                        <InlineSelectEdit
+                          accessibleName="نوع کارت"
+                          displayValue={assembly.cardType}
+                          editLabel={`ویرایش نوع کارت ${assembly.title}`}
+                          isEditing={field === "cardType"}
+                          isHidden={!canEdit}
+                          options={assemblyCardTypeOptions}
+                          value={draftCardType}
+                          onCancel={cancelEdit}
+                          onChange={(value) => setDraftCardType(value as AssemblyCardType)}
+                          onConfirm={() => confirmCardType(assembly)}
+                          onStartEdit={() => startEdit(assembly, "cardType")}
+                        />
+                      </Table.Cell>
                       <Table.Cell className={cellClassName}>
                         <TruncatedText maxChars={ASSEMBLY_CREATED_BY_MAX_CHARS} value={assembly.createdBy} />
                       </Table.Cell>

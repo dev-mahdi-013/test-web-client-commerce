@@ -4,6 +4,7 @@ import { getErrorMessage } from "@/lib/http";
 import { assembliesApi, assemblyKeys } from "../api";
 import type {
   Assembly,
+  AssemblyCardType,
   AssemblyDetail,
   AssemblyStatus,
   AssemblyUnit,
@@ -131,6 +132,21 @@ export function useUpdateAssemblyUnit() {
       toast.success("واجدین مجمع به‌روزرسانی شد");
     },
     onError: (error) => toast.danger(getErrorMessage(error, "به‌روزرسانی واجدین انجام نشد")),
+  });
+}
+
+export function useUpdateAssemblyCardType() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ assemblyId, cardType }: { assemblyId: string; cardType: AssemblyCardType }) =>
+      assembliesApi.updateAssemblyCardType(assemblyId, cardType),
+    onSuccess: (assembly, variables) => {
+      if (assembly) patchAssemblyDetail(queryClient, variables.assemblyId, assembly);
+      else invalidateAssemblies(queryClient);
+      toast.success("کارت مجمع به‌روزرسانی شد");
+    },
+    onError: (error) => toast.danger(getErrorMessage(error, "به‌روزرسانی نوع کارت انجام نشد")),
   });
 }
 

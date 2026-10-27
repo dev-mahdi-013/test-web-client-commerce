@@ -37,6 +37,8 @@ export type Assembly = {
   /** Full ISO from backend `endDate`; null while voting has not ended yet. */
   endsAtDate: string | null;
   unit: AssemblyUnit;
+  /** `cardScope` — نوع کارت the assembly is limited to (همه / بازرگانی). */
+  cardType: AssemblyCardType;
   voters: AssemblyVoterStat;
 };
 
