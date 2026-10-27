@@ -1,6 +1,8 @@
 import { AddCircleIcon } from "@solar-icons/react/linear/add-circle";
 import { Button } from "@heroui/react";
 import { useState } from "react";
+import { useProfile } from "@/features/profile/hooks/useProfile";
+import { activeRoleOf, appRoleOf } from "@/features/profile/roles";
 import { SimplePagination } from "@/shared/components/SimplePagination";
 import { ASSEMBLIES_PAGE_SIZE, organizationsStatusOptions } from "../config";
 import { AddAssociationAssemblyModal } from "../association-head/components/AddAssociationAssemblyModal";
@@ -18,6 +20,9 @@ export function AssociationAssembliesPage() {
   const [status, setStatus] = useState(ALL);
   const [isAddOpen, setAddOpen] = useState(false);
   const [page, setPage] = useState(1);
+  const profile = useProfile();
+  const appRole = appRoleOf(activeRoleOf(profile.data));
+  const hideChamberPencils = appRole === "association-head" || appRole === "association-secretary";
 
   // The association-president list is already scoped to the active association.
   const assemblies = useAssemblies({
@@ -60,6 +65,8 @@ export function AssociationAssembliesPage() {
           assemblies={items}
           detailBasePath={DETAIL_BASE_PATH}
           isLoading={assemblies.isPending}
+          showDelete={false}
+          hideChamberPencils={hideChamberPencils}
           startIndex={startIndex}
         />
 

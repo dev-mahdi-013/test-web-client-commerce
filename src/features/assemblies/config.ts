@@ -94,3 +94,13 @@ export const organizationsStatusOptions = (Object.keys(organizationsStatusMeta) 
     value,
     label: organizationsStatusMeta[value].label,
   }));
+
+function normalizeCreatorText(value: string) {
+  return value.replace(/\u200c/g, "").replace(/\s+/g, "").replace(/ي/g, "ی").replace(/ك/g, "ک");
+}
+
+/** True when the توسط text shows the chamber (e.g. "اتاق"). */
+export function isChamberCreator(createdBy: string | null | undefined) {
+  if (!createdBy) return false;
+  return normalizeCreatorText(createdBy).includes(normalizeCreatorText("اتاق"));
+}

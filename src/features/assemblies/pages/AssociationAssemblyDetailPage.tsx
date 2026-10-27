@@ -9,7 +9,6 @@ import { AssemblySummaryCard } from "../components/AssemblySummaryCard";
 import { VotersRingCard } from "../components/VotersRingCard";
 import { organizationsStatusMeta } from "../config";
 import { useAssembly } from "../hooks/useAssemblies";
-import { useAssemblyOwnerCheck } from "../hooks/useAssemblyOwnerCheck";
 import {
   useAddAgenda,
   useAddAgendaCandidate,
@@ -37,7 +36,6 @@ export function AssociationAssemblyDetailPage() {
   const updateAgenda = useUpdateAgenda(assemblyId);
   const addCandidate = useAddAgendaCandidate(assemblyId);
 
-  const isOwner = useAssemblyOwnerCheck();
   const statusBusy = updateStatus.isPending;
   const headerActions = useMemo(() => {
     if (!detail) return null;
@@ -104,8 +102,7 @@ export function AssociationAssemblyDetailPage() {
 
   // Draft only — once sent for review (`canceled`), cancel-review is active and agenda UI locks
   // (no add form, pencil, or delete), matching the read-only treatment on the other detail page.
-  // Chamber-created assemblies (not created by this role) are read-only here.
-  const canManageAgenda = isOwner(detail) && detail.status === "pending";
+  const canManageAgenda = detail.status === "pending";
   const canEditAgendaFields = canManageAgenda;
 
 

@@ -24,6 +24,7 @@ import {
   assemblyCardTypeOptions,
   assemblyUnitOptions,
   organizationsStatusMeta,
+  isChamberCreator,
 } from "../../config";
 import {
   useUpdateAssemblyCardType,
@@ -41,6 +42,10 @@ type OrganizationsAssembliesTableProps = {
   isLoading: boolean;
   /** Base path for the detail page, without trailing slash. */
   detailBasePath?: string;
+  /** Show the delete icon in the actions column. */
+  showDelete?: boolean;
+  /** Hide the edit pencils on rows whose توسط is the chamber (association head/secretary only). */
+  hideChamberPencils?: boolean;
 };
 
 type EditField = "title" | "newsDate" | "unit" | "cardType";
@@ -99,6 +104,8 @@ export function OrganizationsAssembliesTable({
   startIndex,
   isLoading,
   detailBasePath = "/organizations/assemblies",
+  showDelete = true,
+  hideChamberPencils = false,
 }: OrganizationsAssembliesTableProps) {
   const updateTitle = useUpdateAssemblyTitle();
   const updateNewsDate = useUpdateAssemblyNewsDate();
@@ -252,7 +259,8 @@ export function OrganizationsAssembliesTable({
                   const canEdit = isOwner(assembly);
                   // Running and finished votes can no longer be edited: their pencils keep their space but are invisible.
                   const isLocked = assembly.status === "running" || assembly.status === "finished";
-                  const canEditPencil = canEdit && !isLocked;
+                  const chamberLocked = hideChamberPencils && isChamberCreator(assembly.createdBy);
+                  const canEditPencil = canEdit && !isLocked && !chamberLocked;
 
                   return (
                     <Table.Row id={assembly.id}>
@@ -377,13 +385,16 @@ export function OrganizationsAssembliesTable({
                           >
                             <EyeIcon className="size-4" strokeWidth={2} />
                           </Link>
-                          {canEdit && (
+                          <span
+                            aria-hidden={!showDelete || undefined}
+                            className={cn(!showDelete && "pointer-events-none opacity-0")}
+                          >
                             <DeleteAssemblyButton
                               assembly={assembly}
                               isOpen={deleteTarget?.id === assembly.id}
                               onOpenChange={(open) => setDeleteTarget(open ? assembly : null)}
                             />
-                          )}
+                          </span>
                         </div>
                       </Table.Cell>
                     </Table.Row>
