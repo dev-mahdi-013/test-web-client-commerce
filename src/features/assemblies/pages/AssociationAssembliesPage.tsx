@@ -65,7 +65,7 @@ export function AssociationAssembliesPage() {
           assemblies={items}
           detailBasePath={DETAIL_BASE_PATH}
           isLoading={assemblies.isPending}
-          showDelete={false}
+          showDelete
           hideChamberPencils={hideChamberPencils}
           startIndex={startIndex}
         />

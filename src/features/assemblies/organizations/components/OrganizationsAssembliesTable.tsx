@@ -261,6 +261,8 @@ export function OrganizationsAssembliesTable({
                   const isLocked = assembly.status === "running" || assembly.status === "finished";
                   const chamberLocked = hideChamberPencils && isChamberCreator(assembly.createdBy);
                   const canEditPencil = canEdit && !isLocked && !chamberLocked;
+                  // Chamber-created rows (توسط اتاق) never show delete for association roles.
+                  const canDelete = showDelete && !chamberLocked;
 
                   return (
                     <Table.Row id={assembly.id}>
@@ -386,8 +388,8 @@ export function OrganizationsAssembliesTable({
                             <EyeIcon className="size-4" strokeWidth={2} />
                           </Link>
                           <span
-                            aria-hidden={!showDelete || undefined}
-                            className={cn(!showDelete && "pointer-events-none opacity-0")}
+                            aria-hidden={!canDelete || undefined}
+                            className={cn(!canDelete && "pointer-events-none opacity-0")}
                           >
                             <DeleteAssemblyButton
                               assembly={assembly}
