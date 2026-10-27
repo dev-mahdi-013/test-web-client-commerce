@@ -377,11 +377,13 @@ export function OrganizationsAssembliesTable({
                           >
                             <EyeIcon className="size-4" strokeWidth={2} />
                           </Link>
-                          <DeleteAssemblyButton
-                            assembly={assembly}
-                            isOpen={deleteTarget?.id === assembly.id}
-                            onOpenChange={(open) => setDeleteTarget(open ? assembly : null)}
-                          />
+                          {canEdit && (
+                            <DeleteAssemblyButton
+                              assembly={assembly}
+                              isOpen={deleteTarget?.id === assembly.id}
+                              onOpenChange={(open) => setDeleteTarget(open ? assembly : null)}
+                            />
+                          )}
                         </div>
                       </Table.Cell>
                     </Table.Row>

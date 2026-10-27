@@ -135,11 +135,16 @@ export function UserAssemblyDetailPage() {
                     vote.mutate(
                       { surveyId: currentAgenda.id, voteOptions },
                       {
-                        onSuccess: () =>
+                        onSuccess: () => {
                           setVotedByAgenda((current) => ({
                             ...current,
                             [currentAgenda.id]: voteOptions,
-                          })),
+                          }));
+                          // After a registered vote, move on to the next agenda like the "دستور بعدی" button.
+                          if (canGoNext) {
+                            setAgendaIndex((index) => Math.min(agendas.length - 1, index + 1));
+                          }
+                        },
                       },
                     )
                   }
