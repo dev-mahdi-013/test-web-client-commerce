@@ -106,8 +106,8 @@ export function UserAssemblyDetailPage() {
                   variant="secondary"
                   onPress={() => setAgendaIndex((index) => Math.min(agendas.length - 1, index + 1))}
                 >
+                  <AltArrowRightIcon className="size-4" />
                   دستور بعدی
-                  <AltArrowLeftIcon className="size-4" />
                 </Button>
                 <Button
                   className="h-10 gap-2 rounded-full px-4 text-black"
@@ -116,8 +116,8 @@ export function UserAssemblyDetailPage() {
                   variant="secondary"
                   onPress={() => setAgendaIndex((index) => Math.max(0, index - 1))}
                 >
-                  <AltArrowRightIcon className="size-4" />
                   دستور قبلی
+                  <AltArrowLeftIcon className="size-4" />
                 </Button>
               </div>
 
