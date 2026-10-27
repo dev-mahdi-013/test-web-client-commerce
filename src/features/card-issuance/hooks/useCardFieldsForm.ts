@@ -33,9 +33,8 @@ export function useCardFieldsForm() {
   const isNationalIdValid = !isLegal || isValidNationalCode(managerNationalId);
   const isCardNoValid = cardNo.length >= MIN_CARD_NO_LENGTH && cardNo.length <= MAX_CARD_NO_LENGTH;
   const isExpiryValid = isValidJalaliDate(expiresAt);
-  // Commerce card expiry only applies to natural cards; when provided, it must be a valid date.
-  const isCommercialExpiryValid =
-    isLegal || commercialExpiresAt === "" || isValidJalaliDate(commercialExpiresAt);
+  // Commerce card expiry is optional for both kinds; when provided, it must be a valid date.
+  const isCommercialExpiryValid = commercialExpiresAt === "" || isValidJalaliDate(commercialExpiresAt);
 
   const isValid =
     isCompanyValid &&

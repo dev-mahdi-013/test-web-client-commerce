@@ -18,7 +18,13 @@ export function UserCardItem({ card }: UserCardItemProps) {
 
   return (
     <MembershipCard
+      stacked
       card={card}
+      commerceFooter={
+        <div className="flex w-full justify-end">
+          <CardExpiry expiresAt={card.commerceExpiresAt} />
+        </div>
+      }
       footer={
         <>
           <Button
@@ -35,6 +41,7 @@ export function UserCardItem({ card }: UserCardItemProps) {
           <CardExpiry expiresAt={card.expiresAt} />
         </>
       }
+      missingCommerceFooter={<span className="text-note font-bold">کارت بازرگانی ندارد</span>}
     >
       {isOpen && (
         <div className="animate-fade-in mt-3">

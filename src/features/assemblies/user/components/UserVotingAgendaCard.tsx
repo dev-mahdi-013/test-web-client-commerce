@@ -50,8 +50,9 @@ export function UserVotingAgendaCard({
 }: UserVotingAgendaCardProps) {
   const isPerson = agenda.kind === "person";
   const maxSelections = agenda.minSelections;
-  const isVoteDisabled = isPending || agenda.hasVoted === true;
   const votedIds = agenda.votedOptionIds?.length ? agenda.votedOptionIds : (fallbackSelectedIds ?? []);
+  const isVoted = agenda.hasVoted === true || votedIds.length > 0;
+  const isVoteDisabled = isPending || isVoted;
   const votedKey = votedIds.join("|");
   const [selectedIds, setSelectedIds] = useState<string[]>(
     votedIds.length > 0 ? votedIds : (draftSelectedIds ?? []),
@@ -208,12 +209,12 @@ export function UserVotingAgendaCard({
 
       <div className="mt-5 flex shrink-0 justify-start sm:mt-7">
         <Button
-          className="h-10 min-w-[148px] rounded-full px-8 text-sm font-medium"
+          className="h-10 min-w-[148px] whitespace-nowrap rounded-full px-8 text-sm font-medium"
           isDisabled={isVoteDisabled}
           isPending={isPending}
           onPress={handleConfirm}
         >
-          تأیید
+          {isVoted ? "رأی شما ثبت شده است" : "تأیید"}
         </Button>
       </div>
     </article>

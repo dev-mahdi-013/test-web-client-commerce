@@ -98,6 +98,29 @@ export function UserAssemblyDetailPage() {
                 دستور <span className="text-[32px] font-thin sm:text-[40px]">{agendaIndex + 1}</span>
               </p>
 
+              <div className="flex w-full max-w-[520px] items-center justify-between gap-3 md:hidden">
+                <Button
+                  className="h-10 gap-2 rounded-full px-4 text-black"
+                  isDisabled={!canGoNext}
+                  size="sm"
+                  variant="secondary"
+                  onPress={() => setAgendaIndex((index) => Math.min(agendas.length - 1, index + 1))}
+                >
+                  دستور بعدی
+                  <AltArrowLeftIcon className="size-4" />
+                </Button>
+                <Button
+                  className="h-10 gap-2 rounded-full px-4 text-black"
+                  isDisabled={!canGoPrev}
+                  size="sm"
+                  variant="secondary"
+                  onPress={() => setAgendaIndex((index) => Math.max(0, index - 1))}
+                >
+                  <AltArrowRightIcon className="size-4" />
+                  دستور قبلی
+                </Button>
+              </div>
+
               <AgendaCardStack agendaCount={agendas.length} agendaIndex={agendaIndex}>
                 <UserVotingAgendaCard
                   key={currentAgenda.id}
@@ -144,29 +167,6 @@ export function UserAssemblyDetailPage() {
               label="دستور قبلی"
               onPress={() => setAgendaIndex((index) => Math.max(0, index - 1))}
             />
-          </div>
-
-          <div className="flex w-full max-w-[520px] items-center justify-between gap-3 md:hidden">
-            <Button
-              className="h-10 gap-2 rounded-full px-4 text-black"
-              isDisabled={!canGoNext}
-              size="sm"
-              variant="secondary"
-              onPress={() => setAgendaIndex((index) => Math.min(agendas.length - 1, index + 1))}
-            >
-              دستور بعدی
-              <AltArrowLeftIcon className="size-4" />
-            </Button>
-            <Button
-              className="h-10 gap-2 rounded-full px-4 text-black"
-              isDisabled={!canGoPrev}
-              size="sm"
-              variant="secondary"
-              onPress={() => setAgendaIndex((index) => Math.max(0, index - 1))}
-            >
-              <AltArrowRightIcon className="size-4" />
-              دستور قبلی
-            </Button>
           </div>
         </section>
       ) : null}

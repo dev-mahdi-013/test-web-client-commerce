@@ -36,6 +36,11 @@ function jalaliToEpoch(value: string) {
   return toEpoch(jalaliToDate({ jy, jm, jd }));
 }
 
+/** The commerce expiry is sent only when the user entered one; otherwise the key is left out. */
+function commerceExprDateField(card: CardPayload): { commerceExprDate?: number } {
+  return card.commerceExpiresAt ? { commerceExprDate: jalaliToEpoch(card.commerceExpiresAt) } : {};
+}
+
 function toCardBody(card: CardPayload) {
   if (card.kind === "legal") {
     return {
@@ -47,6 +52,7 @@ function toCardBody(card: CardPayload) {
         nationalCode: card.managerNationalId ?? "",
         cardNum: card.cardNo,
         exprDate: jalaliToEpoch(card.expiresAt),
+        ...commerceExprDateField(card),
       },
     };
   }
@@ -57,7 +63,7 @@ function toCardBody(card: CardPayload) {
       nationalCode: card.nationalCode ?? "",
       cardNum: card.cardNo,
       exprDate: jalaliToEpoch(card.expiresAt),
-      commerceExprDate: card.commerceExpiresAt ? jalaliToEpoch(card.commerceExpiresAt) : 0,
+      ...commerceExprDateField(card),
     },
   };
 }

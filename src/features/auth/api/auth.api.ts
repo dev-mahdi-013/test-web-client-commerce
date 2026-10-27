@@ -98,8 +98,8 @@ function dateOf(...candidates: unknown[]) {
 
 /** Panel labels by backend login type; the docs name the types but not their Persian labels. */
 const panelByLoginType: Record<number, string> = {
-  [LOGIN_TYPE.admin]: "پنل ادمین",
-  [LOGIN_TYPE.town]: "پنل شهر",
+  [LOGIN_TYPE.admin]: "ادمین",
+  [LOGIN_TYPE.town]: "پنل صنعت",
   [LOGIN_TYPE.commerce]: "پنل بازرگانی",
 };
 

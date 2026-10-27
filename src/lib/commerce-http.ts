@@ -19,7 +19,7 @@ const messages: Record<string, string> = {
   "the card number already exists": "این شماره کارت قبلاً ثبت شده است",
   "the input card nums already exists": "این شماره کارت قبلاً ثبت شده است",
   "invalid (national code is not valid)": "کد ملی مدیرعامل معتبر نیست",
-  "exprdate must be greater than current time": "تاریخ انقضا باید بعد از زمان حال باشد",
+  "exprdate must be greater than current time": "تاریخ انقضا باید بعد از زمان فعلی باشد",
   "member not found with this card role id": "کارت عضو پیدا نشد",
   "your card expired": "کارت شما منقضی شده است و اجازه دسترسی به رأی‌گیری را ندارید",
   "this poll is not draft to send to review": "فقط مجمع پیش‌نویس قابل ارسال برای بازبینی است",
@@ -159,13 +159,14 @@ export type ApiCardDetails = {
   nationalCode?: string;
   cardNum: string;
   exprDate: number;
-  /** Present only on natural (real) cards that have a commerce (بازرگانی) card */
+  /** Present on legal and natural cards that have a commerce (بازرگانی) card */
   commerceCard?: { exprDate: number } | null;
 };
 
 export function toMembershipCard(id: string, card: ApiCardDetails): MembershipCardData {
   const isLegal = card.cardType === LEGAL_CARD_TYPE;
-  const hasCommerceCard = !isLegal && Boolean(card.commerceCard);
+  // Commerce (بازرگانی) cards can belong to legal and natural cards alike.
+  const hasCommerceCard = Boolean(card.commerceCard);
   return {
     id,
     kind: isLegal ? "legal" : "natural",
