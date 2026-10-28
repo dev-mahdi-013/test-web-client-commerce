@@ -2,17 +2,21 @@ import { createBrowserRouter, Navigate } from "react-router";
 import { GuestOnly, RequireAppRole, RequireAuth, RoleHome } from "./guards";
 import { DashboardLayout } from "./layouts/dashboard/DashboardLayout";
 import { RootLayout } from "./layouts/RootLayout";
+import { FullScreenLoader } from "@/shared/components/FullScreenLoader";
+import { pages } from "./pages";
 
 export const router = createBrowserRouter([
   {
     Component: RootLayout,
+    // Shown while the router loads the first (lazy) page, so the boot splash never drops to a blank screen.
+    HydrateFallback: FullScreenLoader,
     children: [
       {
         Component: GuestOnly,
         children: [
           {
             path: "/login",
-            lazy: async () => ({ Component: (await import("@/features/auth/pages/LoginPage")).LoginPage }),
+            lazy: async () => ({ Component: (await pages.LoginPage()).LoginPage }),
           },
         ],
       },
@@ -25,14 +29,14 @@ export const router = createBrowserRouter([
               { index: true, Component: RoleHome },
               {
                 path: "/profile",
-                lazy: async () => ({ Component: (await import("@/features/profile/pages/ProfilePage")).ProfilePage }),
+                lazy: async () => ({ Component: (await pages.ProfilePage()).ProfilePage }),
               },
               {
                 element: <RequireAppRole roles={["chamber-president", "other"]} />,
                 children: [
                   {
                     path: "/hr",
-                    lazy: async () => ({ Component: (await import("@/features/hr/pages/HrPage")).HrPage }),
+                    lazy: async () => ({ Component: (await pages.HrPage()).HrPage }),
                   },
                 ],
               },
@@ -43,7 +47,7 @@ export const router = createBrowserRouter([
                 children: [
                   {
                     path: "/members",
-                    lazy: async () => ({ Component: (await import("@/features/members/pages/MembersPage")).MembersPage }),
+                    lazy: async () => ({ Component: (await pages.MembersPage()).MembersPage }),
                   },
                 ],
               },
@@ -53,7 +57,7 @@ export const router = createBrowserRouter([
                   {
                     path: "/association-information",
                     lazy: async () => ({
-                      Component: (await import("@/features/members/pages/AssociationInfoPage")).AssociationInfoPage,
+                      Component: (await pages.AssociationInfoPage()).AssociationInfoPage,
                     }),
                   },
                 ],
@@ -64,7 +68,7 @@ export const router = createBrowserRouter([
                   {
                     path: "/hr-association",
                     lazy: async () => ({
-                      Component: (await import("@/features/association-secretaries/pages/AssociationSecretariesPage"))
+                      Component: (await pages.AssociationSecretariesPage())
                         .AssociationSecretariesPage,
                     }),
                   },
@@ -76,7 +80,7 @@ export const router = createBrowserRouter([
                   {
                     path: "/union-members",
                     lazy: async () => ({
-                      Component: (await import("@/features/card-issuance/pages/UnionMembersPage")).UnionMembersPage,
+                      Component: (await pages.UnionMembersPage()).UnionMembersPage,
                     }),
                   },
                 ],
@@ -96,7 +100,7 @@ export const router = createBrowserRouter([
                   {
                     path: "/associations",
                     lazy: async () => ({
-                      Component: (await import("@/features/associations/pages/AssociationsPage")).AssociationsPage,
+                      Component: (await pages.AssociationsPage()).AssociationsPage,
                     }),
                   },
                 ],
@@ -107,13 +111,13 @@ export const router = createBrowserRouter([
                   {
                     path: "/assemblies",
                     lazy: async () => ({
-                      Component: (await import("@/features/assemblies/pages/ChamberAssembliesPage")).ChamberAssembliesPage,
+                      Component: (await pages.ChamberAssembliesPage()).ChamberAssembliesPage,
                     }),
                   },
                   {
                     path: "/assemblies/:assemblyId",
                     lazy: async () => ({
-                      Component: (await import("@/features/assemblies/pages/ChamberAssemblyDetailPage")).ChamberAssemblyDetailPage,
+                      Component: (await pages.ChamberAssemblyDetailPage()).ChamberAssemblyDetailPage,
                     }),
                   },
                 ],
@@ -124,13 +128,13 @@ export const router = createBrowserRouter([
                   {
                     path: "/organizations/assemblies",
                     lazy: async () => ({
-                      Component: (await import("@/features/assemblies/pages/OrganizationsAssembliesPage")).OrganizationsAssembliesPage,
+                      Component: (await pages.OrganizationsAssembliesPage()).OrganizationsAssembliesPage,
                     }),
                   },
                   {
                     path: "/organizations/assemblies/:assemblyId",
                     lazy: async () => ({
-                      Component: (await import("@/features/assemblies/pages/OrganizationsAssemblyDetailPage")).OrganizationsAssemblyDetailPage,
+                      Component: (await pages.OrganizationsAssemblyDetailPage()).OrganizationsAssemblyDetailPage,
                     }),
                   },
                 ],
@@ -148,14 +152,14 @@ export const router = createBrowserRouter([
                       {
                         index: true,
                         lazy: async () => ({
-                          Component: (await import("@/features/assemblies/pages/AssociationAssembliesPage"))
+                          Component: (await pages.AssociationAssembliesPage())
                             .AssociationAssembliesPage,
                         }),
                       },
                       {
                         path: ":assemblyId",
                         lazy: async () => ({
-                          Component: (await import("@/features/assemblies/pages/AssociationAssemblyDetailPage"))
+                          Component: (await pages.AssociationAssemblyDetailPage())
                             .AssociationAssemblyDetailPage,
                         }),
                       },
@@ -169,13 +173,13 @@ export const router = createBrowserRouter([
                   {
                     path: "/user/assemblies",
                     lazy: async () => ({
-                      Component: (await import("@/features/assemblies/pages/UserAssembliesPage")).UserAssembliesPage,
+                      Component: (await pages.UserAssembliesPage()).UserAssembliesPage,
                     }),
                   },
                   {
                     path: "/user/assemblies/:assemblyId",
                     lazy: async () => ({
-                      Component: (await import("@/features/assemblies/pages/UserAssemblyDetailPage")).UserAssemblyDetailPage,
+                      Component: (await pages.UserAssemblyDetailPage()).UserAssemblyDetailPage,
                     }),
                   },
                 ],
