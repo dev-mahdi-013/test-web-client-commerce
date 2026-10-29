@@ -232,7 +232,7 @@ export function AssociationsTable({
                 نام انجمن
               </Table.Column>
               <Table.Column className={headerCellClassName}>تاریخ تأسیس</Table.Column>
-              <Table.Column className={headerCellClassName}>تاریخ آخرین انجمن</Table.Column>
+              <Table.Column className={headerCellClassName}>تاریخ آخرین مجمع</Table.Column>
               <Table.Column className={headerCellClassName}>رئیس</Table.Column>
               <Table.Column className={headerCellClassName}>دبیر</Table.Column>
             </Table.Header>

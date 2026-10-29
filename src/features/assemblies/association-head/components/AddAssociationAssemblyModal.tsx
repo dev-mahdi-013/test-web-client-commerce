@@ -66,10 +66,10 @@ export function AddAssociationAssemblyModal({ isOpen, onOpenChange }: AddAssocia
               </TextField>
 
               <div className="flex flex-col gap-1.5">
-                <span className="text-sm font-bold text-foreground">روز رأی‌گیری</span>
+                <span className="text-sm font-bold text-foreground">روز مجمع</span>
                 <JalaliDateField
                   className={inputClassName}
-                  label="روز رأی‌گیری"
+                  label="روز مجمع"
                   value={form.votingDay}
                   onChange={form.setVotingDay}
                 />

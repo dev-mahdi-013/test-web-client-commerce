@@ -50,7 +50,7 @@ export function AssemblySummaryCard({ assembly, statusLabel }: AssemblySummaryCa
         <Field className="col-start-2 row-start-3 mt-2 lg:col-start-3 lg:row-start-2 lg:mt-0" label="زمان باقیمانده">
           <RemainingTimeBoxes days={remaining.days} hours={remaining.hours} />
         </Field>
-        <Field className="col-start-1 row-start-3 mt-2 lg:col-start-3 lg:row-start-1 lg:mt-0" label="روز رای گیری">
+        <Field className="col-start-1 row-start-3 mt-2 lg:col-start-3 lg:row-start-1 lg:mt-0" label="روز مجمع">
           <span dir="ltr">{formatJalali(assembly.newsDate)}</span>
         </Field>
       </div>

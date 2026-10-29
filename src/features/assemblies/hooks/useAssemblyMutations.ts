@@ -116,7 +116,7 @@ export function useUpdateAssemblyNewsDate() {
       if (assembly) patchAssemblyDetail(queryClient, variables.assemblyId, assembly);
       else invalidateAssemblies(queryClient);
     },
-    onError: (error) => toast.danger(getErrorMessage(error, "به‌روزرسانی روز رأی‌گیری انجام نشد")),
+    onError: (error) => toast.danger(getErrorMessage(error, "به‌روزرسانی روز مجمع انجام نشد")),
   });
 }
 

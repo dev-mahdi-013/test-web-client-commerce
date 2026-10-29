@@ -12,6 +12,8 @@ type ApiMember = {
   _id: string;
   name: string;
   phone: string;
+  /** Number of cards the member holds, counted by the service. */
+  cardsCount?: number;
   cards: Array<{
     _id: string;
     cardDetails: ApiCardDetails;
@@ -34,6 +36,7 @@ type ApiAssociationMember = {
   phone: string;
   joinedDate?: number;
   cardDetails?: ApiCardDetails;
+  cardsCount?: number;
 };
 
 const AP_MEMBERS_PAGE_SIZE = 30;
@@ -53,6 +56,7 @@ function toMember(member: ApiMember): ChamberMember {
     fullName: member.name,
     phone: member.phone,
     associationCount: associationIds.size,
+    cardsCount: member.cardsCount ?? member.cards.length,
     cards: member.cards.map((card) => toMembershipCard(card._id, card.cardDetails)),
   };
 }
@@ -77,6 +81,7 @@ function toAssociationMember(member: ApiAssociationMember, id?: string): Chamber
     fullName: member.name,
     phone: member.phone,
     associationCount: 1,
+    cardsCount: member.cardsCount ?? (member.cardDetails ? 1 : 0),
     cards: member.cardDetails ? [toMembershipCard(member.roleId, member.cardDetails)] : [],
   };
 }

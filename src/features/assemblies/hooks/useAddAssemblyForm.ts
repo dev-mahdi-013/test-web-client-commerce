@@ -87,7 +87,7 @@ export function useAddAssemblyForm({ onSuccess }: UseAddAssemblyFormOptions) {
     cardType,
     setCardType,
     titleError: isSubmitted && !isTitleValid ? titleErrorMessage(title) : null,
-    dateError: isSubmitted && !isDateValid ? "روز رأی‌گیری را انتخاب کنید" : null,
+    dateError: isSubmitted && !isDateValid ? "روز مجمع را انتخاب کنید" : null,
     associationError: isSubmitted && !isAssociationValid ? "تارگت را انتخاب کنید" : null,
     isSubmitting: createAssembly.isPending,
     submit,

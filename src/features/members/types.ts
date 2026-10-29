@@ -11,6 +11,8 @@ export type ChamberMember = {
   fullName: string;
   phone: string;
   associationCount: number;
+  /** Card count reported by the service (`cardsCount` on the member row). */
+  cardsCount: number;
   cards: MembershipCardData[];
 };
 

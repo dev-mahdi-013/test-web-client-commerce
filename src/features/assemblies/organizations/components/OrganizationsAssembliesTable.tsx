@@ -178,7 +178,7 @@ export function OrganizationsAssembliesTable({
       { assemblyId: assembly.id, votingDay },
       {
         onSuccess: () => {
-          toast.success("روز رأی‌گیری به‌روزرسانی شد");
+          toast.success("روز مجمع به‌روزرسانی شد");
           cancelEdit();
         },
       },
@@ -238,7 +238,7 @@ export function OrganizationsAssembliesTable({
                 <Table.Column className={headerCellClassName}>نوع کارت</Table.Column>
                 <Table.Column className={headerCellClassName}>توسط</Table.Column>
                 <Table.Column className={headerCellClassName}>تاریخ ثبت</Table.Column>
-                <Table.Column className={headerCellClassName}>روز رای‌گیری</Table.Column>
+                <Table.Column className={headerCellClassName}>روز مجمع</Table.Column>
                 <Table.Column className={headerCellClassName}>زمان شروع</Table.Column>
                 <Table.Column className={headerCellClassName}>زمان پایان</Table.Column>
                 <Table.Column className={`${headerCellClassName} min-w-[200px] text-center`}>
@@ -331,7 +331,7 @@ export function OrganizationsAssembliesTable({
                           <div onPointerDown={stopRowPress}>
                             <InlineDatePicker
                               autoOpen
-                              label="روز رای‌گیری"
+                              label="روز مجمع"
                               value={draftNewsDate}
                               onCancel={cancelEdit}
                               onChange={(votingDay) => saveNewsDate(assembly, votingDay)}
@@ -342,7 +342,7 @@ export function OrganizationsAssembliesTable({
                             action={
                               <PencilButton
                                 isHidden={!canEditPencil}
-                                label={`ویرایش روز رای‌گیری ${assembly.title}`}
+                                label={`ویرایش روز مجمع ${assembly.title}`}
                                 onEdit={() => startEdit(assembly, "newsDate")}
                               />
                             }

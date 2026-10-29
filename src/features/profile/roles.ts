@@ -1,6 +1,6 @@
 import type { Profile, UserRole } from "./types";
 
-export const CARD_ISSUANCE_ROLE_TITLE = "واحد صدور کارت";
+export const CARD_ISSUANCE_ROLE_TITLE = "مسئول صدور کارت";
 
 const BackendRoleType = {
   ProvincialChamberPresident: 0x10,
@@ -15,13 +15,13 @@ const backendRoleDefinitions: Partial<Record<number, { appRole: AppRole; title: 
   [BackendRoleType.ProvincialChamberPresident]: { appRole: "chamber-president", title: "رئیس اتاق استان" },
   [BackendRoleType.ProvincialAssociationOfficer]: {
     appRole: "organizations",
-    title: "مسئول امور تشکل های استان",
+    title: "مسئول تشکل ها",
   },
   [BackendRoleType.CardIssuanceOfficer]: { appRole: "card-issuance", title: CARD_ISSUANCE_ROLE_TITLE },
-  [BackendRoleType.AssociationPresident]: { appRole: "association-head", title: "رئیس تشکل استانی" },
+  [BackendRoleType.AssociationPresident]: { appRole: "association-head", title: "رئیس انجمن" },
   [BackendRoleType.AssociationSecretary]: {
     appRole: "association-secretary",
-    title: "دبیر تشکل استانی",
+    title: "دبیر انجمن",
   },
   [BackendRoleType.ChamberMember]: { appRole: "user", title: "عضو اتاق بازرگانی" },
 };
@@ -48,8 +48,12 @@ export type AppRole =
 
 const CHAMBER_PRESIDENT = roleTitleKey("رئیس اتاق استان");
 const CARD_ISSUANCE = roleTitleKey(CARD_ISSUANCE_ROLE_TITLE);
+// Titles the backend used before the rename; kept so stored sessions still map to the same role.
+const CARD_ISSUANCE_LEGACY = roleTitleKey("واحد صدور کارت");
 const ORGANIZATIONS = roleTitleKey("امور تشکلها");
 const ORGANIZATIONS_OFFICER = roleTitleKey("مأمور امور تشکل ها");
+const ORGANIZATIONS_OFFICER_LEGACY = roleTitleKey("مسئول امور تشکل های استان");
+const ORGANIZATIONS_OFFICER_SHORT = roleTitleKey("مسئول تشکل ها");
 const ASSOCIATION_HEAD = roleTitleKey("رئیس انجمن مجامع");
 const ASSOCIATION_INFO = roleTitleKey("رئیس انجمن");
 const ASSOCIATION_SECRETARY = roleTitleKey("دبیر تشکل استانی");
@@ -82,8 +86,15 @@ export function appRoleOf(role: Pick<UserRole, "id" | "roleTypeId" | "title"> | 
 
   const title = roleTitleKey(role?.title ?? "");
   if (title === CHAMBER_PRESIDENT) return "chamber-president";
-  if (title === CARD_ISSUANCE) return "card-issuance";
-  if (title === ORGANIZATIONS || title === ORGANIZATIONS_OFFICER) return "organizations";
+  if (title === CARD_ISSUANCE || title === CARD_ISSUANCE_LEGACY) return "card-issuance";
+  if (
+    title === ORGANIZATIONS ||
+    title === ORGANIZATIONS_OFFICER ||
+    title === ORGANIZATIONS_OFFICER_LEGACY ||
+    title === ORGANIZATIONS_OFFICER_SHORT
+  ) {
+    return "organizations";
+  }
   if (title === ASSOCIATION_HEAD) return "association-head";
   if (title === ASSOCIATION_INFO) return "association-info";
   if (title === ASSOCIATION_SECRETARY || title === ASSOCIATION_SECRETARY_SHORT) {

@@ -7,6 +7,7 @@ type ApiMember = {
   _id: string;
   name: string;
   phone: string;
+  cardsCount?: number;
   cards: Array<{
     _id: string;
     cardDetails: ApiCardDetails;
@@ -74,6 +75,7 @@ function toMember(member: ApiMember): ChamberMember {
     fullName: member.name,
     phone: member.phone,
     associationCount: 0,
+    cardsCount: member.cardsCount ?? member.cards.length,
     cards: member.cards.map((card) => toMembershipCard(card._id, card.cardDetails)),
   };
 }

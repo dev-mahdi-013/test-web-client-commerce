@@ -78,7 +78,7 @@ export function AgendaCandidatesTable({
               </Table.Column>
             )}
             <Table.Column isRowHeader className={headerClassName}>
-              نام و نام خانوادگی
+              {isPerson ? "نام و نام خانوادگی" : "عنوان"}
             </Table.Column>
             {isPerson && <Table.Column className={headerClassName}>شماره کارت</Table.Column>}
             <Table.Column className={headerClassName}>رأی‌دهندگان</Table.Column>

@@ -1,97 +1,109 @@
-import { EyeIcon } from "@solar-icons/react/linear/eye";
+import { useEffect, useRef } from "react";
 import { Button, Spinner } from "@heroui/react";
 import { useNavigate } from "react-router";
 import { formatJalali } from "@/lib/date";
-import { TruncatedText } from "@/shared/components/TruncatedText";
 import { AssemblyStatusBadge } from "../../components/AssemblyStatusBadge";
-import { ASSEMBLY_CREATED_BY_MAX_CHARS, ASSEMBLY_TITLE_MAX_CHARS } from "../../config";
 import type { Assembly } from "../../types";
 
 type UserAssembliesMobileListProps = {
   assemblies: Assembly[];
-  startIndex: number;
   isLoading: boolean;
+  hasNextPage: boolean;
+  isFetchingNextPage: boolean;
+  onLoadMore: () => void;
 };
 
-/** Mobile cards with the same fields as the desktop table. */
-export function UserAssembliesMobileList({ assemblies, startIndex, isLoading }: UserAssembliesMobileListProps) {
+/** Mobile card: title + status, target and voting day, and a full-width entry button. */
+function UserAssemblyMobileCard({ assembly }: { assembly: Assembly }) {
   const navigate = useNavigate();
-
-  if (isLoading) {
-    return (
-      <div className="flex h-40 items-center justify-center lg:hidden">
-        <Spinner size="sm" />
-      </div>
-    );
-  }
-
-  if (assemblies.length === 0) {
-    return (
-      <p className="flex h-40 items-center justify-center text-sm text-muted lg:hidden">مجمعی پیدا نشد</p>
-    );
-  }
+  const isRunning = assembly.status === "running";
 
   return (
-    <ul className="flex  flex-1 flex-col gap-3 overflow-y-auto lg:hidden">
-      {assemblies.map((assembly, index) => (
-        <li key={assembly.id} className="rounded-[20px] bg-white px-4 py-4 shadow-(--box-shadow)">
-          <div className="flex items-start justify-between gap-3">
-            <div className=" flex-1">
-              <p className="text-sm font-bold leading-6">
-                {startIndex + index}.{" "}
-                <TruncatedText maxChars={ASSEMBLY_TITLE_MAX_CHARS} value={assembly.title} />
-              </p>
-              <p className="mt-1 text-xs text-muted">{assembly.association}</p>
-            </div>
-            <AssemblyStatusBadge status={assembly.status} />
-          </div>
+    <li className="flex flex-col gap-4 rounded-[20px] bg-white px-4 pt-[30px] pb-[32px] shadow-(--box-shadow)">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+          <span className="text-xs text-muted">عنوان</span>
+          <p className="truncate text-[15px] font-bold leading-6">{assembly.title}</p>
+        </div>
+        <AssemblyStatusBadge
+          className="h-[22px] px-2.5 text-[10px]"
+          label={isRunning ? "در حال رأی گیری" : undefined}
+          status={assembly.status}
+        />
+      </div>
 
-          <dl className="mt-3 grid grid-cols-2 gap-x-3 gap-y-2 text-xs">
-            <div>
-              <dt className="text-muted">توسط</dt>
-              <dd className="mt-0.5 font-bold">
-                <TruncatedText maxChars={ASSEMBLY_CREATED_BY_MAX_CHARS} value={assembly.createdBy} />
-              </dd>
-            </div>
-            <div>
-              <dt className="text-muted">تاریخ ساخت</dt>
-              <dd className="mt-0.5 font-bold" dir="ltr">
-                {formatJalali(assembly.createdAt)}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-muted">روز برگزاری</dt>
-              <dd className="mt-0.5 font-bold" dir="ltr">
-                {formatJalali(assembly.newsDate)}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-muted">زمان شروع</dt>
-              <dd className="mt-0.5 font-bold" dir="ltr">
-                {assembly.startsAt}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-muted">زمان پایان</dt>
-              <dd className="mt-0.5 font-bold" dir="ltr">
-                {assembly.endsAt}
-              </dd>
-            </div>
-          </dl>
+      <div className="flex items-end justify-between gap-3">
+        <div className="flex min-w-0 flex-col gap-1.5">
+          <span className="text-xs text-muted">تارگت</span>
+          <p className="truncate text-sm font-bold">{assembly.association}</p>
+        </div>
+        <div className="flex flex-col items-end gap-1.5">
+          <span className="text-xs text-muted">روز رأی گیری</span>
+          <p className="text-sm font-bold" dir="ltr">
+            {formatJalali(assembly.newsDate)}
+          </p>
+        </div>
+      </div>
 
-          <div className="mt-3 flex items-center justify-end">
-            <Button
-              isIconOnly
-              aria-label={`ورود به پنل کاربری ${assembly.title}`}
-              className="size-8 min-w-8 rounded-full bg-accent text-white"
-              size="sm"
-              onPress={() => navigate(`/user/assemblies/${assembly.id}`)}
-            >
-              <EyeIcon className="size-4" />
-            </Button>
-          </div>
-        </li>
-      ))}
-    </ul>
+      <Button
+        className="mt-[14px] h-10 w-full rounded-full bg-accent text-sm font-bold text-white"
+        onPress={() => navigate(`/user/assemblies/${assembly.id}`)}
+      >
+        ورود به انتخابات
+      </Button>
+    </li>
+  );
+}
+
+/** Scrollable list that loads the next page when the sentinel at the bottom becomes visible. */
+export function UserAssembliesMobileList({
+  assemblies,
+  isLoading,
+  hasNextPage,
+  isFetchingNextPage,
+  onLoadMore,
+}: UserAssembliesMobileListProps) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const root = scrollRef.current;
+    const target = sentinelRef.current;
+    if (!root || !target || !hasNextPage) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry?.isIntersecting && !isFetchingNextPage) onLoadMore();
+      },
+      { root, rootMargin: "120px" },
+    );
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, onLoadMore]);
+
+  return (
+    <div ref={scrollRef} className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+      {isLoading ? (
+        <div className="flex h-40 items-center justify-center">
+          <Spinner size="sm" />
+        </div>
+      ) : assemblies.length === 0 ? (
+        <p className="flex h-40 items-center justify-center text-sm text-muted">مجمعی پیدا نشد</p>
+      ) : (
+        <ul className="flex flex-col gap-[30px] pb-[60px]">
+          {assemblies.map((assembly) => (
+            <UserAssemblyMobileCard key={assembly.id} assembly={assembly} />
+          ))}
+        </ul>
+      )}
+
+      {isFetchingNextPage && (
+        <div className="flex h-14 items-center justify-center">
+          <Spinner size="sm" />
+        </div>
+      )}
+      <div ref={sentinelRef} aria-hidden className="h-px shrink-0" />
+    </div>
   );
 }

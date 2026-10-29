@@ -5,6 +5,9 @@
 @theme {
   --font-sans: "Peyda", ui-sans-serif, system-ui, sans-serif;
 
+  /* Expose the brand accent to Tailwind utilities (text-accent, bg-accent, ...) */
+  --color-accent: var(--accent);
+
   /* Type scale for the cards, panels and dialogs (text-micro / text-caption / text-note / text-body) */
   --text-micro: 0.625rem;
   --text-caption: 0.6875rem;

@@ -35,7 +35,7 @@ export function AssembliesTable({ assemblies, startIndex, isLoading }: Assemblie
               <Table.Column className={headerCellClassName}>نوع کارت</Table.Column>
               <Table.Column className={headerCellClassName}>توسط</Table.Column>
               <Table.Column className={headerCellClassName}>تاریخ ساخت</Table.Column>
-              <Table.Column className={headerCellClassName}>روز رای‌گیری</Table.Column>
+              <Table.Column className={headerCellClassName}>روز مجمع</Table.Column>
               <Table.Column className={headerCellClassName}>زمان شروع</Table.Column>
               <Table.Column className={headerCellClassName}>زمان پایان</Table.Column>
               <Table.Column className={`${headerCellClassName} min-w-[200px] text-center`}>

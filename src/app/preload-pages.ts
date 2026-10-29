@@ -70,20 +70,80 @@ function pageKeysFor(session: AuthSession, activeRoleId: string | null): PageKey
   return ["ProfilePage", ...pagesByRole[appRoleOf(activeRole)]];
 }
 
+/**
+ * Remembers (in localStorage, so it survives a refresh) which "token + role" combinations already had all their
+ * pages downloaded. After a refresh those pages are served by the browser cache whenever the router needs them,
+ * so there is no reason to download them all again; the preload only runs after a login or a role switch.
+ */
+const PRELOADED_KEY = "hodhod.preloaded";
+
+function preloadSignature(session: AuthSession, activeRoleId: string | null) {
+  return `${session.tokenId}:${resolveActiveRoleId(session.user.roles, activeRoleId)}`;
+}
+
+function readPreloaded(): string[] {
+  try {
+    const value: unknown = JSON.parse(localStorage.getItem(PRELOADED_KEY) ?? "[]");
+    return Array.isArray(value) ? value.filter((item): item is string => typeof item === "string") : [];
+  } catch {
+    return [];
+  }
+}
+
+function writePreloaded(signatures: string[]) {
+  try {
+    if (signatures.length === 0) localStorage.removeItem(PRELOADED_KEY);
+    else localStorage.setItem(PRELOADED_KEY, JSON.stringify(signatures));
+  } catch {
+    // Storage may be unavailable (private mode); the only cost is preloading again after a refresh.
+  }
+}
+
+/** Resolves to true when every page was downloaded without an error. */
+async function download(keys: PageKey[]): Promise<boolean> {
+  const results = await Promise.all(
+    keys.map(async (key) => {
+      if (settled.has(key)) return true;
+      let ok = true;
+      // import() caches the module, so a page that is already downloaded costs nothing here.
+      await pages[key]().catch(() => {
+        ok = false;
+      });
+      settled.add(key);
+      notifyChange();
+      return ok;
+    }),
+  );
+  return results.every(Boolean);
+}
+
 function preloadForCurrentSession() {
   const { session, activeRoleId } = useSessionStore.getState();
-  const keys: PageKey[] = session ? pageKeysFor(session, activeRoleId) : ["LoginPage"];
 
-  for (const key of keys) {
-    if (settled.has(key)) continue;
-    // import() caches the module, so a page that is already downloaded costs nothing here.
-    pages[key]()
-      .catch(() => {})
-      .finally(() => {
-        settled.add(key);
-        notifyChange();
-      });
+  if (!session) {
+    // Signed out: forget what was preloaded, so the next login downloads the pages again.
+    writePreloaded([]);
+    void download(["LoginPage"]);
+    return;
   }
+
+  const keys = pageKeysFor(session, activeRoleId);
+  const signature = preloadSignature(session, activeRoleId);
+  const done = readPreloaded();
+
+  if (done.includes(signature)) {
+    // Already downloaded at login (this is a refresh): don't fetch everything again.
+    for (const key of keys) settled.add(key);
+    notifyChange();
+    return;
+  }
+
+  void download(keys).then((ok) => {
+    if (!ok) return; // Leave it unmarked so that the next start tries again.
+    // Only the current token's entries are kept, so the list can't grow across logins.
+    const sameToken = readPreloaded().filter((item) => item.startsWith(`${session.tokenId}:`));
+    writePreloaded([...new Set([...sameToken, signature])]);
+  });
 }
 
 /** The boot loading screen stays at least this long after the page was opened, so it is always seen. */
@@ -111,8 +171,8 @@ function waitForFonts() {
 let started = false;
 
 /**
- * Downloads the active role's page chunks as soon as a session exists: on app start, silently right after login
- * and on role switch. Only the first page open shows the loading screen (see useAppBootReady).
+ * Downloads the active role's page chunks once: silently right after login and on role switch. On a refresh they are
+ * not downloaded again (see PRELOADED_KEY). Only the first page open shows the loading screen (see useAppBootReady).
  */
 function startPagePreloading() {
   if (started) return;

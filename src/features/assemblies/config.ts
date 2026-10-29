@@ -45,7 +45,7 @@ export const statusMeta: Record<AssemblyStatus, StatusMeta> = {
     className: "border border-(--status-pending) bg-(--status-pending-bg) text-(--status-pending)",
   },
   finished: {
-    label: "پایان رأی گیری",
+    label: "پایان مجمع",
     className: "border border-(--status-finished) bg-(--status-finished-bg) text-(--status-finished)",
   },
   archived: {

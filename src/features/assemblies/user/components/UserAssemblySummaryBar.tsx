@@ -52,7 +52,7 @@ export function UserAssemblySummaryBar({ assembly }: UserAssemblySummaryBarProps
           status={assembly.status}
         />
       </Field>
-      <Field label="روز رای گیری">
+      <Field label="روز مجمع">
         <span dir="ltr">{formatJalali(assembly.newsDate)}</span>
       </Field>
       <Field label="زمان باقیمانده">

@@ -72,7 +72,7 @@ export function MembersTable({
                 <Table.Cell className="text-sm">
                   <span dir="ltr">{member.phone}</span>
                 </Table.Cell>
-                <Table.Cell className="text-sm">{member.cards.length}</Table.Cell>
+                <Table.Cell className="text-sm">{member.cardsCount}</Table.Cell>
                 {showAssociationCount && <Table.Cell className="text-sm">{member.associationCount}</Table.Cell>}
                 <Table.Cell
                   className="text-center"
