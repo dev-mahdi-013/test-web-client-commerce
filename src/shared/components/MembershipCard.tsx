@@ -13,6 +13,13 @@ const expiredBackground = "bg-(image:--card-expired) [--card-label:rgb(0_0_0/0.3
 const accentSurface = "bg-(image:--card-accent)";
 const missingSurface = "bg-(image:--card-missing)";
 const accentLabel = "rgb(255 255 255 / 0.62)";
+const expiredLabel = "rgb(0 0 0 / 0.32)";
+
+function expiryPassed(isoDate: string | null | undefined) {
+  if (!isoDate) return false;
+  const time = new Date(isoDate).getTime();
+  return !Number.isNaN(time) && time < Date.now();
+}
 
 function formatCardNo(value: string) {
   const digits = value.replace(/\D/g, "");
@@ -85,7 +92,7 @@ export function CardExpiry({ expiresAt }: { expiresAt: string | null }) {
 }
 
 function CommerceBody({ card, footer }: { card: MembershipCardData; footer?: ReactNode }) {
-  const expired = Boolean(card.commerceExpiresAt) && new Date(card.commerceExpiresAt ?? "").getTime() < Date.now();
+  const expired = expiryPassed(card.commerceExpiresAt);
   const isLegal = card.kind === "legal";
   const cardNoField = (
     <CardField
@@ -191,9 +198,12 @@ export function MembershipCard({
 }: MembershipCardProps) {
   const isLegal = card.kind === "legal";
   const deck = stacked;
-  const commerceSurface = card.hasCommerceCard ? accentSurface : missingSurface;
+  // The commerce face grays out on expiry, exactly like the green membership face.
+  const commerceExpired = card.hasCommerceCard && dimWhenExpired && expiryPassed(card.commerceExpiresAt);
+  const commerceSurface = !card.hasCommerceCard ? missingSurface : commerceExpired ? expiredBackground : accentSurface;
   const [blueInFront, setBlueInFront] = useState(false);
   const commerceInFront = deck && blueInFront;
+  const commerceLabel = commerceExpired ? expiredLabel : accentLabel;
   const cardBackground = card.expired && dimWhenExpired ? expiredBackground : activeBackground;
   const toggleDeck = () => setBlueInFront((inFront) => !inFront);
 
@@ -211,7 +221,7 @@ export function MembershipCard({
         className,
       )}
       onClick={deck ? handleCardClick : undefined}
-      style={deck && blueInFront ? ({ "--card-label": accentLabel } as CSSProperties) : undefined}
+      style={deck && blueInFront ? ({ "--card-label": commerceLabel } as CSSProperties) : undefined}
     >
       {deck && (
         <span
