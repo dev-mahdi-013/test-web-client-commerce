@@ -3,6 +3,7 @@ import { CloseIcon } from "@solar-icons/react/linear/close";
 import type { RefObject } from "react";
 import { OpaqueBackdrop } from "./OpaqueBackdrop";
 import { cn } from "@/lib/cn";
+import { SearchableSelectField, type SearchableSelectSearch } from "./SearchableSelectField";
 import { SelectField, type SelectFieldOption } from "./SelectField";
 
 type InlineEditControlProps = {
@@ -20,10 +21,12 @@ type InlineEditControlProps = {
   editorRef?: RefObject<HTMLDivElement | null>;
   stopPropagation?: boolean;
   handleKeyboard?: boolean;
-  mode?: "text" | "number" | "select";
+  mode?: "text" | "number" | "select" | "searchable";
   options?: SelectFieldOption[];
   selectTriggerClassName?: string;
   selectPopoverClassName?: string;
+  /** Backend search of the select options, used by the searchable mode. */
+  search?: SearchableSelectSearch;
   accessibleName?: string;
 };
 
@@ -48,6 +51,7 @@ export function InlineEditControl({
   options = [],
   selectTriggerClassName,
   selectPopoverClassName,
+  search,
   accessibleName = placeholder ?? "ویرایش",
 }: InlineEditControlProps) {
   if (!isOpen) return null;
@@ -57,7 +61,19 @@ export function InlineEditControl({
   };
 
   const control =
-    mode === "select" ? (
+    mode === "searchable" ? (
+      <SearchableSelectField
+        autoOpen
+        className="h-9"
+        label={accessibleName}
+        options={options}
+        popoverClassName={selectPopoverClassName}
+        search={search}
+        triggerClassName={selectTriggerClassName}
+        value={value}
+        onChange={onChange}
+      />
+    ) : mode === "select" ? (
       <SelectField
         className="h-9 w-0 flex-1 rounded-xl bg-transparent text-sm shadow-none"
         label={accessibleName}

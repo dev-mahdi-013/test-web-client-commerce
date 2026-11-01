@@ -14,13 +14,16 @@ export function useAssociations(params: ListAssociationsParams, options?: { enab
   });
 }
 
-export function useAssociationMembers(associationId: string | null, page: number) {
+export function useAssociationMembers(associationId: string | null, page: number, query = "") {
   return useQuery({
-    queryKey: associationKeys.members(associationId ?? "none", page),
-    queryFn: () => associationsApi.listMembers({ associationId: associationId!, page }),
+    queryKey: associationKeys.members(associationId ?? "none", page, query),
+    queryFn: () => associationsApi.listMembers({ associationId: associationId!, page, query }),
     enabled: associationId !== null,
-    placeholderData: (previous, previousQuery) =>
-      previousQuery?.queryKey[2] === associationId ? previous : undefined,
+    // Keep the rows while paging, but drop them as soon as the association or the search changes.
+    placeholderData: (previous, previousQuery) => {
+      const previousKey = previousQuery?.queryKey;
+      return previousKey?.[2] === associationId && previousKey?.[4] === query ? previous : undefined;
+    },
   });
 }
 

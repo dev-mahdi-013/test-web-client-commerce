@@ -20,6 +20,8 @@ type AssociationMembersColumnProps = {
   isLoading: boolean;
   /** Lets the viewer remove a member from the association. */
   canManageCards?: boolean;
+  /** Shown instead of the default empty text, e.g. when a search found nothing. */
+  emptyMessage?: string;
 };
 
 function AssociationMemberCard({
@@ -110,6 +112,7 @@ export function AssociationMembersColumn({
   members,
   isLoading,
   canManageCards = false,
+  emptyMessage,
 }: AssociationMembersColumnProps) {
   if (isLoading) {
     return (
@@ -120,7 +123,11 @@ export function AssociationMembersColumn({
   }
 
   if (members.length === 0 || !associationId) {
-    return <p className="flex h-40 items-center justify-center text-sm text-muted">عضوی برای این انجمن ثبت نشده است</p>;
+    return (
+      <p className="flex h-40 items-center justify-center text-sm text-muted">
+        {emptyMessage ?? "عضوی برای این انجمن ثبت نشده است"}
+      </p>
+    );
   }
 
   return (

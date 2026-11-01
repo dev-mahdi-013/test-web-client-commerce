@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useProfile } from "@/features/profile/hooks/useProfile";
 import { activeRoleOf, appRoleOf } from "@/features/profile/roles";
 import { ListSectionHeader } from "@/shared/components/ListSectionHeader";
+import { SearchField } from "@/shared/components/SearchField";
 import { SectionHeading } from "@/shared/components/SectionHeading";
 import { SimplePagination } from "@/shared/components/SimplePagination";
 import { useRevealWhenReady } from "@/shared/hooks/useRevealWhenReady";
@@ -31,9 +32,16 @@ export function AssociationsPage() {
   const items = associations.data?.items ?? [];
   // Until the user picks one, preview the first association of the current page.
   const selected = chosen ?? items[0] ?? null;
-  const [membersPageState, setMembersPageState] = useState({ associationId: "", page: 1 });
-  const membersPage = membersPageState.associationId === selected?.id ? membersPageState.page : 1;
-  const members = useAssociationMembers(selected?.id ?? null, membersPage);
+  // A member search of its own: its page falls back to 1 when the query or the association changes.
+  const {
+    query: memberQuery,
+    setQuery: setMemberQuery,
+    debouncedQuery: memberQueryDebounced,
+    searchError: memberSearchError,
+    page: membersPage,
+    setPage: setMembersPage,
+  } = useSearchPagination(selected?.id ?? "");
+  const members = useAssociationMembers(selected?.id ?? null, membersPage, memberQueryDebounced);
   const membersPanel = useRevealWhenReady<HTMLElement>(selected && members.isSuccess ? selected.id : null);
   const totalPages = associations.data?.totalPages ?? 1;
   const membersTotalPages = members.data?.totalPages ?? 1;
@@ -91,7 +99,12 @@ export function AssociationsPage() {
             changeBoss.mutate({ associationId, memberId, memberRoleId }, { onSuccess });
           }}
           onSelect={(id) => {
-            setChosen(items.find((association) => association.id === id) ?? null);
+            if (id !== selected?.id) {
+              setChosen(items.find((association) => association.id === id) ?? null);
+              // A new association starts from its own first page, never the page of the previous one.
+              setMemberQuery("");
+              setMembersPage(1);
+            }
             membersPanel.requestReveal(id);
           }}
         />
@@ -107,38 +120,46 @@ export function AssociationsPage() {
       </section>
 
       <section
-        aria-label="اعضای انجمن انتخابی"
+        aria-label="اعضای انجمن"
         className="order-1 flex w-full max-w-full flex-col rounded-[28px] bg-(--panel) p-3 sm:p-4 2xl:order-none 2xl:h-[727px]"
       >
-        <header
-          ref={membersPanel.ref}
-          className="mb-3 flex min-h-10 scroll-mt-20 items-center justify-between gap-3 px-1 lg:scroll-mt-28"
-        >
-          <SectionHeading>اعضای انجمن انتخابی</SectionHeading>
-          {isOrganizations && (
-            <Button className={addButtonClassName} size="sm" onPress={handleAddMember}>
-              افزودن
-              <AddCircleIcon className="size-5" />
-            </Button>
-          )}
-        </header>
-        <AssociationMembersColumn
-          key={`${selected?.id}.${membersPage}`}
-          associationId={selected?.id ?? null}
-          canManageCards={isOrganizations}
-          isLoading={associations.isPending || members.isLoading}
-          members={members.data?.items ?? []}
-        />
-        {membersTotalPages > 1 && (
-          <div className="px-1 pt-4">
-            <SimplePagination
-              isDisabled={members.isFetching}
-              page={membersPage}
-              totalPages={membersTotalPages}
-              onPageChange={(nextPage) => setMembersPageState({ associationId: selected?.id ?? "", page: nextPage })}
-            />
+        <header ref={membersPanel.ref} className="mb-3 scroll-mt-20 px-1 lg:scroll-mt-28">
+          <div className="flex min-h-10 items-center justify-between gap-3">
+            <SectionHeading>اعضای انجمن</SectionHeading>
+            {isOrganizations && (
+              <Button className={addButtonClassName} size="sm" onPress={handleAddMember}>
+                افزودن
+                <AddCircleIcon className="size-5" />
+              </Button>
+            )}
           </div>
-        )}
+          <SearchField
+            className="mt-3 w-full"
+            errorMessage={memberSearchError}
+            placeholder="جست و جو در نام، تلفن یا شماره کارت"
+            value={memberQuery}
+            onChange={setMemberQuery}
+          />
+        </header>
+        {/* Fills the panel so the pagination stays pinned to its bottom, even with no members. */}
+        <div className="flex min-h-0 flex-1 flex-col">
+          <AssociationMembersColumn
+            key={`${selected?.id}.${membersPage}`}
+            associationId={selected?.id ?? null}
+            canManageCards={isOrganizations}
+            emptyMessage={memberQueryDebounced ? "عضوی با این جستجو پیدا نشد" : undefined}
+            isLoading={associations.isPending || members.isLoading}
+            members={members.data?.items ?? []}
+          />
+        </div>
+        <div className="shrink-0 px-1 pt-4">
+          <SimplePagination
+            isDisabled={members.isFetching}
+            page={membersPage}
+            totalPages={membersTotalPages}
+            onPageChange={setMembersPage}
+          />
+        </div>
       </section>
 
       {isOrganizations && (

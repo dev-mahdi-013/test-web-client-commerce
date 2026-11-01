@@ -56,7 +56,7 @@ export function AgendaCardStack({ agendaCount, agendaIndex, children }: AgendaCa
   const behind = visibleCount(agendaIndex);
 
   return (
-    <div className="relative h-[min(724px,calc(100dvh-11rem))] w-full max-w-none shrink overflow-visible sm:h-[608px] sm:max-w-[468px]">
+    <div className="relative w-full max-w-none shrink overflow-visible sm:h-[608px] sm:max-w-[468px]">
       <div className="pointer-events-none absolute inset-0 hidden overflow-visible sm:block">
         {Array.from({ length: ahead }, (_, index) => (
           <Sheet key={`next-${ahead - index}`} depth={ahead - index} side="start" />
@@ -66,7 +66,7 @@ export function AgendaCardStack({ agendaCount, agendaIndex, children }: AgendaCa
         ))}
       </div>
 
-      <div className="relative z-10 h-full  w-full">{children}</div>
+      <div className="relative z-10 w-full sm:h-full">{children}</div>
     </div>
   );
 }

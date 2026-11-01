@@ -20,4 +20,6 @@ export type ListMembersParams = {
   page: number;
   query?: string;
   associationId?: string | null;
+  /** Rows per page; a picker asks for its own step, lists leave it to the server. */
+  perPage?: number;
 };

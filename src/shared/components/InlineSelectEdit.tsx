@@ -2,6 +2,7 @@ import { PenIcon } from "@solar-icons/react/linear/pen";
 import type { MouseEvent, PointerEvent as ReactPointerEvent, ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import { InlineEditControl } from "./InlineEditControl";
+import type { SearchableSelectSearch } from "./SearchableSelectField";
 import type { SelectFieldOption } from "./SelectField";
 
 type InlineSelectEditProps = {
@@ -15,6 +16,10 @@ type InlineSelectEditProps = {
   isDisabled?: boolean;
   /** Keep the pencil's space but make it invisible and unclickable. */
   isHidden?: boolean;
+  /** Search inside the option list instead of scrolling a long plain list. */
+  searchable?: boolean;
+  /** Backend search of the options, used with `searchable`. */
+  search?: SearchableSelectSearch;
   /** Aria / select label, e.g. ویرایش رئیس … */
   editLabel: string;
   accessibleName?: string;
@@ -40,6 +45,8 @@ export function InlineSelectEdit({
   canEdit = true,
   isDisabled = false,
   isHidden = false,
+  searchable = false,
+  search,
   editLabel,
   accessibleName,
   className = "w-[190px]",
@@ -56,8 +63,9 @@ export function InlineSelectEdit({
         accessibleName={accessibleName ?? editLabel}
         className={cn(className, isDisabled && "pointer-events-none opacity-60")}
         isOpen
-        mode="select"
+        mode={searchable ? "searchable" : "select"}
         options={options}
+        search={search}
         selectPopoverClassName={selectPopoverClassName}
         stopPropagation
         value={value}

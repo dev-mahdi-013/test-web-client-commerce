@@ -105,12 +105,14 @@ type ListParams = {
   searchKeyword?: string;
   status?: number;
   associationId?: string;
+  /** Rows per page; the server picks its own size when omitted. */
+  perPage?: number;
 };
 
-/** Fetches one page of a list endpoint; the page size is fixed by the server. */
+/** Fetches one page of a list endpoint; the page size comes from the server unless `perPage` asks otherwise. */
 export async function commercePage<T, R>(
   path: string,
-  { page = 1, searchKeyword, status, associationId }: ListParams,
+  { page = 1, searchKeyword, status, associationId, perPage }: ListParams,
   map: (item: T) => R,
 ): Promise<Paginated<R>> {
   const body = await commerceHttp<ListEnvelope<T> | T[]>(path, {
@@ -119,6 +121,7 @@ export async function commercePage<T, R>(
       searchKeyword: searchKeyword?.trim() || undefined,
       status,
       associationId: associationId || undefined,
+      per_page: perPage,
     },
     envelope: true,
   });

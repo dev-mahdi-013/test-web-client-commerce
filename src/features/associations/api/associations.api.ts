@@ -29,6 +29,9 @@ type ApiAssociationMember = {
   cardDetails: ApiCardDetails;
 };
 
+/** AP answers with the full list; the other association scopes use the service's page size. */
+const AP_MEMBER_PAGE_SIZE = 30;
+
 function associationsBase() {
   return currentCommerceScope() === "pao" ? "/pao/associations" : "/pcp/associations";
 }
@@ -55,6 +58,15 @@ function toMember(member: ApiAssociationMember): AssociationMember {
   };
 }
 
+async function memberPage(associationId: string, page: number, query?: string) {
+  const path = `${associationsBase()}/${associationId}/members/list`;
+  return commercePage<ApiAssociationMember, AssociationMember>(
+    path,
+    { page, searchKeyword: query },
+    toMember,
+  );
+}
+
 function jalaliToEpoch(value: string) {
   const [jy = 0, jm = 0, jd = 0] = value.split("/").map(Number);
   return toEpoch(jalaliToDate({ jy, jm, jd }));
@@ -76,18 +88,31 @@ export const associationsApi = {
     return commercePage(`${associationsBase()}/list`, { page, searchKeyword: query }, toAssociation);
   },
 
-  listMembers: async ({ associationId, page }: ListAssociationMembersParams) => {
+  listMembers: async ({ associationId, page, query }: ListAssociationMembersParams) => {
     if (currentCommerceScope() === "ap") {
+      // The association endpoint answers with every member; search and pages are cut here.
       const members = await commerceHttp<ApiAssociationMember[]>("/ap/association/members/list");
+      const keyword = query?.trim();
+      const matched = keyword
+        ? members.filter(
+            (member) =>
+              member.name.includes(keyword) ||
+              member.phone.includes(keyword) ||
+              (member.cardDetails?.cardNum ?? "").includes(keyword),
+          )
+        : members;
+      const totalPages = Math.max(1, Math.ceil(matched.length / AP_MEMBER_PAGE_SIZE));
+      const current = Math.min(page, totalPages);
+      const start = (current - 1) * AP_MEMBER_PAGE_SIZE;
       return {
-        items: members.map(toMember),
-        page: 1,
-        pageSize: Math.max(1, members.length),
-        total: members.length,
-        totalPages: 1,
+        items: matched.slice(start, start + AP_MEMBER_PAGE_SIZE).map(toMember),
+        page: current,
+        pageSize: AP_MEMBER_PAGE_SIZE,
+        total: matched.length,
+        totalPages,
       };
     }
-    return commercePage(`${associationsBase()}/${associationId}/members/list`, { page }, toMember);
+    return memberPage(associationId, page, query);
   },
 
   listAllMembers: async (associationId: string) => {

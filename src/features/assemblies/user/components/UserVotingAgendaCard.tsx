@@ -64,6 +64,7 @@ export function UserVotingAgendaCard({
     ...candidate,
     rowNumber: index + 1,
   }));
+  const hasScrollableCandidates = rows.length > 4;
 
   const applySelection = (next: string[]) => {
     setSelectedIds(next);
@@ -102,7 +103,7 @@ export function UserVotingAgendaCard({
   };
 
   return (
-    <article className="relative z-10 flex h-full  w-full max-w-none flex-col overflow-hidden rounded-[20px] bg-white px-4 py-5 ps-7 shadow-(--box-shadow) sm:max-w-[468px] sm:rounded-2xl sm:px-6 sm:py-7 sm:ps-9">
+    <article className="relative z-10 flex w-full max-w-none flex-col rounded-[20px] bg-white px-4 py-5 ps-7 shadow-(--box-shadow) sm:h-full sm:max-w-[468px] sm:overflow-hidden sm:rounded-2xl sm:px-6 sm:py-7 sm:ps-9">
       <span aria-hidden className="absolute inset-y-0 start-0 w-[7px] bg-accent sm:w-[10px]" />
 
       <dl className="grid shrink-0 grid-cols-2 gap-x-3 gap-y-4 sm:gap-x-6 sm:gap-y-6">
@@ -129,8 +130,13 @@ export function UserVotingAgendaCard({
         />
       </dl>
 
-      <Table className="mt-4   flex-1 bg-transparent p-0 sm:mt-6" variant="secondary">
-        <Table.ScrollContainer className="  overflow-x-auto overflow-y-auto">
+      <Table className="mt-4 bg-transparent p-0 sm:mt-6 sm:min-h-0 sm:flex-1" variant="secondary">
+        <Table.ScrollContainer
+          className={cn(
+            "overflow-x-auto sm:max-h-full sm:overflow-y-auto",
+            hasScrollableCandidates && "max-h-[260px] overflow-y-auto",
+          )}
+        >
           <Table.Content
             aria-label={`کاندیداهای ${agenda.title}`}
             className={isPerson ? " sm:min-w-[320px]" : " sm:min-w-[240px]"}

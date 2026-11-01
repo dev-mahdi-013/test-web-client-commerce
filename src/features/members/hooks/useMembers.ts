@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { memberKeys, membersApi } from "../api";
 import type { ListMembersParams } from "../types";
 
@@ -14,6 +14,18 @@ export function useMembers(params: ListMembersParams, enabled = true) {
         ? previous
         : undefined;
     },
+  });
+}
+
+/** Endless member list: pickers append the next page while the list is scrolled. */
+export function useInfiniteMembers(params: Omit<ListMembersParams, "page">, enabled = true) {
+  return useInfiniteQuery({
+    queryKey: [...memberKeys.all, "infinite", params],
+    queryFn: ({ pageParam }) => membersApi.listMembers({ ...params, page: pageParam }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) =>
+      lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
+    enabled,
   });
 }
 

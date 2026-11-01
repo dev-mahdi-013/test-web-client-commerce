@@ -38,7 +38,7 @@ export function MembersPage({ showAssociationInfo = false }: MembersPageProps) {
     <div className="flex w-full flex-col gap-6 2xl:grid 2xl:grid-cols-[minmax(0,1fr)_382px] 2xl:items-start 2xl:gap-9">
       <section
         aria-label={isOrganizations ? "اعضای اتاق" : "لیست اعضا"}
-        className="order-2 flex min-h-[551px] flex-col overflow-hidden rounded-[28px] lg:min-h-[640px] 2xl:order-none 2xl:min-h-[727px] max-lg:mb-4"
+        className="order-2 flex h-[551px] flex-col overflow-hidden rounded-[28px] lg:h-[640px] 2xl:order-none 2xl:h-[727px] max-lg:mb-4"
       >
         {showAssociationInfo && <AssociationInfoCard className="lg:flex hidden mb-4 shrink-0" />}
 
@@ -50,8 +50,9 @@ export function MembersPage({ showAssociationInfo = false }: MembersPageProps) {
             onQueryChange={setQuery}
           />
 
-          <div className="flex  flex-col overflow-hidden rounded-[20px] bg-white">
+          <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-[20px] bg-white">
             <MembersTable
+              fillHeight
               isLoading={members.isPending}
               members={items}
               selectedId={selected?.id ?? null}

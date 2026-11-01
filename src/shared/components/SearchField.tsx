@@ -42,7 +42,10 @@ export function SearchField({
           )}
           placeholder={placeholder}
         />
-        <FieldError className="px-3">{errorMessage}</FieldError>
+        {/* Overlaid rather than stacked, so the hint never pushes the toolbar or the list down. */}
+        <FieldError className="pointer-events-none absolute start-0 top-full z-20 mt-1 w-max max-w-full rounded-lg bg-white px-2 py-1 shadow-(--box-shadow)">
+          {errorMessage}
+        </FieldError>
       </TextField>
       <MagnifierIcon
         className={cn("pointer-events-none absolute start-3 size-4 -translate-y-1/2 text-muted", isMuted ? "top-[18px]" : "top-5")}

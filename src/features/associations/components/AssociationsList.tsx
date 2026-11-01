@@ -7,11 +7,13 @@ import {
   type MouseEvent,
   type PointerEvent as ReactPointerEvent,
 } from "react";
+import { useInfiniteMembers } from "@/features/members/hooks/useMembers";
 import { cn } from "@/lib/cn";
 import { formatJalali } from "@/lib/date";
 import { getErrorMessage } from "@/lib/http";
 import { InlineEditControl } from "@/shared/components/InlineEditControl";
 import { InlineSelectEdit } from "@/shared/components/InlineSelectEdit";
+import { useDebouncedValue } from "@/shared/hooks/useDebouncedValue";
 import type { SelectFieldOption } from "@/shared/components/SelectField";
 import { selectableRowClassName, singleSelectionProps } from "@/shared/components/tableSelection";
 import type { Association, AssociationDraft, AssociationMember } from "../types";
@@ -33,7 +35,6 @@ type AssociationsListProps = {
 type EditField = "name" | "foundedAt" | "presidentName";
 
 const MIN_NAME_LENGTH = 3;
-
 const headerCellClassName = "text-start text-xs font-normal text-muted";
 const cellClassName = "text-sm whitespace-nowrap";
 function stopRowPress(event: MouseEvent | ReactPointerEvent) {
@@ -115,6 +116,43 @@ export function AssociationsTable({
   const editAssociationId = editingField === "presidentName" ? editingId : null;
   const editMembersQuery = useAllAssociationMembers(editAssociationId);
   const editMembers = editMembersQuery.data ?? [];
+  const [presidentQuery, setPresidentQuery] = useState("");
+  const trimmedPresidentQuery = presidentQuery.trim();
+  const debouncedPresidentQuery = useDebouncedValue(trimmedPresidentQuery);
+  const isPresidentSearchCurrent = debouncedPresidentQuery === trimmedPresidentQuery;
+  // The president must be one of the association's members, so its member list answers the search.
+  const presidentMembersQuery = useInfiniteMembers(
+    { query: debouncedPresidentQuery, associationId: editAssociationId },
+    Boolean(editAssociationId) && debouncedPresidentQuery.length > 0,
+  );
+  const presidentSearchOptions = isPresidentSearchCurrent
+    ? (presidentMembersQuery.data?.pages ?? [])
+        .flatMap((page) => page.items)
+        .flatMap((member) => {
+          const memberId = member.id.split(".")[0] ?? member.id;
+          return member.cards.map((card) => ({
+            value: `${memberId}.${card.id}`,
+            label: member.fullName,
+          }));
+        })
+    : [];
+  const presidentSearch = {
+    errorMessage: presidentMembersQuery.isError
+      ? getErrorMessage(presidentMembersQuery.error, "دریافت اعضای انجمن انجام نشد")
+      : null,
+    hasMore: Boolean(presidentMembersQuery.hasNextPage),
+    isLoadingMore: presidentMembersQuery.isFetchingNextPage,
+    isSearching:
+      debouncedPresidentQuery.length > 0 &&
+      (!isPresidentSearchCurrent || presidentMembersQuery.isPending),
+    onLoadMore: () => {
+      if (presidentMembersQuery.hasNextPage && !presidentMembersQuery.isFetchingNextPage) {
+        void presidentMembersQuery.fetchNextPage();
+      }
+    },
+    onQueryChange: setPresidentQuery,
+    options: presidentSearchOptions,
+  };
 
   const startEdit = (association: Association, field: EditField) => {
     if (isSaving) return;
@@ -123,6 +161,7 @@ export function AssociationsTable({
     setEditingField(field);
     if (field === "presidentName") {
       setPresidentDraft("");
+      setPresidentQuery("");
     }
   };
 
@@ -150,6 +189,7 @@ export function AssociationsTable({
   const closeEdit = () => {
     setEditingId(null);
     setEditingField(null);
+    setPresidentQuery("");
   };
 
   const cancelEdit = () => {
@@ -332,6 +372,8 @@ export function AssociationsTable({
                             isDisabled={isSaving}
                             isEditing={field === "presidentName" && editMembers.length > 0}
                             options={memberOptions(editMembers)}
+                            search={presidentSearch}
+                            searchable
                             selectPopoverClassName="max-sm:!w-[240px]"
                             value={presidentDraft}
                             onCancel={cancelEdit}

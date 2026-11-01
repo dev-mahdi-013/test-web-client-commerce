@@ -99,7 +99,7 @@ function apMemberId(member: ApiAssociationMember) {
 }
 
 export const membersApi = {
-  listMembers: async ({ page, query, associationId }: ListMembersParams) => {
+  listMembers: async ({ page, query, associationId, perPage }: ListMembersParams) => {
     const scope = currentCommerceScope();
     if (scope === "pao" && associationId) {
       return commercePage<ApiAssociationMember, ChamberMember>(

@@ -36,18 +36,25 @@ type AssociationMemberPickerProps = {
  */
 export function AssociationMemberPicker({ onAdd, isAdding = false }: AssociationMemberPickerProps) {
   const [query, setQuery] = useState("");
-  const debouncedQuery = useDebouncedValue(query.trim());
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
+  const trimmedQuery = query.trim();
+  const debouncedQuery = useDebouncedValue(trimmedQuery);
+  const hasQuery = trimmedQuery.length > 0;
+  // The cached rows of the previous query must not stand in for this one while the debounce
+  // runs, or the first keystroke would flash the whole unfiltered list before the real hits.
+  const isSearchCurrent = debouncedQuery === trimmedQuery;
   const members = useMembers({ page: 1, query: debouncedQuery });
-  const rows: PickerMember[] = (members.data?.items ?? []).flatMap((member) =>
-    member.cards.map((card) => ({
-      key: `${member.id}.${card.id}`,
-      fullName: member.fullName,
-      phone: member.phone,
-      card,
-    })),
-  );
-  const hasQuery = query.trim().length > 0;
+  const rows: PickerMember[] = isSearchCurrent
+    ? (members.data?.items ?? []).flatMap((member) =>
+        member.cards.map((card) => ({
+          key: `${member.id}.${card.id}`,
+          fullName: member.fullName,
+          phone: member.phone,
+          card,
+        })),
+      )
+    : [];
+  const isSearching = hasQuery && (!isSearchCurrent || members.isPending);
   const selected = hasQuery ? (rows.find((row) => row.key === selectedKey) ?? null) : null;
   const resultKeys = rows.map((row) => row.key).join("|");
 
@@ -83,7 +90,7 @@ export function AssociationMemberPicker({ onAdd, isAdding = false }: Association
       />
 
       {hasQuery &&
-        (members.isPending ? (
+        (isSearching ? (
           <div className="flex h-16 items-center justify-center">
             <Spinner size="sm" />
           </div>

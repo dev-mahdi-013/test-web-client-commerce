@@ -32,4 +32,5 @@ export type ListAssociationsParams = {
 export type ListAssociationMembersParams = {
   associationId: string;
   page: number;
+  query?: string;
 };
