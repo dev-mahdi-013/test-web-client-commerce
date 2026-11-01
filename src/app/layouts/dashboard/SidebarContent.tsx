@@ -15,7 +15,7 @@ type SidebarContentProps = {
   onRequestSessions: () => void;
 };
 
-const itemClassName = "flex h-12 items-center gap-3 rounded-full px-5 text-[15px] transition-colors";
+const itemClassName = "flex h-12 items-center gap-3 rounded-full px-5 text-base transition-colors";
 
 export function SidebarContent({ onNavigate, onRequestLogout, onRequestSessions }: SidebarContentProps) {
   const profile = useProfile();
@@ -53,7 +53,7 @@ export function SidebarContent({ onNavigate, onRequestLogout, onRequestSessions 
         aria-label="منوی اصلی"
         className={cn("flex flex-col gap-3.5", showMembershipCard ? "mt-6" : "mt-12")}
       >
-        {visibleNavItems.map(({ to, label, icon: Icon }) => (
+        {visibleNavItems.map(({ to, label, icon }) => (
           <NavLink
             key={to}
             className={({ isActive }) =>
@@ -65,8 +65,14 @@ export function SidebarContent({ onNavigate, onRequestLogout, onRequestSessions 
             to={to}
             onClick={onNavigate}
           >
-            <Icon className="size-[22px] shrink-0" />
-            {label}
+            <span
+              className="size-5 shrink-0 bg-current"
+              style={{
+                WebkitMaskImage: `url("${icon}")`,
+                maskImage: `url("${icon}")`,
+              }}
+            />
+            <span className="mt-[2px]">{label}</span>
           </NavLink>
         ))}
       </nav>
