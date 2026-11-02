@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>اتصال به اینترنت برقرار نیست</title>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        padding: 24px;
+        box-sizing: border-box;
+        background: #f8f8f8;
+        color: #1f1f1f;
+        font-family: "Peyda", system-ui, sans-serif;
+        text-align: center;
+      }
+      img { width: 76px; height: 76px; }
+      h1 { font-size: 20px; margin: 0; }
+      p { margin: 0; color: #6b6b6b; }
+      button {
+        margin-top: 8px;
+        padding: 10px 28px;
+        border: 0;
+        border-radius: 999px;
+        background: #0485f7;
+        color: #fff;
+        font: inherit;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <img src="/favicon.svg" alt="" />
+    <h1>اتصال به اینترنت برقرار نیست</h1>
+    <p>لطفاً اتصال خود را بررسی کنید و دوباره تلاش کنید.</p>
+    <button type="button" onclick="location.reload()">تلاش مجدد</button>
+  </body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "name": "پلتفرم هدهد (بازرگانی)",
+  "short_name": "هدهد",
+  "description": "پلتفرم هدهد برای مدیریت مجامع، اعضا و کارت‌های عضویت",
+  "lang": "fa",
+  "dir": "rtl",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f8f8f8",
+  "theme_color": "#0485f7",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/icons/icon-maskable.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}
