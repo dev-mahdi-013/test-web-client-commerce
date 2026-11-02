@@ -92,6 +92,19 @@
   }
 }
 
+/* The dialog must not follow the pointer: HeroUI's own drag gesture would otherwise move it
+   around (and the RTL translate hack above fights with it). Lock the transform once the
+   enter/exit animation is done. */
+[dir="rtl"] .drawer__content--left .drawer__dialog {
+  touch-action: pan-y;
+  user-select: none;
+}
+
+[dir="rtl"] .drawer__content--left .drawer__dialog:not([data-entering="true"]):not([data-exiting="true"]) {
+  translate: none !important;
+  transform: none !important;
+}
+
 @layer base {
   html,
   body,
