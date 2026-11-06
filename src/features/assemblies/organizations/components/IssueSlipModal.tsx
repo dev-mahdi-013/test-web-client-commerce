@@ -137,7 +137,7 @@ export function IssueSlipModal({
                   <Table.Content aria-label="اعضای مجمع" className="min-w-[520px]">
                     <Table.Header className="bg-(--field-muted) rounded-full">
                       <Table.Column isRowHeader className={headerClassName}>
-                        نام انجمن
+                        نام و نام خانوادگی
                       </Table.Column>
                       <Table.Column className={headerClassName}>شماره موبایل</Table.Column>
                       <Table.Column className={headerClassName}>شماره کارت</Table.Column>
