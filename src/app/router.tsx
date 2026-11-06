@@ -41,6 +41,17 @@ export const router = createBrowserRouter([
                 ],
               },
               {
+                element: <RequireAppRole roles={["organizations"]} />,
+                children: [
+                  {
+                    path: "/organizations/hr",
+                    lazy: async () => ({
+                      Component: (await pages.OrganizationsHrPage()).OrganizationsHrPage,
+                    }),
+                  },
+                ],
+              },
+              {
                 element: (
                   <RequireAppRole roles={["chamber-president", "organizations", "association-head", "other"]} />
                 ),
@@ -164,6 +175,15 @@ export const router = createBrowserRouter([
                         }),
                       },
                     ],
+                  },
+                ],
+              },
+              {
+                element: <RequireAppRole roles={["poll-agent"]} />,
+                children: [
+                  {
+                    path: "/poll-agent",
+                    lazy: async () => ({ Component: (await pages.PollAgentPage()).PollAgentPage }),
                   },
                 ],
               },

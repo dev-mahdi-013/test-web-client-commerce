@@ -12,6 +12,7 @@ import type {
   CreateAgendaInput,
   CreateAssemblyInput,
   UpdateAgendaInput,
+  UpdateAssemblyFieldsInput,
 } from "../types";
 
 function isAssemblyDetailKey(queryKey: readonly unknown[]) {
@@ -89,6 +90,21 @@ export function useUpdateAssemblyStatus() {
       writeAssemblyDetail(queryClient, variables.assemblyId, detail);
     },
     onError: (error) => toast.danger(getErrorMessage(error)),
+  });
+}
+
+/** Saves every edited field of one table row in a single request. */
+export function useUpdateAssemblyFields() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ assemblyId, ...input }: UpdateAssemblyFieldsInput) =>
+      assembliesApi.updateAssemblyFields(assemblyId, input),
+    onSuccess: (assembly, variables) => {
+      patchAssemblyDetail(queryClient, variables.assemblyId, assembly);
+      toast.success("مجمع به‌روزرسانی شد");
+    },
+    onError: (error) => toast.danger(getErrorMessage(error, "ویرایش مجمع انجام نشد")),
   });
 }
 

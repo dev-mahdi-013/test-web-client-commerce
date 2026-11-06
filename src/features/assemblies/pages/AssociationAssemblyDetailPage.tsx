@@ -1,5 +1,5 @@
 import { Spinner, toast } from "@heroui/react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useParams } from "react-router";
 import { getErrorMessage } from "@/lib/http";
 import { SectionHeading } from "@/shared/components/SectionHeading";
@@ -9,6 +9,7 @@ import { AssemblySummaryCard } from "../components/AssemblySummaryCard";
 import { VotersRingCard } from "../components/VotersRingCard";
 import { organizationsStatusMeta } from "../config";
 import { useAssembly } from "../hooks/useAssemblies";
+import { useAssemblyOwnerCheck } from "../hooks/useAssemblyOwnerCheck";
 import {
   useAddAgenda,
   useAddAgendaCandidate,
@@ -18,6 +19,7 @@ import {
   useUpdateAssemblyStatus,
 } from "../hooks/useAssemblyMutations";
 import { AddAgendaForm } from "../organizations/components/AddAgendaForm";
+import { IssueSlipModal } from "../organizations/components/IssueSlipModal";
 import { OrganizationsAgendaCard } from "../organizations/components/OrganizationsAgendaCard";
 
 /**
@@ -35,15 +37,24 @@ export function AssociationAssemblyDetailPage() {
   const removeCandidate = useRemoveAgendaCandidate(assemblyId);
   const updateAgenda = useUpdateAgenda(assemblyId);
   const addCandidate = useAddAgendaCandidate(assemblyId);
+  const [isSlipOpen, setSlipOpen] = useState(false);
 
   const statusBusy = updateStatus.isPending;
+  const isOwner = useAssemblyOwnerCheck();
+  const isCreatedByCurrentUser = detail ? isOwner(detail) : false;
+
   const headerActions = useMemo(() => {
     if (!detail) return null;
+    // Slips are for polls created by this head whose voting is pending or already running.
+    const canIssueSlip =
+      isCreatedByCurrentUser &&
+      (detail.status === "published" || detail.status === "running");
     return (
       <AssociationAssemblyHeaderActions
         hasAgendas={detail.agendas.length > 0}
         isPending={statusBusy}
         status={detail.status}
+        onIssueSlip={canIssueSlip ? () => setSlipOpen(true) : undefined}
         onSecondaryAction={() => {
           if (detail.status === "canceled") {
             updateStatus.mutate(
@@ -72,7 +83,7 @@ export function AssociationAssemblyDetailPage() {
         }}
       />
     );
-  }, [detail, statusBusy, updateStatus]);
+  }, [detail, isCreatedByCurrentUser, statusBusy, updateStatus]);
 
   useHeaderActions(headerActions);
 
@@ -168,6 +179,12 @@ export function AssociationAssemblyDetailPage() {
           ))}
         </div>
       </section>
+
+      <IssueSlipModal
+        assemblyId={detail.id}
+        isOpen={isSlipOpen}
+        onOpenChange={setSlipOpen}
+      />
     </div>
   );
 }

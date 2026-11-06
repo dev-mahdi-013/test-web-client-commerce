@@ -14,6 +14,11 @@ export type NavItem = {
 
 const hr: NavItem = { to: "/hr", label: "منابع انسانی", icon: humanResourcesIconUrl };
 const hrAssociation: NavItem = { to: "/hr-association", label: "منابع انسانی", icon: humanResourcesIconUrl };
+const hrOrganizations: NavItem = {
+  to: "/organizations/hr",
+  label: "منابع انسانی",
+  icon: humanResourcesIconUrl,
+};
 const chamberMembers: NavItem = { to: "/members", label: "لیست اعضای اتاق", icon: chamberMembersListIconUrl };
 const organizationMembers: NavItem = { to: "/members", label: "اعضای اتاق", icon: chamberMembersIconUrl };
 const associationInfo: NavItem = { to: "/association-information", label: "اطلاعات", icon: chamberMembersIconUrl };
@@ -27,11 +32,13 @@ const userElections: NavItem = { to: "/user/assemblies", label: "انتخابا�
 const menus: Record<AppRole, NavItem[]> = {
   "chamber-president": [hr, chamberMembers, associations, chamberAssemblies],
   "card-issuance": [cardIssuance],
-  organizations: [organizationMembers, associations, organizationAssemblies],
+  organizations: [hrOrganizations, organizationMembers, associations, organizationAssemblies],
   "association-head": [hrAssociation, associationInfo, associationAssemblies],
   "association-info": [hrAssociation, associationInfo, associationAssemblies],
   "association-secretary": [associationInfo, associationAssemblies],
   user: [userElections],
+  // Poll agents work inside the Commerce Assistant app, so the web has no menu for them.
+  "poll-agent": [],
   other: [hr, chamberMembers, associations, chamberAssemblies],
 };
 
@@ -43,6 +50,7 @@ export function navItemsFor(role: AppRole) {
 export const navItems: NavItem[] = [
   hr,
   hrAssociation,
+  hrOrganizations,
   chamberMembers,
   associationInfo,
   cardIssuance,

@@ -6,6 +6,8 @@ type AssemblyHeaderActionsProps = {
   hasAgendas: boolean;
   isCreatedByCurrentUser: boolean;
   isPending?: boolean;
+  /** Opens the slip (فیش) dialog; the header renders it on phones and desktops alike. */
+  onIssueSlip?: () => void;
   onStart: () => void;
   onEnd: () => void;
 };
@@ -19,6 +21,7 @@ export function AssemblyHeaderActions({
   hasAgendas,
   isCreatedByCurrentUser,
   isPending,
+  onIssueSlip,
   onStart,
   onEnd,
 }: AssemblyHeaderActionsProps) {
@@ -45,25 +48,9 @@ export function AssemblyHeaderActions({
 
   return (
     <div className="flex max-w-[min(100%,42rem)] flex-wrap items-center justify-end gap-1.5 sm:gap-2">
-      {showEnd && (
-        <Button
-          className={`${buttonClassName} ${
-            canEnd
-              ? "bg-success text-white"
-              : "bg-(--field-muted) text-white pointer-events-none"
-          } data-[disabled=true]:bg-(--field-muted) data-[disabled=true]:text-white/80`}
-          isDisabled={!canEnd || isPending}
-          onPress={onEnd}
-        >
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M10 20C15.5228 20 20 15.5228 20 10C20 4.47715 15.5228 0 10 0C4.47715 0 0 4.47715 0 10C0 15.5228 4.47715 20 10 20ZM6.07612 6.61732C6 6.80109 6 7.03406 6 7.5V12.5C6 12.9659 6 13.1989 6.07612 13.3827C6.17761 13.6277 6.37229 13.8224 6.61732 13.9239C6.80109 14 7.03406 14 7.5 14C7.96594 14 8.19891 14 8.38268 13.9239C8.62771 13.8224 8.82239 13.6277 8.92388 13.3827C9 13.1989 9 12.9659 9 12.5V7.5C9 7.03406 9 6.80109 8.92388 6.61732C8.82239 6.37229 8.62771 6.17761 8.38268 6.07612C8.19891 6 7.96594 6 7.5 6C7.03406 6 6.80109 6 6.61732 6.07612C6.37229 6.17761 6.17761 6.37229 6.07612 6.61732ZM11.0761 6.61732C11 6.80109 11 7.03406 11 7.5V12.5C11 12.9659 11 13.1989 11.0761 13.3827C11.1776 13.6277 11.3723 13.8224 11.6173 13.9239C11.8011 14 12.0341 14 12.5 14C12.9659 14 13.1989 14 13.3827 13.9239C13.6277 13.8224 13.8224 13.6277 13.9239 13.3827C14 13.1989 14 12.9659 14 12.5V7.5C14 7.03406 14 6.80109 13.9239 6.61732C13.8224 6.37229 13.6277 6.17761 13.3827 6.07612C13.1989 6 12.9659 6 12.5 6C12.0341 6 11.8011 6 11.6173 6.07612C11.3723 6.17761 11.1776 6.37229 11.0761 6.61732Z" fillRule="evenodd" clipRule="evenodd" fill="#F8F8F8"/>
-          </svg>
-          <span className="truncate">پایان مجمع</span>
-        </Button>
-      )}
         {showPrimaryAction && (
         <Button
-          className={`${buttonClassName} order-first ${
+          className={`${buttonClassName} ${
               canUsePrimaryAction
               ? "bg-success text-white"
               : "bg-(--field-muted) text-white pointer-events-none"
@@ -84,6 +71,22 @@ export function AssemblyHeaderActions({
           </span>
         </Button>
         )}
+      {showEnd && (
+        <Button
+          className={`${buttonClassName} ${
+            canEnd
+              ? "bg-success text-white"
+              : "bg-(--field-muted) text-white pointer-events-none"
+          } data-[disabled=true]:bg-(--field-muted) data-[disabled=true]:text-white/80`}
+          isDisabled={!canEnd || isPending}
+          onPress={onEnd}
+        >
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 20C15.5228 20 20 15.5228 20 10C20 4.47715 15.5228 0 10 0C4.47715 0 0 4.47715 0 10C0 15.5228 4.47715 20 10 20ZM6.07612 6.61732C6 6.80109 6 7.03406 6 7.5V12.5C6 12.9659 6 13.1989 6.07612 13.3827C6.17761 13.6277 6.37229 13.8224 6.61732 13.9239C6.80109 14 7.03406 14 7.5 14C7.96594 14 8.19891 14 8.38268 13.9239C8.62771 13.8224 8.82239 13.6277 8.92388 13.3827C9 13.1989 9 12.9659 9 12.5V7.5C9 7.03406 9 6.80109 8.92388 6.61732C8.82239 6.37229 8.62771 6.17761 8.38268 6.07612C8.19891 6 7.96594 6 7.5 6C7.03406 6 6.80109 6 6.61732 6.07612C6.37229 6.17761 6.17761 6.37229 6.07612 6.61732ZM11.0761 6.61732C11 6.80109 11 7.03406 11 7.5V12.5C11 12.9659 11 13.1989 11.0761 13.3827C11.1776 13.6277 11.3723 13.8224 11.6173 13.9239C11.8011 14 12.0341 14 12.5 14C12.9659 14 13.1989 14 13.3827 13.9239C13.6277 13.8224 13.8224 13.6277 13.9239 13.3827C14 13.1989 14 12.9659 14 12.5V7.5C14 7.03406 14 6.80109 13.9239 6.61732C13.8224 6.37229 13.6277 6.17761 13.3827 6.07612C13.1989 6 12.9659 6 12.5 6C12.0341 6 11.8011 6 11.6173 6.07612C11.3723 6.17761 11.1776 6.37229 11.0761 6.61732Z" fillRule="evenodd" clipRule="evenodd" fill="#F8F8F8"/>
+          </svg>
+          <span className="truncate">پایان مجمع</span>
+        </Button>
+      )}
       {((isReviewing && !isCreatedByCurrentUser) || hasApproved) && (
         <Button
           className={`${buttonClassName} bg-(--field-muted) text-white pointer-events-none data-[disabled=true]:bg-(--field-muted) data-[disabled=true]:text-white/80`}
@@ -94,6 +97,17 @@ export function AssemblyHeaderActions({
             <path d="M10 20C15.5228 20 20 15.5228 20 10C20 4.47715 15.5228 0 10 0C4.47715 0 0 4.47715 0 10C0 15.5228 4.47715 20 10 20ZM6.07612 6.61732C6 6.80109 6 7.03406 6.07612 7.5V12.5C6 12.9659 6 13.1989 6.07612 13.3827C6.17761 13.6277 6.37229 13.8224 6.61732 13.9239C6.80109 14 7.03406 14 7.5 14C7.96594 14 8.19891 14 8.38268 13.9239C8.62771 13.8224 8.82239 13.6277 8.92388 13.3827C9 13.1989 9 12.9659 9 12.5V7.5C9 7.03406 9 6.80109 8.92388 6.61732C8.82239 6.37229 8.62771 6.17761 8.38268 6.07612C8.19891 6 7.96594 6 7.5 6C7.03406 6 6.80109 6 6.61732 6.07612C6.37229 6.17761 6.17761 6.37229 6.07612 6.61732ZM11.0761 6.61732C11 6.80109 11 7.03406 11 7.5V12.5C11 12.9659 11 13.1989 11.0761 13.3827C11.1776 13.6277 11.3723 13.8224 11.6173 13.9239C11.8011 14 12.0341 14 12.5 14C12.9659 14 13.1989 14 13.3827 13.9239C13.6277 13.8224 13.8224 13.6277 13.9239 13.3827C14 13.1989 14 12.9659 14 12.5V7.5C14 7.03406 14 6.80109 13.9239 6.61732C13.8224 6.37229 13.6277 6.17761 13.3827 6.07612C13.1989 6 12.9659 6 12.5 6C12.0341 6 11.8011 6 11.6173 6.07612C11.3723 6.17761 11.1776 6.37229 11.0761 6.61732Z" fillRule="evenodd" clipRule="evenodd" fill="#F8F8F8"/>
           </svg>
           <span className="truncate">لغو مجمع</span>
+        </Button>
+      )}
+      {onIssueSlip && (
+        <Button
+          className={`${buttonClassName} bg-foreground text-white transition-opacity hover:opacity-90`}
+          isPending={isPending}
+          variant="secondary"
+          onPress={onIssueSlip}
+        >
+          <img alt="" aria-hidden className="size-4 shrink-0 sm:size-5" src="/icons/payroll-slip.svg" />
+          <span className="truncate">صدور فیش</span>
         </Button>
       )}
     </div>

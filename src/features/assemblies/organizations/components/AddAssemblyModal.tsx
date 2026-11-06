@@ -64,15 +64,27 @@ export function AddAssemblyModal({ isOpen, onOpenChange }: AddAssemblyModalProps
                 <FieldError>{form.titleError}</FieldError>
               </TextField>
 
-              <div className="flex flex-col gap-1.5">
-                <span className="text-sm font-bold text-foreground">روز مجمع</span>
-                <JalaliDateField
-                  className={inputClassName}
-                  label="روز مجمع"
-                  value={form.votingDay}
-                  onChange={form.setVotingDay}
-                />
-                {form.dateError && <p className="text-xs text-danger">{form.dateError}</p>}
+              <div className="flex flex-wrap items-end gap-4">
+                <div className="flex min-w-0  flex-1 flex-col gap-1.5">
+                  <span className="text-sm font-bold text-foreground">روز مجمع</span>
+                  <JalaliDateField
+                    className={inputClassName}
+                    label="روز مجمع"
+                    value={form.votingDay}
+                    onChange={form.setVotingDay}
+                  />
+                  {form.dateError && <p className="text-xs text-danger">{form.dateError}</p>}
+                </div>
+                <label className="flex basis-0 flex-1 cursor-pointer items-center justify-between gap-2 pb-2" dir="ltr">
+                  <input
+                    type="checkbox"
+                    className="size-4 cursor-pointer accent-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-50"
+                    checked={form.allowOnlineVoting}
+                    disabled={form.isSubmitting}
+                    onChange={(event) => form.setAllowOnlineVoting(event.target.checked)}
+                  />
+                  <span className="text-sm text-foreground" dir="rtl">اجازه رأی‌گیری آنلاین</span>
+                </label>
               </div>
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

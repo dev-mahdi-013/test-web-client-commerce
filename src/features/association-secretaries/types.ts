@@ -8,8 +8,8 @@ export type AssociationSecretary = {
   dismissedAt: string | null;
 };
 
-/** Docs: POST `/ap/agents/20/add` body — association member + card role. */
+/** Docs: POST `/ap/agents/20/add` body — name & phone instead of association member ids. */
 export type AddSecretaryPayload = {
-  memberId: string;
-  memberRoleId: string;
+  fullName: string;
+  phone: string;
 };

@@ -39,6 +39,8 @@ export type Assembly = {
   unit: AssemblyUnit;
   /** `cardScope` — نوع کارت the assembly is limited to (همه / بازرگانی). */
   cardType: AssemblyCardType;
+  /** `allowOnlineVoting` — members may vote from their own panel; false means the poll is held in person. */
+  allowOnlineVoting: boolean;
   voters: AssemblyVoterStat;
 };
 
@@ -77,6 +79,16 @@ export type AssemblyDetail = Assembly & {
   agendas: AssemblyAgenda[];
 };
 
+/** A member that can receive an in-person voting slip (فیش) for a poll. */
+export type PollMember = {
+  memberId: string;
+  /** Card role id the QR auth endpoint expects next to the member id. */
+  memberRoleId: string;
+  name: string;
+  phone: string | null;
+  cardNo: string | null;
+};
+
 export type ListAssembliesParams = {
   page: number;
   query?: string;
@@ -92,6 +104,18 @@ export type CreateAssemblyInput = {
   unit: AssemblyUnit;
   /** Sent as the poll's `cardScope`: همه → all cards, بازرگانی → commerce cards only. */
   cardType?: AssemblyCardType;
+  /** Sent as the poll's `allowOnlineVoting`: false makes the poll in-person only. */
+  allowOnlineVoting?: boolean;
+};
+
+/** Row-level edit of an assembly: every field the table used to edit on its own, sent at once. */
+export type UpdateAssemblyFieldsInput = {
+  assemblyId: string;
+  title?: string;
+  votingDay?: string;
+  unit?: AssemblyUnit;
+  cardType?: AssemblyCardType;
+  allowOnlineVoting?: boolean;
 };
 
 export type CreateAgendaInput = {

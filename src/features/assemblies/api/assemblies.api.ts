@@ -1,7 +1,7 @@
 import { jalaliToDate } from "@/lib/date";
-import { commerceHttp, commercePage, toEpoch } from "@/lib/commerce-http";
+import { commerceBlob, commerceHttp, commercePage, toEpoch } from "@/lib/commerce-http";
 import { currentCommerceScope, type CommerceScope } from "@/lib/commerce-scope";
-import { ApiError } from "@/lib/http";
+import { ApiError, type DownloadProgressHandler } from "@/lib/http";
 import type { Paginated } from "@/shared/types/api";
 import type {
   Assembly,
@@ -12,6 +12,7 @@ import type {
   CreateAssemblyInput,
   AddAgendaCandidateInput,
   ListAssembliesParams,
+  PollMember,
   UpdateAgendaInput,
 } from "../types";
 import {
@@ -41,6 +42,74 @@ function filterByQuery(items: Assembly[], query?: string) {
   return items.filter(
     (assembly) => assembly.title.includes(keyword) || assembly.createdBy.includes(keyword),
   );
+}
+
+/** One row of `/polls/{id}/members/list`; the docs do not pin the response shape down. */
+type ApiPollMemberRow = {
+  _id?: string;
+  id?: string;
+  roleId?: string;
+  memberId?: string;
+  memberRoleId?: string;
+  name?: string;
+  memberName?: string;
+  fullName?: string;
+  phone?: string;
+  memberPhone?: string;
+  cardNum?: string;
+  memberCard?: { cardNum?: string };
+  card?: { _id?: string; cardNum?: string; cardDetails?: { cardNum?: string } };
+  cards?: Array<{ _id?: string; cardNum?: string; cardDetails?: { cardNum?: string } }>;
+};
+
+function firstText(...values: unknown[]) {
+  for (const value of values) {
+    if (typeof value === "string" && value.trim() !== "") return value.trim();
+  }
+  return null;
+}
+
+/** Cursor for the next page of the poll members list; the docs do not pin the response shape down. */
+function nextCursorOf(payload: unknown): string | null {
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) return null;
+  const record = payload as Record<string, unknown>;
+  const meta = record.meta && typeof record.meta === "object" ? (record.meta as Record<string, unknown>) : {};
+  return firstText(record.nextCursor, record.next_cursor, meta.nextCursor, meta.next_cursor);
+}
+
+export type PollMembersPage = { items: PollMember[]; nextCursor: string | null };
+
+/** Accepts a bare array and the wrappers the service has used for other member lists. */
+function pollMemberRows(payload: unknown): ApiPollMemberRow[] {
+  if (Array.isArray(payload)) return payload as ApiPollMemberRow[];
+  if (!payload || typeof payload !== "object") return [];
+  const record = payload as Record<string, unknown>;
+  for (const key of ["items", "members", "list", "rows", "data"]) {
+    const value = record[key];
+    if (Array.isArray(value)) return value as ApiPollMemberRow[];
+  }
+  return [];
+}
+
+function toPollMember(row: ApiPollMemberRow): PollMember | null {
+  const memberId = firstText(row.memberId, row._id, row.id);
+  // The QR auth endpoint needs the card role id next to the member id.
+  const memberRoleId = firstText(row.memberRoleId, row.roleId, row.card?._id, row.cards?.[0]?._id);
+  if (!memberId || !memberRoleId) return null;
+  return {
+    memberId,
+    memberRoleId,
+    name: firstText(row.memberName, row.name, row.fullName) ?? "—",
+    phone: firstText(row.phone, row.memberPhone),
+    cardNo: firstText(
+      row.cardNum,
+      row.memberCard?.cardNum,
+      row.card?.cardDetails?.cardNum,
+      row.card?.cardNum,
+      row.cards?.[0]?.cardDetails?.cardNum,
+      row.cards?.[0]?.cardNum,
+    ),
+  };
 }
 
 async function listPollsPage(params: ListAssembliesParams): Promise<Paginated<Assembly>> {
@@ -116,6 +185,34 @@ function operationsForStatusChange(current: AssemblyStatus, next: AssemblyStatus
 export const assembliesApi = {
   listAssemblies: listPollsPage,
 
+  /** Members of the poll that can receive an in-person voting slip (فیش). */
+  listPollMembers: async (
+    assemblyId: string,
+    { searchKeyword, cursor }: { searchKeyword?: string; cursor?: string } = {},
+  ): Promise<PollMembersPage> => {
+    // `envelope` keeps the whole body so the next-page cursor is not dropped with the wrapper.
+    const payload = await commerceHttp<unknown>(`${pollsBase()}/${assemblyId}/members/list`, {
+      params: { searchKeyword: searchKeyword?.trim() || undefined, cursor: cursor || undefined },
+      envelope: true,
+    });
+    const items = pollMemberRows(payload)
+      .map(toPollMember)
+      .filter((member): member is PollMember => member !== null);
+    return { items, nextCursor: nextCursorOf(payload) };
+  },
+
+  /** QR auth letter (PDF) of one member in the poll. */
+  downloadPollMemberQrAuth: async (
+    assemblyId: string,
+    memberId: string,
+    memberRoleId: string,
+    onDownloadProgress?: DownloadProgressHandler,
+  ) =>
+    commerceBlob(
+      `${pollsBase()}/${assemblyId}/members/${memberId}/${memberRoleId}/genQRAuth`,
+      onDownloadProgress,
+    ),
+
   getAssembly: async (assemblyId: string) => {
     const poll = await fetchPoll(assemblyId);
     return poll ? detailOf(poll) : null;
@@ -130,6 +227,7 @@ export const assembliesApi = {
         pollDate: jalaliToEpoch(input.votingDay),
         eligibilityScope: toEligibilityCode(input.unit),
         cardScope: toCardScopeCode(input.cardType ?? "همه"),
+        allowOnlineVoting: input.allowOnlineVoting ?? true,
         // The association-president endpoint is bound to its own association.
         associationId: scope === "ap" ? undefined : input.associationId,
       },
@@ -172,6 +270,7 @@ export const assembliesApi = {
         pollDate: jalaliToEpoch(votingDay),
         eligibilityScope: poll.target?.data.eligibilityScope ?? toEligibilityCode("حقوقی"),
         cardScope: poll.target?.data.cardScope ?? toCardScopeCode("همه"),
+        allowOnlineVoting: poll.allowOnlineVoting !== false,
       },
     });
     const refreshed = await fetchPoll(assemblyId);
@@ -189,6 +288,7 @@ export const assembliesApi = {
         pollDate: poll.pollDate ?? 0,
         eligibilityScope: poll.target?.data.eligibilityScope ?? toEligibilityCode("حقوقی"),
         cardScope: poll.target?.data.cardScope ?? toCardScopeCode("همه"),
+        allowOnlineVoting: poll.allowOnlineVoting !== false,
       },
     });
     const refreshed = await fetchPoll(assemblyId);
@@ -206,6 +306,39 @@ export const assembliesApi = {
         pollDate: poll.pollDate ?? 0,
         eligibilityScope: toEligibilityCode(unit),
         cardScope: poll.target?.data.cardScope ?? toCardScopeCode("همه"),
+        allowOnlineVoting: poll.allowOnlineVoting !== false,
+      },
+    });
+    const refreshed = await fetchPoll(assemblyId);
+    if (!refreshed) throw new Error("مجمعی پیدا نشد");
+    return toAssembly(refreshed);
+  },
+
+  /** One request for a whole table row: title, voting day, واجدین and نوع کارت together. */
+  updateAssemblyFields: async (
+    assemblyId: string,
+    input: {
+      title?: string;
+      votingDay?: string;
+      unit?: Assembly["unit"];
+      cardType?: AssemblyCardType;
+      allowOnlineVoting?: boolean;
+    },
+  ) => {
+    const poll = await fetchPoll(assemblyId);
+    if (!poll) throw new Error("مجمعی پیدا نشد");
+    await commerceHttp(`${pollsBase()}/${assemblyId}/update`, {
+      method: "POST",
+      body: {
+        title: input.title?.trim() ?? poll.title,
+        pollDate: input.votingDay ? jalaliToEpoch(input.votingDay) : (poll.pollDate ?? 0),
+        eligibilityScope: input.unit
+          ? toEligibilityCode(input.unit)
+          : (poll.target?.data.eligibilityScope ?? toEligibilityCode("حقوقی")),
+        cardScope: input.cardType
+          ? toCardScopeCode(input.cardType)
+          : (poll.target?.data.cardScope ?? toCardScopeCode("همه")),
+        allowOnlineVoting: input.allowOnlineVoting ?? (poll.allowOnlineVoting !== false),
       },
     });
     const refreshed = await fetchPoll(assemblyId);
@@ -223,6 +356,7 @@ export const assembliesApi = {
         pollDate: poll.pollDate ?? 0,
         eligibilityScope: poll.target?.data.eligibilityScope ?? toEligibilityCode("حقوقی"),
         cardScope: toCardScopeCode(cardType),
+        allowOnlineVoting: poll.allowOnlineVoting !== false,
       },
     });
     const refreshed = await fetchPoll(assemblyId);

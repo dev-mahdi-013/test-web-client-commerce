@@ -1,4 +1,10 @@
-export type OfficerUnit = "organizations" | "card-issuance";
+export type OfficerUnit =
+  | "organizations"
+  | "card-issuance"
+  /** ChamberPollAgent 0x16 — «مامور اخذ رای اتاق استان» */
+  | "chamber-poll-agent"
+  /** AssociationPollAgent 0x17 — «مامور اخذ رای انجمن» */
+  | "association-poll-agent";
 
 export type Officer = {
   /** Unique per appointment; the same person may be appointed more than once */

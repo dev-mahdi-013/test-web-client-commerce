@@ -1,7 +1,7 @@
 import { env } from "@/config/env";
 import type { Paginated } from "@/shared/types/api";
 import type { MembershipCardData } from "@/shared/types/membership";
-import { createHttpClient } from "./http";
+import { createHttpClient, type DownloadProgressHandler } from "./http";
 
 const messages: Record<string, string> = {
   "authentication error !": "نشست شما منقضی شده است، دوباره وارد شوید",
@@ -63,6 +63,18 @@ const messages: Record<string, string> = {
   "item not matched with survey order item source": "نوع گزینه با منبع دستور هم‌خوانی ندارد",
   "active poll exist for member joined associations":
     "برای انجمن‌های این عضو مجمع فعالی در جریان است",
+  // Poll slip (فیش) endpoints.
+  "access to generate qr verification not allowed in this state":
+    "در وضعیت فعلی صدور فیش مجاز نیست",
+  "this user is not member of target association of poll":
+    "این کاربر عضو انجمن هدف این مجمع نیست",
+  "this user is not eligible for this poll": "این کاربر واجد شرایط رأی در این مجمع نیست",
+  "this user not have commerce card for this poll":
+    "این کاربر کارت بازرگانی مورد نیاز این مجمع را ندارد",
+  "member not found": "عضو پیدا نشد",
+  "this user card has expired": "کارت این کاربر منقضی شده است",
+  // In-person polls (allowOnlineVoting = false) reject member-side voting.
+  "this poll will be held in person": "این مجمع حضوری برگزار می‌شود و رأی آنلاین برای آن فعال نیست",
 };
 
 function translateCommerceMessage(message: string) {
@@ -94,6 +106,11 @@ export const commerceHttp = createHttpClient({
   unwrapEnvelope: true,
   translateMessage: translateCommerceMessage,
 });
+
+/** Fetches a PDF response (e.g. the QR auth slip of a poll member) as a Blob. */
+export function commerceBlob(path: string, onDownloadProgress?: DownloadProgressHandler) {
+  return commerceHttp<Blob>(path, { responseType: "blob", onDownloadProgress });
+}
 
 type ListEnvelope<T> = {
   data: T[];

@@ -107,6 +107,7 @@ export type ApiPoll = {
   title: string;
   stats?: { registeredCount?: number; votersCount?: number };
   status: number;
+  allowOnlineVoting?: boolean;
   target?: ApiPollTarget;
   createdBy?: { type?: string; data?: { _id?: string; name?: string } };
   createdDate?: number;
@@ -190,6 +191,7 @@ export function toAssembly(poll: ApiPoll): Assembly {
     endsAtDate: endIso,
     unit: toAssemblyUnit(poll.target?.data.eligibilityScope),
     cardType: toAssemblyCardType(poll.target?.data.cardScope),
+    allowOnlineVoting: poll.allowOnlineVoting !== false,
     voters: {
       total,
       eligible,

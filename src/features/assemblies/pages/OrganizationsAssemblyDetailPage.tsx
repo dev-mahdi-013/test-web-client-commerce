@@ -1,7 +1,6 @@
 import { Spinner, toast } from "@heroui/react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useParams } from "react-router";
-import { useSessionStore } from "@/features/auth/stores/session.store";
 import { getErrorMessage } from "@/lib/http";
 import { SectionHeading } from "@/shared/components/SectionHeading";
 import { useHeaderActions } from "@/shared/hooks/useHeaderActions";
@@ -20,13 +19,12 @@ import {
 } from "../hooks/useAssemblyMutations";
 import { AddAgendaForm } from "../organizations/components/AddAgendaForm";
 import { AssemblyHeaderActions } from "../organizations/components/AssemblyHeaderActions";
+import { IssueSlipModal } from "../organizations/components/IssueSlipModal";
 import { OrganizationsAgendaCard } from "../organizations/components/OrganizationsAgendaCard";
 
 /** Assembly detail for the organizations (امور تشکل‌ها) role. */
 export function OrganizationsAssemblyDetailPage() {
   const { assemblyId = "" } = useParams();
-  const activeRoleId = useSessionStore((state) => state.activeRoleId);
-  const session = useSessionStore((state) => state.session);
   const assembly = useAssembly(assemblyId || null);
   const detail = assembly.data;
   const updateStatus = useUpdateAssemblyStatus();
@@ -35,6 +33,7 @@ export function OrganizationsAssemblyDetailPage() {
   const removeCandidate = useRemoveAgendaCandidate(assemblyId);
   const updateAgenda = useUpdateAgenda(assemblyId);
   const addCandidate = useAddAgendaCandidate(assemblyId);
+  const [isSlipOpen, setSlipOpen] = useState(false);
 
   const statusBusy = updateStatus.isPending;
 
@@ -43,12 +42,17 @@ export function OrganizationsAssemblyDetailPage() {
 
   const headerActions = useMemo(() => {
     if (!detail) return null;
+    // The service only issues QR auth letters for approved polls that can start voting.
+    const canIssueSlip =
+      isCreatedByCurrentUser &&
+      (detail.status === "published" || detail.status === "running");
     return (
       <AssemblyHeaderActions
         hasAgendas={detail.agendas.length > 0}
         isCreatedByCurrentUser={isCreatedByCurrentUser}
         isPending={statusBusy}
         status={detail.status}
+        onIssueSlip={canIssueSlip ? () => setSlipOpen(true) : undefined}
         onEnd={() => {
           updateStatus.mutate(
             { assemblyId: detail.id, status: "finished" },
@@ -114,12 +118,6 @@ export function OrganizationsAssemblyDetailPage() {
   const canEditAgendaFields = canManageAgenda;
   const canAddAgenda = canManageAgenda;
 
-  console.log(detail, 'dsads', {
-    createdById: detail.createdById,
-    isCreatedByCurrentUser,
-    activeRole: session?.user.roles.find((role) => role.id === activeRoleId),
-  })
-
   return (
     <div className="flex flex-col gap-6 rounded-3xl bg-(--panel-cards) px-4 py-5 sm:px-6 xl:px-10">
       <section aria-label="اطلاعات عمومی مجمع" className="flex flex-col gap-4">
@@ -181,6 +179,12 @@ export function OrganizationsAssemblyDetailPage() {
           ))}
         </div>
       </section>
+
+      <IssueSlipModal
+        assemblyId={detail.id}
+        isOpen={isSlipOpen}
+        onOpenChange={setSlipOpen}
+      />
     </div>
   );
 }

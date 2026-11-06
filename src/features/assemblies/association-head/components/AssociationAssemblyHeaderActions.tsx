@@ -5,6 +5,8 @@ type AssociationAssemblyHeaderActionsProps = {
   status: AssemblyStatus;
   hasAgendas: boolean;
   isPending?: boolean;
+  /** Opens the QR auth letter (فیش) dialog; omitted when the poll has no slips to issue. */
+  onIssueSlip?: () => void;
   onPrimaryAction: () => void;
   onSecondaryAction: () => void;
 };
@@ -17,6 +19,7 @@ export function AssociationAssemblyHeaderActions({
   status,
   hasAgendas,
   isPending,
+  onIssueSlip,
   onPrimaryAction,
   onSecondaryAction,
 }: AssociationAssemblyHeaderActionsProps) {
@@ -28,24 +31,6 @@ export function AssociationAssemblyHeaderActions({
 
   return (
     <div className="flex max-w-[min(100%,42rem)] flex-wrap items-center justify-end gap-1.5 sm:gap-2">
-      <Button
-        className={`${buttonClassName} ${
-          canStartOrSend
-            ? status === "pending"
-              ? "bg-foreground text-white"
-              : "bg-success text-white transition-opacity hover:opacity-90"
-            : "bg-(--field-muted) text-white pointer-events-none"
-        } data-[disabled=true]:bg-(--field-muted) data-[disabled=true]:text-white/80`}
-        isDisabled={!canStartOrSend || isPending}
-        onPress={onPrimaryAction}
-      >
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M10 20C15.5228 20 20 15.5228 20 10C20 4.47715 15.5228 0 10 0C4.47715 0 0 4.47715 0 10C0 15.5228 4.47715 20 10 20ZM8.69349 13.8458L13.4137 11.059C14.1954 10.5974 14.1954 9.40259 13.4137 8.94103L8.69349 6.15419C7.93371 5.70561 7 6.28947 7 7.21316V12.7868C7 13.7105 7.93371 14.2944 8.69349 13.8458Z" fillRule="evenodd" clipRule="evenodd" fill="#F8F8F8"/>
-        </svg>
-        <span className="truncate">
-          {status === "pending" ? "ارسال برای بازبینی" : "شروع مجمع"}
-        </span>
-      </Button>
       <Button
         className={`${buttonClassName} ${
           canEnd
@@ -64,6 +49,33 @@ export function AssociationAssemblyHeaderActions({
           {showEndAction ? "پایان مجمع" : "لغو ارسال برای بازبینی"}
         </span>
       </Button>
+      <Button
+        className={`${buttonClassName} ${
+          canStartOrSend
+            ? status === "pending"
+              ? "bg-foreground text-white"
+              : "bg-success text-white transition-opacity hover:opacity-90"
+            : "bg-(--field-muted) text-white pointer-events-none"
+        } data-[disabled=true]:bg-(--field-muted) data-[disabled=true]:text-white/80`}
+        isDisabled={!canStartOrSend || isPending}
+        onPress={onPrimaryAction}
+      >
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M10 20C15.5228 20 20 15.5228 20 10C20 4.47715 15.5228 0 10 0C4.47715 0 0 4.47715 0 10C0 15.5228 4.47715 20 10 20ZM8.69349 13.8458L13.4137 11.059C14.1954 10.5974 14.1954 9.40259 13.4137 8.94103L8.69349 6.15419C7.93371 5.70561 7 6.28947 7 7.21316V12.7868C7 13.7105 7.93371 14.2944 8.69349 13.8458Z" fillRule="evenodd" clipRule="evenodd" fill="#F8F8F8"/>
+        </svg>
+        <span className="truncate">
+          {status === "pending" ? "ارسال برای بازبینی" : "شروع مجمع"}
+        </span>
+      </Button>
+      {onIssueSlip && (
+        <Button
+          className={`${buttonClassName} bg-foreground text-white transition-opacity hover:opacity-90`}
+          onPress={onIssueSlip}
+        >
+          <img alt="" aria-hidden className="size-4 shrink-0 sm:size-5" src="/icons/payroll-slip.svg" />
+          <span className="truncate">صدور فیش</span>
+        </Button>
+      )}
     </div>
   );
 }

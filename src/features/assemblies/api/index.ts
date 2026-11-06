@@ -10,4 +10,7 @@ export const assemblyKeys = {
     [...assemblyKeys.all, currentCommerceScope(), params] as const,
   detail: (assemblyId: string) =>
     [...assemblyKeys.all, currentCommerceScope(), "detail", assemblyId] as const,
+  /** Members of a poll for the slip (فیش) dialog, keyed by the search keyword. */
+  pollMembers: (assemblyId: string, query: string) =>
+    [...assemblyKeys.all, currentCommerceScope(), "members", assemblyId, query] as const,
 };

@@ -5,7 +5,9 @@
 export const pages = {
   LoginPage: () => import("@/features/auth/pages/LoginPage"),
   ProfilePage: () => import("@/features/profile/pages/ProfilePage"),
+  PollAgentPage: () => import("@/features/profile/pages/PollAgentPage"),
   HrPage: () => import("@/features/hr/pages/HrPage"),
+  OrganizationsHrPage: () => import("@/features/hr/pages/OrganizationsHrPage"),
   MembersPage: () => import("@/features/members/pages/MembersPage"),
   AssociationInfoPage: () => import("@/features/members/pages/AssociationInfoPage"),
   AssociationSecretariesPage: () => import("@/features/association-secretaries/pages/AssociationSecretariesPage"),

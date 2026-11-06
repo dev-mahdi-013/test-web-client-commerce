@@ -25,6 +25,7 @@ const pagesByRole: Record<AppRole, PageKey[]> = {
   "chamber-president": chamberPages,
   other: chamberPages,
   organizations: [
+    "OrganizationsHrPage",
     "MembersPage",
     "AssociationsPage",
     "OrganizationsAssembliesPage",
@@ -35,6 +36,7 @@ const pagesByRole: Record<AppRole, PageKey[]> = {
   "association-secretary": associationPages,
   "card-issuance": ["UnionMembersPage"],
   user: ["UserAssembliesPage", "UserAssemblyDetailPage"],
+  "poll-agent": ["PollAgentPage"],
 };
 
 /**

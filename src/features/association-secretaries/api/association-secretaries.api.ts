@@ -27,11 +27,11 @@ export const associationSecretariesApi = {
   /** Full appointment history, oldest and current secretaries alike. */
   list: async () => (await commerceHttp<ApiAgent[]>(`${AGENTS_BASE}/history`)).map(toSecretary),
 
-  add: async ({ memberId, memberRoleId }: AddSecretaryPayload) =>
+  add: async ({ fullName, phone }: AddSecretaryPayload) =>
     toSecretary(
       await commerceHttp<ApiAgent>(`${AGENTS_BASE}/add`, {
         method: "POST",
-        body: { memberId, memberRoleId },
+        body: { name: fullName, phone },
       }),
     ),
 

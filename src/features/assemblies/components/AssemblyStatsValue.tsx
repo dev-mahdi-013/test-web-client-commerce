@@ -32,7 +32,7 @@ export function AssemblyStatsValue({ assembly }: AssemblyStatsValueProps) {
 /** Shared column header for the stats cell. */
 export function AssemblyStatsColumnHeader({ className }: { className?: string }) {
   return (
-    <span className={className ?? "inline-flex w-full flex-col items-start gap-0.5 pr-[28px] leading-tight"}>
+    <span className={className ?? "inline-flex w-full flex-col items-center gap-0.5 leading-tight"}>
       <span className="text-xs font-medium text-foreground">آمار</span>
       <span className="text-micro font-normal text-muted" dir="ltr">
         کل | نوع | حاضرین | رأی دهندگان

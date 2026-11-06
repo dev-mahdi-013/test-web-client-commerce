@@ -32,6 +32,7 @@ export function useAddAssemblyForm({ onSuccess }: UseAddAssemblyFormOptions) {
   const [associationId, setAssociationId] = useState("");
   const [unit, setUnit] = useState<AssemblyUnit>("حقوقی");
   const [cardType, setCardType] = useState<AssemblyCardType>("همه");
+  const [allowOnlineVoting, setAllowOnlineVoting] = useState(true);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   useEffect(() => {
@@ -50,6 +51,7 @@ export function useAddAssemblyForm({ onSuccess }: UseAddAssemblyFormOptions) {
     setAssociationId(options[0]?.value ?? "");
     setUnit("حقوقی");
     setCardType("همه");
+    setAllowOnlineVoting(true);
     setIsSubmitted(false);
   };
 
@@ -63,6 +65,7 @@ export function useAddAssemblyForm({ onSuccess }: UseAddAssemblyFormOptions) {
       associationId,
       unit,
       cardType,
+      allowOnlineVoting,
     };
 
     createAssembly.mutate(input, {
@@ -86,6 +89,8 @@ export function useAddAssemblyForm({ onSuccess }: UseAddAssemblyFormOptions) {
     setUnit,
     cardType,
     setCardType,
+    allowOnlineVoting,
+    setAllowOnlineVoting,
     titleError: isSubmitted && !isTitleValid ? titleErrorMessage(title) : null,
     dateError: isSubmitted && !isDateValid ? "روز مجمع را انتخاب کنید" : null,
     associationError: isSubmitted && !isAssociationValid ? "تارگت را انتخاب کنید" : null,

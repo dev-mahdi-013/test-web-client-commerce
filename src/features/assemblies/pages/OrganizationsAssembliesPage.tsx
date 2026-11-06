@@ -65,6 +65,7 @@ export function OrganizationsAssembliesPage() {
         <OrganizationsAssembliesTable
           assemblies={items}
           isLoading={assemblies.isPending}
+          showEditBackdrop
           startIndex={startIndex}
         />
 

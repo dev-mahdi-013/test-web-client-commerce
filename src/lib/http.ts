@@ -21,7 +21,14 @@ type RequestOptions = {
   signal?: AbortSignal;
   /** Resolve with the whole envelope (e.g. to read `meta`) instead of only its `data` */
   envelope?: boolean;
+  /** `blob` is used for file downloads (e.g. the poll QR auth slip PDF); the body is returned as-is. */
+  responseType?: "json" | "blob";
+  /** Reports download progress; `total` is missing when the server does not send a length. */
+  onDownloadProgress?: DownloadProgressHandler;
 };
+
+export type DownloadProgress = { loaded: number; total?: number };
+export type DownloadProgressHandler = (progress: DownloadProgress) => void;
 
 type HttpClientOptions = {
   baseUrl: string;
@@ -34,6 +41,8 @@ type HttpClientOptions = {
 const FALLBACK_MESSAGE = "خطایی در ارتباط با سرور رخ داد";
 const NETWORK_ERROR_MESSAGE = "ارتباط با سرور برقرار نشد، اتصال اینترنت را بررسی کنید";
 const REQUEST_TIMEOUT_MS = 3_000;
+// Files such as the slip PDF are much larger than JSON responses and need more time.
+const BLOB_TIMEOUT_MS = 60_000;
 
 type SessionExpiredHandler = (error: ApiError) => void;
 let onSessionExpired: SessionExpiredHandler = () => {};
@@ -95,12 +104,40 @@ export function createHttpClient({ baseUrl, authorization, unwrapEnvelope, trans
     return error;
   };
 
+  /** A blob request still receives its errors as JSON, so read that message before translating. */
+  const errorBodyOf = async (data: unknown) => {
+    if (typeof Blob !== "undefined" && data instanceof Blob) {
+      try {
+        return JSON.parse(await data.text()) as unknown;
+      } catch {
+        return data;
+      }
+    }
+    return data;
+  };
+
   return async function request<T>(
     path: string,
-    { method = "GET", body, params, headers, signal, envelope }: RequestOptions = {},
+    { method = "GET", body, params, headers, signal, envelope, responseType, onDownloadProgress }: RequestOptions = {},
   ) {
     try {
-      const { data, status } = await instance.request<unknown>({ url: path, method, data: body, params, headers, signal });
+      const { data, status } = await instance.request<unknown>({
+        url: path,
+        method,
+        data: body,
+        params,
+        headers,
+        signal,
+        responseType,
+        timeout: responseType === "blob" ? BLOB_TIMEOUT_MS : undefined,
+        onDownloadProgress: onDownloadProgress
+          ? (event) => onDownloadProgress({ loaded: event.loaded, total: event.total })
+          : undefined,
+      });
+
+      // A file (PDF) response is not a JSON envelope and is too large to keep in the backend log.
+      if (responseType === "blob") return data as T;
+
       recordBackendResponse(path, status, data);
 
       if (unwrapEnvelope && data && typeof data === "object") {
@@ -110,7 +147,9 @@ export function createHttpClient({ baseUrl, authorization, unwrapEnvelope, trans
       return data as T;
     } catch (error) {
       if (error instanceof ApiError) throw error;
-      if (axios.isAxiosError(error) && error.response) throw toApiError(error.response.status, error.response.data);
+      if (axios.isAxiosError(error) && error.response) {
+        throw toApiError(error.response.status, await errorBodyOf(error.response.data));
+      }
       throw new ApiError(NETWORK_ERROR_MESSAGE, 0);
     }
   };

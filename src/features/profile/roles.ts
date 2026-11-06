@@ -9,6 +9,8 @@ const BackendRoleType = {
   AssociationPresident: 0x13,
   AssociationSecretary: 0x14,
   ChamberMember: 0x15,
+  ChamberPollAgent: 0x16,
+  AssociationPollAgent: 0x17,
 } as const;
 
 const backendRoleDefinitions: Partial<Record<number, { appRole: AppRole; title: string }>> = {
@@ -24,6 +26,9 @@ const backendRoleDefinitions: Partial<Record<number, { appRole: AppRole; title: 
     title: "دبیر انجمن",
   },
   [BackendRoleType.ChamberMember]: { appRole: "user", title: "عضو اتاق بازرگانی" },
+  // Poll agents have no web workspace; they land on a notice telling them to use the Commerce Assistant app.
+  [BackendRoleType.ChamberPollAgent]: { appRole: "poll-agent", title: "مامور اخذ رای اتاق استان" },
+  [BackendRoleType.AssociationPollAgent]: { appRole: "poll-agent", title: "مامور اخذ رای انجمن" },
 };
 
 const ROLE_TYPE_BY_BACKEND_ID: Record<string, number> = {
@@ -44,6 +49,7 @@ export type AppRole =
   | "association-info"
   | "association-secretary"
   | "user"
+  | "poll-agent"
   | "other";
 
 const CHAMBER_PRESIDENT = roleTitleKey("رئیس اتاق استان");
@@ -59,6 +65,8 @@ const ASSOCIATION_INFO = roleTitleKey("رئیس انجمن");
 const ASSOCIATION_SECRETARY = roleTitleKey("دبیر تشکل استانی");
 const ASSOCIATION_SECRETARY_SHORT = roleTitleKey("دبیر انجمن");
 const USER = roleTitleKey("کاربر");
+const POLL_AGENT_CHAMBER = roleTitleKey("مامور اخذ رای اتاق استان");
+const POLL_AGENT_ASSOCIATION = roleTitleKey("مامور اخذ رای انجمن");
 
 function backendRoleDefinition(id: string | undefined) {
   const normalizedId = id?.trim().toLowerCase();
@@ -101,6 +109,7 @@ export function appRoleOf(role: Pick<UserRole, "id" | "roleTypeId" | "title"> | 
     return "association-secretary";
   }
   if (title === USER) return "user";
+  if (title === POLL_AGENT_CHAMBER || title === POLL_AGENT_ASSOCIATION) return "poll-agent";
   return "other";
 }
 
@@ -120,6 +129,8 @@ export function homePathFor(role: AppRole) {
       return "/association-information";
     case "user":
       return "/user/assemblies";
+    case "poll-agent":
+      return "/poll-agent";
     default:
       return "/hr";
   }

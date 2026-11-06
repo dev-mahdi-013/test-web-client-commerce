@@ -13,6 +13,8 @@ type InlineDatePickerProps = {
   value: string;
   onChange: (value: string) => void;
   autoOpen?: boolean;
+  /** Set false when the surrounding row already blurs the page, so the calendar adds no second backdrop. */
+  withBackdrop?: boolean;
   onCancel?: () => void;
 };
 
@@ -25,7 +27,14 @@ function partsOf(value: string): JalaliParts {
 }
 
 /** The compact date chip of the table's edit mode, opening the calendar popover on click. */
-export function InlineDatePicker({ label, value, onChange, autoOpen = false, onCancel }: InlineDatePickerProps) {
+export function InlineDatePicker({
+  label,
+  value,
+  onChange,
+  autoOpen = false,
+  withBackdrop = true,
+  onCancel,
+}: InlineDatePickerProps) {
   const triggerRef = useRef<HTMLButtonElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const [isOpen, setOpen] = useState(autoOpen);
@@ -46,7 +55,7 @@ export function InlineDatePicker({ label, value, onChange, autoOpen = false, onC
 
   return (
     <>
-      <OpaqueBackdrop isOpen={isOpen} />
+      {withBackdrop && <OpaqueBackdrop isOpen={isOpen} />}
       <Popover isOpen={isOpen} onOpenChange={handleOpenChange}>
         <button
           ref={triggerRef}
