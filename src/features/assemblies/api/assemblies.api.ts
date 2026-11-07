@@ -57,9 +57,30 @@ type ApiPollMemberRow = {
   phone?: string;
   memberPhone?: string;
   cardNum?: string;
-  memberCard?: { cardNum?: string };
-  card?: { _id?: string; cardNum?: string; cardDetails?: { cardNum?: string } };
-  cards?: Array<{ _id?: string; cardNum?: string; cardDetails?: { cardNum?: string } }>;
+  cardNo?: string;
+  cardNumber?: string;
+  cardDetails?: { cardNum?: string; cardNo?: string; cardNumber?: string };
+  memberCard?: {
+    cardNum?: string;
+    cardNo?: string;
+    cardNumber?: string;
+    cardDetails?: { cardNum?: string; cardNo?: string; cardNumber?: string };
+  };
+  card?: {
+    _id?: string;
+    cardNum?: string;
+    cardNo?: string;
+    cardNumber?: string;
+    cardDetails?: { cardNum?: string; cardNo?: string; cardNumber?: string };
+  };
+  cards?: Array<{
+    _id?: string;
+    cardNum?: string;
+    cardNo?: string;
+    cardNumber?: string;
+    cardDetails?: { cardNum?: string; cardNo?: string; cardNumber?: string };
+  }>;
+  data?: ApiPollMemberRow;
 };
 
 function firstText(...values: unknown[]) {
@@ -74,7 +95,20 @@ function nextCursorOf(payload: unknown): string | null {
   if (!payload || typeof payload !== "object" || Array.isArray(payload)) return null;
   const record = payload as Record<string, unknown>;
   const meta = record.meta && typeof record.meta === "object" ? (record.meta as Record<string, unknown>) : {};
-  return firstText(record.nextCursor, record.next_cursor, meta.nextCursor, meta.next_cursor);
+  const pagination =
+    record.pagination && typeof record.pagination === "object"
+      ? (record.pagination as Record<string, unknown>)
+      : {};
+  const directCursor = firstText(
+    record.nextCursor,
+    record.next_cursor,
+    meta.nextCursor,
+    meta.next_cursor,
+    pagination.nextCursor,
+    pagination.next_cursor,
+  );
+  if (directCursor) return directCursor;
+  return record.data && typeof record.data === "object" ? nextCursorOf(record.data) : null;
 }
 
 export type PollMembersPage = { items: PollMember[]; nextCursor: string | null };
@@ -87,15 +121,18 @@ function pollMemberRows(payload: unknown): ApiPollMemberRow[] {
   for (const key of ["items", "members", "list", "rows", "data"]) {
     const value = record[key];
     if (Array.isArray(value)) return value as ApiPollMemberRow[];
+    if (value && typeof value === "object") return pollMemberRows(value);
   }
   return [];
 }
 
-function toPollMember(row: ApiPollMemberRow): PollMember | null {
+function toPollMember(source: ApiPollMemberRow): PollMember | null {
+  const row = source.data ?? source;
   const memberId = firstText(row.memberId, row._id, row.id);
   // The QR auth endpoint needs the card role id next to the member id.
   const memberRoleId = firstText(row.memberRoleId, row.roleId, row.card?._id, row.cards?.[0]?._id);
   if (!memberId || !memberRoleId) return null;
+  const memberCard = row.cards?.find((card) => card._id === memberRoleId) ?? row.cards?.[0];
   return {
     memberId,
     memberRoleId,
@@ -103,11 +140,29 @@ function toPollMember(row: ApiPollMemberRow): PollMember | null {
     phone: firstText(row.phone, row.memberPhone),
     cardNo: firstText(
       row.cardNum,
+      row.cardNo,
+      row.cardNumber,
+      row.cardDetails?.cardNum,
+      row.cardDetails?.cardNo,
+      row.cardDetails?.cardNumber,
       row.memberCard?.cardNum,
+      row.memberCard?.cardNo,
+      row.memberCard?.cardNumber,
+      row.memberCard?.cardDetails?.cardNum,
+      row.memberCard?.cardDetails?.cardNo,
+      row.memberCard?.cardDetails?.cardNumber,
       row.card?.cardDetails?.cardNum,
+      row.card?.cardDetails?.cardNo,
+      row.card?.cardDetails?.cardNumber,
       row.card?.cardNum,
-      row.cards?.[0]?.cardDetails?.cardNum,
-      row.cards?.[0]?.cardNum,
+      row.card?.cardNo,
+      row.card?.cardNumber,
+      memberCard?.cardDetails?.cardNum,
+      memberCard?.cardDetails?.cardNo,
+      memberCard?.cardDetails?.cardNumber,
+      memberCard?.cardNum,
+      memberCard?.cardNo,
+      memberCard?.cardNumber,
     ),
   };
 }
@@ -227,7 +282,7 @@ export const assembliesApi = {
         pollDate: jalaliToEpoch(input.votingDay),
         eligibilityScope: toEligibilityCode(input.unit),
         cardScope: toCardScopeCode(input.cardType ?? "همه"),
-        allowOnlineVoting: input.allowOnlineVoting ?? true,
+        allowOnlineVoting: input.allowOnlineVoting ?? false,
         // The association-president endpoint is bound to its own association.
         associationId: scope === "ap" ? undefined : input.associationId,
       },

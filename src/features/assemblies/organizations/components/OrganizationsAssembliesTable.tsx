@@ -2,7 +2,7 @@ import { EyeIcon } from "@solar-icons/react/linear/eye";
 import { CheckIcon } from "@solar-icons/react/linear/check";
 import { CloseIcon } from "@solar-icons/react/linear/close";
 import { PenIcon } from "@solar-icons/react/linear/pen";
-import { Spinner, Table, toast } from "@heroui/react";
+import { Checkbox, Spinner, Table, toast } from "@heroui/react";
 import type { MouseEvent, PointerEvent as ReactPointerEvent, ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
@@ -292,16 +292,24 @@ export function OrganizationsAssembliesTable({
                       </Table.Cell>
                       <Table.Cell className={cn(cellClassName, isEditing && "text-center")}>
                         {isEditing ? (
-                          // Native checkbox: it renders as a square checkbox and its checked state follows the row value 1:1.
-                          <label className="inline-flex cursor-pointer items-center" onPointerDown={stopRowPress}>
-                            <input
-                              type="checkbox"
+                          <div
+                            className="inline-flex justify-center"
+                            onClick={stopRowPress}
+                            onKeyDown={stopRowPress}
+                            onPointerDown={stopRowPress}
+                          >
+                            <Checkbox
                               aria-label="اجازه رأی‌گیری آنلاین"
-                              className="size-4 cursor-pointer accent-[var(--accent)]"
-                              checked={draftAllowOnlineVoting}
-                              onChange={(event) => setDraftAllowOnlineVoting(event.target.checked)}
-                            />
-                          </label>
+                              isSelected={draftAllowOnlineVoting}
+                              onChange={setDraftAllowOnlineVoting}
+                            >
+                              <Checkbox.Content aria-label="اجازه رأی‌گیری آنلاین">
+                                <Checkbox.Control className="!rounded-[4px]">
+                                  <Checkbox.Indicator />
+                                </Checkbox.Control>
+                              </Checkbox.Content>
+                            </Checkbox>
+                          </div>
                         ) : assembly.allowOnlineVoting ? (
                           "غیرحضوری"
                         ) : (

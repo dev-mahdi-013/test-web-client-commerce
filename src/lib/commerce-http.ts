@@ -107,9 +107,13 @@ export const commerceHttp = createHttpClient({
   translateMessage: translateCommerceMessage,
 });
 
-/** Fetches a PDF response (e.g. the QR auth slip of a poll member) as a Blob. */
+/** Fetches a PDF response and its suggested filename (e.g. the QR auth slip of a poll member). */
 export function commerceBlob(path: string, onDownloadProgress?: DownloadProgressHandler) {
-  return commerceHttp<Blob>(path, { responseType: "blob", onDownloadProgress });
+  return commerceHttp<{ blob: Blob; contentDisposition: string | null }>(path, {
+    responseType: "blob",
+    includeContentDisposition: true,
+    onDownloadProgress,
+  });
 }
 
 type ListEnvelope<T> = {

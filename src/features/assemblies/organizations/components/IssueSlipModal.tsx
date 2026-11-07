@@ -19,11 +19,29 @@ const cellClassName =
 
 type SlipRow = PollMember & { id: string };
 
-function saveSlip(blob: Blob, memberName: string) {
+function filenameFromContentDisposition(header: string | null, fallbackName: string) {
+  if (!header) return `فیش ${fallbackName}`;
+
+  const encodedFilename = /filename\*\s*=\s*(?:[^']*'[^']*')?([^;]+)/i.exec(header)?.[1]
+    ?.trim()
+    .replace(/^"|"$/g, "");
+  if (encodedFilename) {
+    try {
+      return decodeURIComponent(encodedFilename);
+    } catch {
+      return encodedFilename;
+    }
+  }
+
+  const filename = /filename\s*=\s*(?:"([^"]+)"|([^;]+))/i.exec(header);
+  return (filename?.[1] ?? filename?.[2]?.trim()) || `فیش ${fallbackName}`;
+}
+
+function saveSlip(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = `فیش ${memberName}`.replace(/[\\/:*?"<>|]/g, "-");
+  link.download = filename.replace(/[\\/:*?"<>|]/g, "-");
   document.body.appendChild(link);
   link.click();
   link.remove();
@@ -93,7 +111,8 @@ export function IssueSlipModal({
           setDownloadPercent(total ? Math.min(100, Math.round((loaded / total) * 100)) : null),
       },
       {
-        onSuccess: (blob) => saveSlip(blob, member.name),
+        onSuccess: ({ blob, contentDisposition }) =>
+          saveSlip(blob, filenameFromContentDisposition(contentDisposition, member.name)),
         onError: (downloadError) =>
           toast.danger(getErrorMessage(downloadError, "دریافت فیش انجام نشد")),
         onSettled: () => {

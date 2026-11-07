@@ -1,4 +1,4 @@
-import { Button, FieldError, Form, Input, Label, Modal, TextField } from "@heroui/react";
+import { Button, Checkbox, FieldError, Form, Input, Label, Modal, TextField } from "@heroui/react";
 import { JalaliDateField } from "@/shared/components/JalaliDateField";
 import { SelectField } from "@/shared/components/SelectField";
 import { ASSEMBLY_TITLE_MAX_CHARS, assemblyCardTypeOptions, assemblyCreationUnitOptions } from "../../config";
@@ -76,16 +76,22 @@ export function AddAssociationAssemblyModal({ isOpen, onOpenChange }: AddAssocia
                   />
                   {form.dateError && <p className="text-xs text-danger">{form.dateError}</p>}
                 </div>
-                <label className="flex min-w-0 basis-0 flex-1 cursor-pointer items-center justify-between gap-2 pb-2" >
-                  <input
-                    type="checkbox"
-                    className="size-4 cursor-pointer accent-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-50"
-                    checked={form.allowOnlineVoting}
-                    disabled={form.isSubmitting}
-                    onChange={(event) => form.setAllowOnlineVoting(event.target.checked)}
-                  />
-                  <span className="text-sm text-foreground" dir="rtl">اجازه رأی‌گیری آنلاین</span>
-                </label>
+                <Checkbox
+                  className="!flex !flex-row basis-0 flex-1 items-center justify-between gap-2 pb-2"
+                  dir="ltr"
+                  isDisabled={form.isSubmitting}
+                  isSelected={form.allowOnlineVoting}
+                  onChange={form.setAllowOnlineVoting}
+                >
+                  <Checkbox.Content className="!flex !flex-row flex-1 items-center justify-between gap-2 !text-right">
+                    <Checkbox.Control className="!rounded-[4px]">
+                      <Checkbox.Indicator />
+                    </Checkbox.Control>
+                    <Label className="cursor-pointer text-sm text-foreground" dir="rtl">
+                      اجازه رأی‌گیری آنلاین
+                    </Label>
+                  </Checkbox.Content>
+                </Checkbox>
               </div>
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

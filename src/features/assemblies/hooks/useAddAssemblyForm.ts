@@ -30,9 +30,9 @@ export function useAddAssemblyForm({ onSuccess }: UseAddAssemblyFormOptions) {
   const [title, setTitle] = useState("");
   const [votingDay, setVotingDay] = useState(today);
   const [associationId, setAssociationId] = useState("");
-  const [unit, setUnit] = useState<AssemblyUnit>("حقوقی");
+  const [unit, setUnit] = useState<AssemblyUnit>("همه");
   const [cardType, setCardType] = useState<AssemblyCardType>("همه");
-  const [allowOnlineVoting, setAllowOnlineVoting] = useState(true);
+  const [allowOnlineVoting, setAllowOnlineVoting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   useEffect(() => {
@@ -49,9 +49,9 @@ export function useAddAssemblyForm({ onSuccess }: UseAddAssemblyFormOptions) {
     setTitle("");
     setVotingDay(today());
     setAssociationId(options[0]?.value ?? "");
-    setUnit("حقوقی");
+    setUnit("همه");
     setCardType("همه");
-    setAllowOnlineVoting(true);
+    setAllowOnlineVoting(false);
     setIsSubmitted(false);
   };
 

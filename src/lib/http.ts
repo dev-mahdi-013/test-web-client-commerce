@@ -23,6 +23,8 @@ type RequestOptions = {
   envelope?: boolean;
   /** `blob` is used for file downloads (e.g. the poll QR auth slip PDF); the body is returned as-is. */
   responseType?: "json" | "blob";
+  /** Include the response Content-Disposition header with a blob download. */
+  includeContentDisposition?: boolean;
   /** Reports download progress; `total` is missing when the server does not send a length. */
   onDownloadProgress?: DownloadProgressHandler;
 };
@@ -118,10 +120,20 @@ export function createHttpClient({ baseUrl, authorization, unwrapEnvelope, trans
 
   return async function request<T>(
     path: string,
-    { method = "GET", body, params, headers, signal, envelope, responseType, onDownloadProgress }: RequestOptions = {},
+    {
+      method = "GET",
+      body,
+      params,
+      headers,
+      signal,
+      envelope,
+      responseType,
+      includeContentDisposition,
+      onDownloadProgress,
+    }: RequestOptions = {},
   ) {
     try {
-      const { data, status } = await instance.request<unknown>({
+      const { data, status, headers: responseHeaders } = await instance.request<unknown>({
         url: path,
         method,
         data: body,
@@ -136,7 +148,16 @@ export function createHttpClient({ baseUrl, authorization, unwrapEnvelope, trans
       });
 
       // A file (PDF) response is not a JSON envelope and is too large to keep in the backend log.
-      if (responseType === "blob") return data as T;
+      if (responseType === "blob") {
+        if (includeContentDisposition) {
+          const value = responseHeaders["content-disposition"];
+          return {
+            blob: data as Blob,
+            contentDisposition: typeof value === "string" ? value : null,
+          } as T;
+        }
+        return data as T;
+      }
 
       recordBackendResponse(path, status, data);
 
