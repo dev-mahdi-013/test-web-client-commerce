@@ -3,7 +3,7 @@ import { CheckIcon } from "@solar-icons/react/linear/check";
 import { CloseIcon } from "@solar-icons/react/linear/close";
 import { PenIcon } from "@solar-icons/react/linear/pen";
 import { Checkbox, Spinner, Table, toast } from "@heroui/react";
-import type { MouseEvent, PointerEvent as ReactPointerEvent, ReactNode } from "react";
+import type { ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 import { InlineDatePicker } from "@/features/associations/components/InlineDatePicker";
@@ -48,7 +48,7 @@ const editorInputClassName =
 const actionButtonClassName =
   "inline-flex size-8 min-w-8 shrink-0 cursor-pointer items-center justify-center rounded-full text-white";
 
-function stopRowPress(event: MouseEvent | ReactPointerEvent) {
+function stopRowPress(event: { stopPropagation: () => void }) {
   event.stopPropagation();
 }
 
