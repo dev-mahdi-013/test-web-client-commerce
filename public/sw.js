@@ -4,7 +4,7 @@
 // - Cross-origin requests (accounts/commerce APIs) are never intercepted,
 //   so auth, profile, card and voting data are always fetched live.
 
-const VERSION = "hodhod-v2";
+const VERSION = "hodhod-v3";
 const STATIC_CACHE = `${VERSION}-static`;
 const PAGE_CACHE = `${VERSION}-pages`;
 const OFFLINE_URL = "/offline.html";
@@ -12,7 +12,7 @@ const PRECACHE_URLS = [
   OFFLINE_URL,
   "/favicon.svg",
   "/icons/pwa-icon.svg",
-  "/icons/apple-touch-icon.png",
+  "/icons/apple-touch-icon.png?v=3",
   "/icons/icon-maskable.svg",
   "/manifest.webmanifest",
 ];
