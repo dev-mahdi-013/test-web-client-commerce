@@ -36,8 +36,6 @@ type OrganizationsAssembliesTableProps = {
   showDelete?: boolean;
   /** Hide the edit pencils on rows whose توسط is the chamber (association head/secretary only). */
   hideChamberPencils?: boolean;
-  /** Blur the rest of the page while a row is edited (focus mode). Off unless a page opts in. */
-  showEditBackdrop?: boolean;
 };
 
 const MIN_TITLE_LENGTH = 3;
@@ -91,7 +89,6 @@ export function OrganizationsAssembliesTable({
   detailBasePath = "/organizations/assemblies",
   showDelete = true,
   hideChamberPencils = false,
-  showEditBackdrop = false,
 }: OrganizationsAssembliesTableProps) {
   const updateFields = useUpdateAssemblyFields();
   const isOwner = useAssemblyOwnerCheck();
@@ -179,20 +176,7 @@ export function OrganizationsAssembliesTable({
 
   return (
     <>
-      {/* Optional focus mode: everything except the row being edited goes behind a blur. */}
-      {showEditBackdrop && editingId !== null && (
-        <div
-          aria-hidden
-          className="animate-fade-in pointer-events-none fixed inset-0 z-[calc(var(--z-index-overlay)-1)] bg-black/60 backdrop-blur-md"
-        />
-      )}
-      {/* The card sits above the blur while editing, so its vertical/horizontal scrollbars stay sharp and draggable. */}
-      <div
-        className={cn(
-          "flex w-full max-w-full flex-1 flex-col overflow-hidden rounded-[20px] bg-white",
-          showEditBackdrop && editingId !== null && "relative z-[var(--z-index-overlay)]",
-        )}
-      >
+      <div className="flex w-full max-w-full flex-1 flex-col overflow-hidden rounded-[20px] bg-white">
         <Table className="relative flex w-full flex-1 flex-col overflow-hidden bg-transparent p-0">
           <Table.ScrollContainer className="absolute inset-0 overflow-auto">
             <Table.Content aria-label="لیست مجامع" className="w-[1400px] bg-transparent">
@@ -235,16 +219,6 @@ export function OrganizationsAssembliesTable({
                   return (
                     <Table.Row
                       ref={isEditing ? editingRowRef : undefined}
-                      className={cn(
-                        // Focus mode keeps the edited row and the table scrollbars sharp; other rows fade out.
-                        showEditBackdrop &&
-                          editingId !== null &&
-                          !isEditing &&
-                          "[&>td]:opacity-40 [&>td]:blur-[1.5px]",
-                        showEditBackdrop &&
-                          isEditing &&
-                          "relative z-[var(--z-index-overlay)] [&>*]:bg-white",
-                      )}
                       id={assembly.id}
                     >
                       <Table.Cell className={`${cellClassName} py-4`}>
@@ -328,7 +302,6 @@ export function OrganizationsAssembliesTable({
                             <InlineDatePicker
                               label="روز مجمع"
                               value={draftNewsDate}
-                              withBackdrop={!showEditBackdrop}
                               onChange={setDraftNewsDate}
                             />
                           </div>
