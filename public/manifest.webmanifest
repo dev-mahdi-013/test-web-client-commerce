@@ -12,7 +12,6 @@
   "theme_color": "#0485f7",
   "icons": [
     { "src": "/icons/pwa-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
-    { "src": "/icons/apple-touch-icon.png?v=3", "sizes": "180x180", "type": "image/png", "purpose": "any" },
-    { "src": "/icons/icon-maskable.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+    { "src": "/icons/apple-touch-icon.png?v=5", "sizes": "180x180", "type": "image/png", "purpose": "any" }
   ]
 }
