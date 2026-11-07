@@ -147,14 +147,14 @@ export function IssueSlipModal({
               onChange={setQuery}
             />
 
-            <div
-              ref={scrollRef}
-              className="flex max-h-[420px] min-h-[220px] flex-col overflow-y-auto rounded-[20px] bg-white"
-            >
+            <div className="flex flex-col rounded-[20px] bg-white">
               <Table className="bg-transparent p-0" variant="secondary">
-                <Table.ScrollContainer className="overflow-auto">
+                <Table.ScrollContainer
+                  ref={scrollRef}
+                  className="max-h-[420px] min-h-[220px] overflow-auto"
+                >
                   <Table.Content aria-label="اعضای مجمع" className="min-w-[520px]">
-                    <Table.Header className="bg-(--field-muted) rounded-full">
+                    <Table.Header className="sticky top-0 z-10 bg-(--field-muted) rounded-full">
                       <Table.Column isRowHeader className={headerClassName}>
                         نام و نام خانوادگی
                       </Table.Column>
@@ -201,14 +201,14 @@ export function IssueSlipModal({
                       )}
                     </Table.Body>
                   </Table.Content>
+                  {isFetchingNextPage && (
+                    <div className="flex h-12 shrink-0 items-center justify-center">
+                      <Spinner size="sm" />
+                    </div>
+                  )}
+                  <div ref={sentinelRef} aria-hidden className="h-px shrink-0" />
                 </Table.ScrollContainer>
               </Table>
-              {isFetchingNextPage && (
-                <div className="flex h-12 shrink-0 items-center justify-center">
-                  <Spinner size="sm" />
-                </div>
-              )}
-              <div ref={sentinelRef} aria-hidden className="h-px shrink-0" />
             </div>
 
           </Modal.Body>
