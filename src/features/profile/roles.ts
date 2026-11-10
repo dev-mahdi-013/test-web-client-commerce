@@ -120,7 +120,7 @@ export function homePathFor(role: AppRole) {
     case "card-issuance":
       return "/union-members";
     case "organizations":
-      return "/members";
+      return "/organizations/hr";
     case "association-head":
       return "/hr-association";
     case "association-info":

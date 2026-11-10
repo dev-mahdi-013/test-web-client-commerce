@@ -18,7 +18,7 @@ export function SearchField({
   value,
   onChange,
   className,
-  placeholder = "جست و جو",
+  placeholder = "جستجو",
   autoFocus,
   errorMessage,
   isMuted = false,

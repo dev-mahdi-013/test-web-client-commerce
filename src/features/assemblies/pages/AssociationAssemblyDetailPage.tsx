@@ -140,7 +140,6 @@ export function AssociationAssemblyDetailPage() {
           <>
             <h3 className="text-right text-sm font-medium text-foreground">افزودن دستور</h3>
             <AddAgendaForm
-              associationId={detail.associationId}
               assemblyUnit={detail.unit}
               isPending={addAgenda.isPending}
               onSubmit={(input) => {

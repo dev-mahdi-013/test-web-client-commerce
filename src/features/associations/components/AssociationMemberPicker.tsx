@@ -84,7 +84,7 @@ export function AssociationMemberPicker({ onAdd, isAdding = false }: Association
         className="w-full"
         isMuted
         rounded="xl"
-        placeholder="جست و جو در نام، تلفن یا شماره کارت"
+        placeholder="جستجو در نام، تلفن یا شماره کارت"
         value={query}
         onChange={setQuery}
       />

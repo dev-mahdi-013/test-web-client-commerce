@@ -136,7 +136,7 @@ export function AssociationsPage() {
           <SearchField
             className="mt-3 w-full"
             errorMessage={memberSearchError}
-            placeholder="جست و جو در نام، تلفن یا شماره کارت"
+            placeholder="جستجو در نام، تلفن یا شماره کارت"
             value={memberQuery}
             onChange={setMemberQuery}
           />

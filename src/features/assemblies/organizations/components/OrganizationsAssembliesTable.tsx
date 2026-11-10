@@ -187,7 +187,7 @@ export function OrganizationsAssembliesTable({
                 <Table.Column className={headerCellClassName}>وضعیت</Table.Column>
                 <Table.Column className={headerCellClassName}>تارگت</Table.Column>
                 <Table.Column className={headerCellClassName}>نوع کارت</Table.Column>
-                <Table.Column className={headerCellClassName}>رأی‌گیری آنلاین</Table.Column>
+                <Table.Column className={headerCellClassName}>رأی‌ از پنل کاربری</Table.Column>
                 <Table.Column className={headerCellClassName}>توسط</Table.Column>
                 <Table.Column className={headerCellClassName}>تاریخ ثبت</Table.Column>
                 <Table.Column className={headerCellClassName}>روز مجمع</Table.Column>
@@ -273,21 +273,21 @@ export function OrganizationsAssembliesTable({
                             onPointerDown={stopRowPress}
                           >
                             <Checkbox
-                              aria-label="اجازه رأی‌گیری آنلاین"
+                              aria-label="اجازه رأی‌دادن از پنل کاربری"
                               isSelected={draftAllowOnlineVoting}
                               onChange={setDraftAllowOnlineVoting}
                             >
-                              <Checkbox.Content aria-label="اجازه رأی‌گیری آنلاین">
-                                <Checkbox.Control className="!rounded-[4px]">
+                              <Checkbox.Content aria-label="اجازه رأی‌دادن از پنل کاربری">
+                                <Checkbox.Control className="bg-background-secondary">
                                   <Checkbox.Indicator />
                                 </Checkbox.Control>
                               </Checkbox.Content>
                             </Checkbox>
                           </div>
                         ) : assembly.allowOnlineVoting ? (
-                          "غیرحضوری"
+                          "فعال"
                         ) : (
-                          "حضوری"
+                          "غیرفعال"
                         )}
                       </Table.Cell>
                       <Table.Cell className={cellClassName}>

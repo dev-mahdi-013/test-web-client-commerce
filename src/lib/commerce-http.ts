@@ -74,7 +74,7 @@ const messages: Record<string, string> = {
   "member not found": "عضو پیدا نشد",
   "this user card has expired": "کارت این کاربر منقضی شده است",
   // In-person polls (allowOnlineVoting = false) reject member-side voting.
-  "this poll will be held in person": "این مجمع حضوری برگزار می‌شود و رأی آنلاین برای آن فعال نیست",
+  "this poll will be held in person": "این مجمع حضوری برگزار می‌شود و رأی از طریق پنل کاربری برای آن فعال نیست",
 };
 
 function translateCommerceMessage(message: string) {

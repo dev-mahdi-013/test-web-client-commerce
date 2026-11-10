@@ -42,7 +42,7 @@ export function ListSectionHeader({
           <Button
             isIconOnly
             aria-expanded={showCompactSearch}
-            aria-label="جست و جو"
+            aria-label="جستجو"
             className="size-9 min-w-9 self-center rounded-full bg-white lg:hidden"
             variant="ghost"
             onPress={() => setSearchOpen((open) => !open)}

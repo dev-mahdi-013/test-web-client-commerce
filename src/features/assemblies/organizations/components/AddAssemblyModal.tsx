@@ -83,11 +83,11 @@ export function AddAssemblyModal({ isOpen, onOpenChange }: AddAssemblyModalProps
                   onChange={form.setAllowOnlineVoting}
                 >
                   <Checkbox.Content className="!flex !flex-row flex-1 items-center justify-between gap-2 !text-right">
-                    <Checkbox.Control className="!rounded-[4px]">
+                    <Checkbox.Control className="bg-background-secondary">
                       <Checkbox.Indicator />
                     </Checkbox.Control>
                     <Label className="cursor-pointer text-sm text-foreground" dir="rtl">
-                      اجازه رأی‌گیری آنلاین
+                      اجازه رأی‌دادن از پنل کاربری
                     </Label>
                   </Checkbox.Content>
                 </Checkbox>

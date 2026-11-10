@@ -134,7 +134,7 @@ export function IssueSlipModal({
         <Modal.Dialog className="w-full max-w-[calc(100vw-2rem)] rounded-[28px] p-6 sm:max-w-[620px]">
           <Modal.CloseTrigger className="start-auto end-5 top-5" />
           <Modal.Header>
-            <Modal.Heading className="text-lg font-bold">جست و جوی کاربر</Modal.Heading>
+            <Modal.Heading className="text-lg font-bold">جستجوی کاربر</Modal.Heading>
           </Modal.Header>
 
           <Modal.Body className="mt-3 flex flex-col gap-3 py-2">
